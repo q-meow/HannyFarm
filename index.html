@@ -2,311 +2,302 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paimon's Shop 🌟 - รับฟาร์มและบริการเติมเกม</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Mitr:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paimon Dashboard - Task Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            /* Paimon & Genshin Color Palette */
-            --paimon-white: #fdfaf1;
+            --primary-pink: #ffe4e9;
+            --accent-pink: #ffb6c1;
             --paimon-gold: #f4d03f;
-            --paimon-blue: #3d5afe;
-            --bg-main: #0c0f1d; 
-            --bg-card: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(244, 208, 63, 0.3);
-            --text-muted: #a0a8c3;
+            --text-dark: #5d576b;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --card-shadow: 0 8px 32px rgba(255, 182, 193, 0.2);
         }
 
-        html { scroll-behavior: smooth; }
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Kanit', sans-serif;
-            background: var(--bg-main);
-            color: #fff;
-            background-image: radial-gradient(circle at 50% 50%, #161b33 0%, #0c0f1d 100%);
-            overflow-x: hidden;
-            padding-bottom: 110px;
         }
 
-        /* Particles / Stars Background */
-        #pts { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-        .pt { position: absolute; animation: ptUp linear infinite; opacity: 0; }
-        @keyframes ptUp {
-            0%   { transform: translateY(105vh); opacity: 0; }
-            10%  { opacity: 0.6; }
-            90%  { opacity: 0.6; }
-            100% { transform: translateY(-8vh) rotate(360deg); opacity: 0; }
+        body {
+            background-color: #fff5f7; /* ชมพูอ่อนมาก */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 228, 233, 0.5) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(244, 208, 63, 0.1) 0px, transparent 50%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        /* --- HERO SECTION --- */
-        .hero {
-            background: linear-gradient(180deg, rgba(244, 208, 63, 0.1) 0%, rgba(12, 15, 29, 0) 100%);
-            padding: 60px 20px 70px;
-            text-align: center;
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* --- Header Section --- */
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid white;
+            box-shadow: var(--card-shadow);
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--accent-pink);
+            border: 2px solid white;
+        }
+
+        .status-badge {
+            background: #e0f9f1;
+            color: #27ae60;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .dot { width: 8px; height: 8px; background: #27ae60; border-radius: 50%; }
+
+        /* --- Banner Section --- */
+        .banner {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #ffc0cb, #ffe4e9);
+            border-radius: 25px;
+            border: 4px solid white;
+            overflow: hidden;
             position: relative;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 40px;
-        }
-        .hero-title {
-            font-family: 'Mitr', sans-serif;
-            font-size: 36px; font-weight: 700; color: var(--paimon-gold);
-            margin-bottom: 8px; letter-spacing: 1px;
-            text-shadow: 0 0 20px rgba(244, 208, 63, 0.4);
-        }
-        .hero-sub { font-size: 14px; color: var(--paimon-white); opacity: 0.8; }
-
-        /* Segmented Tab Control */
-        .tab-container {
-            position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
-            display: flex; background: #1a1c2c;
-            border: 1.5px solid var(--paimon-gold);
-            border-radius: 15px; padding: 5px; width: 280px; z-index: 10;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-        }
-        .tab-btn {
-            flex: 1; padding: 10px 0; border-radius: 10px; border: none;
-            font-family: inherit; font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: 0.3s; background: transparent; color: var(--text-muted);
-        }
-        .tab-btn.active { background: var(--paimon-gold); color: #000; }
-
-        /* --- CONTENT --- */
-        .content { max-width: 600px; margin: 0 auto; padding: 0 20px 50px; position: relative; z-index: 5; }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            box-shadow: var(--card-shadow);
         }
 
-        /* Info Card */
-        .info-card {
-            background: var(--bg-card); backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color); border-radius: 20px; padding: 30px 24px;
-        }
-        .info-row {
-            display: flex; justify-content: space-between; padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px;
-        }
-        .info-row span:first-child { color: var(--paimon-gold); font-weight: 600; }
-
-        /* Product Grid */
-        .sh { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; }
-        .sh-line { width: 4px; height: 24px; background: var(--paimon-gold); border-radius: 4px; }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .item-card {
-            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px; padding: 16px; position: relative; cursor: pointer;
-            transition: 0.2s; display: flex; flex-direction: column; backdrop-filter: blur(5px);
-        }
-        .item-card.selected { border-color: var(--paimon-gold); background: rgba(244, 208, 63, 0.05); }
-
-        .check-circle {
-            position: absolute; top: 12px; right: 12px; width: 20px; height: 20px;
-            border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2);
-        }
-        .item-card.selected .check-circle { background: var(--paimon-gold); border-color: var(--paimon-gold); }
-        
-        .card-icon { font-size: 28px; margin-bottom: 10px; }
-        .card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #fff; }
-        .card-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; flex-grow: 1; }
-        .card-price {
-            align-self: flex-start; background: rgba(244, 208, 63, 0.15);
-            color: var(--paimon-gold); font-weight: 700; font-size: 13px;
-            padding: 4px 10px; border-radius: 6px;
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
         }
 
-        .cat-divider { grid-column: 1 / -1; margin: 15px 0 5px; display: flex; align-items: center; gap: 10px; }
-        .cat-divider span { font-size: 13px; font-weight: 700; color: var(--paimon-gold); opacity: 0.9; }
-        .cat-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--paimon-gold), transparent); opacity: 0.3; }
-
-        /* --- BOTTOM BAR --- */
-        .bottom-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(26, 28, 44, 0.95); backdrop-filter: blur(15px);
-            border-top: 2px solid var(--paimon-gold); padding: 18px 24px;
-            display: flex; justify-content: space-between; align-items: center;
-            transform: translateY(100%); transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            z-index: 1000;
-        }
-        .bottom-bar.active { transform: translateY(0); }
-        .bb-total { font-size: 22px; font-weight: 700; }
-        .bb-total span { color: var(--paimon-gold); margin-right: 4px; }
-        .bb-btn {
-            background: var(--paimon-gold); color: #000; border: none; border-radius: 25px;
-            padding: 12px 28px; font-size: 16px; font-weight: 700; font-family: inherit;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(244, 208, 63, 0.3);
+        /* --- Stats Cards --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
-        /* --- MODAL --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 2000; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.3s;
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
         }
-        .modal-overlay.show { opacity: 1; pointer-events: all; }
-        .modal-box {
-            background: #1a1c2c; border: 2px solid var(--paimon-gold);
-            border-radius: 20px; width: 90%; max-width: 400px; padding: 25px;
+
+        .stat-card h3 {
+            font-size: 32px;
+            color: var(--accent-pink);
         }
-        .modal-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
-        .modal-btn {
-            background: #2ecc71; color: #fff; border: none; width: 100%;
-            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer;
+
+        .stat-card p {
+            font-size: 12px;
+            color: #b5b5b5;
         }
+
+        /* --- Task List Section --- */
+        .task-filter {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .search-bar {
+            flex: 1;
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: var(--card-shadow);
+            outline: none;
+        }
+
+        .task-card {
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            border: 1px solid rgba(255, 182, 193, 0.1);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            background: #fff0f3;
+            color: #ff4d6d;
+        }
+
+        .urgent { background: #ff4d6d; color: white; }
+
+        .date-box {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .date-box span { display: block; font-size: 14px; font-weight: 600; }
+        .date-box small { font-size: 10px; color: #999; }
+
+        /* --- Floating Menu --- */
+        .floating-menu {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 10px 30px;
+            border-radius: 50px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 0 10px 40px rgba(255, 182, 193, 0.4);
+            border: 1px solid white;
+            z-index: 100;
+        }
+
+        .menu-item {
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .menu-item:hover { color: var(--accent-pink); }
+
+        .add-btn {
+            background: var(--accent-pink);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-top: -5px;
+        }
+
     </style>
 </head>
 <body>
 
-<div id="pts"></div>
+    <div class="container">
+        <div class="header-nav">
+            <div class="profile-info">
+                <div class="avatar"></div>
+                <span style="font-weight: 600;">Paimon Shop</span>
+            </div>
+            <div class="status-badge">
+                <div class="dot"></div> Queue Open
+            </div>
+        </div>
 
-<div class="hero">
-    <div class="hero-title">PAIMON SHOP 🌟</div>
-    <div class="hero-sub">"ไม่ได้เป็นอาหารฉุกเฉินนะ! รับอะไรดีคะนักเดินทาง?"</div>
-    
-    <div class="tab-container">
-        <button class="tab-btn" id="btn-info" onclick="switchTab('info')">ข้อมูลร้าน</button>
-        <button class="tab-btn active" id="btn-products" onclick="switchTab('products')">เลือกสินค้า</button>
-    </div>
-</div>
+        <div class="banner">
+            <div style="padding: 20px; color: white; position: relative; z-index: 2;">
+                <h2 style="text-shadow: 0 2px 10px rgba(0,0,0,0.1);">Welcome Traveler!</h2>
+                <p style="font-size: 12px; opacity: 0.9;">"อาหารฉุกเฉินพร้อมช่วยจัดการงานแล้ว!"</p>
+            </div>
+        </div>
 
-<div class="content">
-    <div id="tab-info" class="tab-content">
-        <div class="info-card">
-            <div class="info-row"><span>Line ID</span><span>@997pfoig</span></div>
-            <div class="info-row"><span>Facebook</span><span>Wanderer Shop</span></div>
-            <div class="info-row"><span>เวลาทำการ</span><span>11:00 - 00:00 น.</span></div>
-            <div class="info-row"><span>การรับประกัน</span><span>ดูแลไวภายใน 24 ชม.</span></div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p>Total Tasks</p>
+                <h3>03</h3>
+                <p>2 waiting</p>
+            </div>
+            <div class="stat-card">
+                <p>Currently Queued</p>
+                <h3>02</h3>
+                <p>Being served</p>
+            </div>
+        </div>
+
+        <div class="task-filter">
+            <input type="text" class="search-bar" placeholder="Search tasks...">
+        </div>
+
+        <div class="task-card">
+            <div class="task-header">
+                <span style="font-weight: 600;">✨ ฟาร์ม Primogems</span>
+                <span class="tag urgent">🔥 Urgent</span>
+            </div>
+            <p style="font-size: 13px; color: #888;">Design & Farm</p>
+            <p style="font-size: 14px; margin-top: 5px;">Traveler Name: Lumine</p>
+            
+            <div class="date-box">
+                <small>DATE</small>
+                <span>30 MAR</span>
+                <small>2026</small>
+            </div>
+
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <span class="tag" style="background: #e0f9f1; color: #27ae60;">ชำระเงินแล้ว</span>
+            </div>
+        </div>
+
+        <div class="task-card">
+            <div class="task-header">
+                <span style="font-weight: 600;">📦 จัดการคลังสินค้า</span>
+                <span class="tag">Normal</span>
+            </div>
+            <p style="font-size: 13px; color: #888;">Management</p>
+            
+            <div class="date-box">
+                <small>DATE</small>
+                <span>05 APR</span>
+                <small>2026</small>
+            </div>
         </div>
     </div>
 
-    <div id="tab-products" class="tab-content active">
-        <div class="sh"><div class="sh-line"></div><h2>รายการสินค้า</h2></div>
-        <div class="grid-container" id="productGrid"></div>
+    <div class="floating-menu">
+        <div class="menu-item">🏠</div>
+        <div class="add-btn">+</div>
+        <div class="menu-item">⚙️</div>
     </div>
-</div>
 
-<div class="bottom-bar" id="bottomBar">
-    <div class="bb-info">
-        <div style="font-size: 12px; color: var(--text-muted);" id="cartCount">เลือก 0 รายการ</div>
-        <div class="bb-total"><span>฿</span><span id="cartTotal">0</span></div>
-    </div>
-    <button class="bb-btn" onclick="openSummary()">สั่งซื้อเลย ✨</button>
-</div>
-
-<div class="modal-overlay" id="summaryModal">
-    <div class="modal-box">
-        <h3 style="margin-bottom: 20px; color: var(--paimon-gold);">🛒 สรุปรายการสั่งซื้อ</h3>
-        <div id="modalItemsList" style="margin-bottom: 20px;"></div>
-        <div style="border-top: 1px dashed var(--paimon-gold); padding-top: 15px; margin-bottom: 25px; display: flex; justify-content: space-between;">
-            <strong>ยอดรวม:</strong>
-            <strong style="color: var(--paimon-gold); font-size: 20px;">฿<span id="modalTotalPrice">0</span></strong>
-        </div>
-        <button class="modal-btn" onclick="checkout()">💬 สั่งผ่าน LINE</button>
-        <p onclick="closeSummary()" style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--text-muted); cursor: pointer;">ยกเลิก</p>
-    </div>
-</div>
-
-<script>
-    // --- PRODUCT DATA ---
-    const products = [
-        { id: 'p1', cat: 'Genshin Impact', name: 'รายวัน 7 วัน', desc: 'คอมมิชชั่น + เรซิน', price: 150, icon: '⭐' },
-        { id: 'p2', cat: 'Genshin Impact', name: 'สำรวจแมพใหม่ 100%', desc: 'เก็บกล่องครบทุกใบ', price: 450, icon: '🗺️' },
-        { id: 'n1', cat: 'Streaming', name: 'Netflix 4K (30 วัน)', desc: 'จอส่วนตัว ไม่ชน', price: 140, icon: '🍿' },
-        { id: 'd1', cat: 'Streaming', name: 'Disney+ (30 วัน)', desc: 'หาร 4 ไม่ชน', price: 125, icon: '🏰' }
-    ];
-
-    let cart = [];
-
-    // Render Stars
-    const P = document.getElementById('pts');
-    ['✦','✨','✧'].forEach(e => {
-        for (let j = 0; j < 5; j++) {
-            const d = document.createElement('div');
-            d.className = 'pt'; d.textContent = e;
-            d.style.cssText = `left:${Math.random()*100}vw;font-size:${10+Math.random()*10}px;color:${Math.random() > 0.5 ? '#f4d03f' : '#fff'};animation-duration:${10+Math.random()*15}s;animation-delay:${-Math.random()*20}s;`;
-            P.appendChild(d);
-        }
-    });
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(`btn-${tabId}`).classList.add('active');
-        document.getElementById(`tab-${tabId}`).classList.add('active');
-    }
-
-    function renderProducts() {
-        const grid = document.getElementById('productGrid');
-        let currentCat = '';
-        let html = '';
-        products.forEach(p => {
-            if (p.cat !== currentCat) {
-                html += `<div class="cat-divider"><span>${p.cat}</span></div>`;
-                currentCat = p.cat;
-            }
-            html += `
-                <div class="item-card" id="card-${p.id}" onclick="toggleItem('${p.id}')">
-                    <div class="check-circle"></div>
-                    <div class="card-icon">${p.icon}</div>
-                    <div class="card-title">${p.name}</div>
-                    <div class="card-desc">${p.desc}</div>
-                    <div class="card-price">฿${p.price}</div>
-                </div>`;
-        });
-        grid.innerHTML = html;
-    }
-
-    function toggleItem(id) {
-        const card = document.getElementById(`card-${id}`);
-        const product = products.find(p => p.id === id);
-        const index = cart.findIndex(item => item.id === id);
-        if (index > -1) {
-            cart.splice(index, 1);
-            card.classList.remove('selected');
-        } else {
-            cart.push(product);
-            card.classList.add('selected');
-        }
-        const bar = document.getElementById('bottomBar');
-        if (cart.length > 0) {
-            bar.classList.add('active');
-            document.getElementById('cartCount').innerText = `เลือก ${cart.length} รายการ`;
-            document.getElementById('cartTotal').innerText = cart.reduce((s, i) => s + i.price, 0);
-        } else { bar.classList.remove('active'); }
-    }
-
-    function openSummary() {
-        const listEl = document.getElementById('modalItemsList');
-        let html = ''; let total = 0;
-        cart.forEach(item => {
-            html += `<div class="modal-item"><span>${item.name}</span><span>฿${item.price}</span></div>`;
-            total += item.price;
-        });
-        listEl.innerHTML = html;
-        document.getElementById('modalTotalPrice').innerText = total;
-        document.getElementById('summaryModal').classList.add('show');
-    }
-
-    function closeSummary() { document.getElementById('summaryModal').classList.remove('show'); }
-
-    function checkout() {
-        let total = cart.reduce((s, i) => s + i.price, 0);
-        let text = "🌟 สรุปรายการสั่งซื้อจาก Paimon Shop\n\n";
-        cart.forEach(i => text += `- ${i.cat}: ${i.name} (${i.price}.-)\n`);
-        text += `\n💰 ยอดรวมทั้งหมด: ${total} บาท\n\nกรุณารอแอดมินยืนยันออเดอร์นะคะ`;
-        
-        const temp = document.createElement("textarea");
-        temp.value = text; document.body.appendChild(temp);
-        temp.select(); document.execCommand("copy");
-        document.body.removeChild(temp);
-        
-        window.location.href = "https://lin.ee/Vt7DR6S"; // เปลี่ยนเป็นลิงก์ Line ของคุณ
-    }
-
-    renderProducts();
-</script>
 </body>
 </html>
