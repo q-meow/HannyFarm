@@ -1,64 +1,433 @@
 <!DOCTYPE html>
-
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teyvat Odyssey - Narrative Overlay</title>
-    <link rel="stylesheet" href="style-v2.css">
+    <title>Genshin Primogem Services - รับฟาร์มเจมราคาถูก ปลอดภัย 100%</title>
+    <style>
+        /* --- CSS Reset & Core Styles --- */
+        :root {
+            --bg-color: #050a14;
+            --primary-light: #4cddd3;
+            --primary-dark: #007bff;
+            --accent-gold: #f4d03f;
+            --text-main: #ffffff;
+            --text-muted: #a0aab5;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* ฉากหลังลายดาวจางๆ */
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* --- Global Components --- */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            border-color: #fff;
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- Navigation --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 10, 20, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-light);
+            letter-spacing: 1px;
+        }
+
+        .logo span { color: var(--accent-gold); }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a:hover { color: var(--primary-light); }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding-top: 80px; /* offset for nav */
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .hero-content h1 span.highlight {
+            background: linear-gradient(135deg, var(--accent-gold), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* เอฟเฟกต์แสงด้านหลัง */
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--primary-dark);
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        /* --- Services/Pricing Section --- */
+        .services { padding: 100px 0; }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .price-card {
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-light);
+        }
+
+        .price-card.featured {
+            border: 2px solid var(--accent-gold);
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--accent-gold);
+            color: #000;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .price-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .price-card .price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+        }
+
+        .price-card .price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .price-features {
+            margin-bottom: 30px;
+            color: var(--text-muted);
+            text-align: left;
+            display: inline-block;
+        }
+
+        .price-features li {
+            margin-bottom: 10px;
+        }
+
+        .price-features li::before {
+            content: '✦';
+            color: var(--primary-light);
+            margin-right: 10px;
+        }
+
+        /* --- Process/Why Us Section --- */
+        .process {
+            padding: 100px 0;
+            background: rgba(255,255,255,0.01);
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .process-item {
+            text-align: center;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            font-size: 2rem;
+            color: var(--primary-light);
+            border: 1px solid var(--glass-border);
+        }
+
+        .process-item h4 { margin-bottom: 10px; font-size: 1.25rem; }
+        .process-item p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* --- Footer --- */
+        footer {
+            padding: 50px 0;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer .logo { margin-bottom: 20px; display: inline-block; }
+
+        /* --- Responsive Media Queries --- */
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .hero-content p { font-size: 1rem; }
+            .section-title { font-size: 2rem; }
+            .nav-links { display: none; } /* ซ่อนเมนูบนมือถือเพื่อความง่าย */
+        }
+    </style>
 </head>
 <body>
-    <div class="background-overlay"></div>
 
-    <main class="content-v2">
-        <div class="background-image-glass" style="grid-area: bg;">
-            </div>
-
-        <div class="glass-panel main-display" style="grid-area: main;">
-            <nav class="inline-nav">
-                <ul>
-                    <li><a href="#">หน้าแรก</a></li>
-                    <li><a href="#">คู่มือ</a></li>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">GENSHIN<span>GEMS</span></div>
+                <ul class="nav-links">
+                    <li><a href="#hero">หน้าแรก</a></li>
+                    <li><a href="#services">ราคา/บริการ</a></li>
+                    <li><a href="#process">ขั้นตอน</a></li>
+                    <li><a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" class="btn-contact-nav">ติดต่อเรา</a></li>
                 </ul>
             </nav>
-            <h1>สำรวจมหากาพย์ TEYVAT</h1>
-            <p>คู่มือสู่การผจญภัยระดับคอสมิกกับไพมอน</p>
-            <button class="glass-btn btn-crystal">เริ่มการผจญภัย</button>
         </div>
+    </header>
 
-        <div class="mirror-card star-control" style="grid-area: map;">
-            <div class="control-header">เลือกภูมิภาค</div>
+    <section id="hero" class="hero">
+        <div class="container hero-content">
+            <h1>รับฟาร์มเจม <span class="highlight">Genshin Impact</span><br>ราคาถูก ปลอดภัย มืออาชีพ</h1>
+            <p>ประหยัดเวลาการเล่นของคุณ ให้เราดูแลไอดี ทีมงานมืออาชีพ ฟาร์มไว ได้เจมครบตามกำหนด การันตีความปลอดภัย 100%</p>
+            <div class="hero-btns">
+                <a href="#services" class="btn btn-primary">ดูแพ็คเกจราคา</a>
+                <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" class="btn btn-secondary">สอบถามเพิ่มเติม</a>
             </div>
-    </main>
+        </div>
+    </section>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">แพ็คเกจฟาร์มเจมยอดนิยม</h2>
+            <div class="price-grid">
+                
+                <div class="glass-card price-card">
+                    <h3>สายชิลล์รายสัปดาห์</h3>
+                    <div class="price">฿299 <span>/ สัปดาห์</span></div>
+                    <ul class="price-features">
+                        <li>เคลียร์เควสรายวันครบ 7 วัน</li>
+                        <li>เคลียร์เรซินรายวัน (ไม่ดอง)</li>
+                        <li>เคลียร์กิจกรรมจำกัดเวลา (Event)</li>
+                        <li>ประมาณ 420+ Primogems</li>
+                    </ul>
+                    <a href="https://line.me/ti/p/~YOUR_LINE_ID?text=สนใจแพ็คเกจสายชิลล์" target="_blank" class="btn btn-primary">สั่งซื้อเลย</a>
+                </div>
+
+                <div class="glass-card price-card featured">
+                    <div class="badge">คุ้มสุด!</div>
+                    <h3>แพ็คเกจเริ่มต้น</h3>
+                    <div class="price">฿990</div>
+                    <ul class="price-features">
+                        <li>ฟาร์มเนื้อเรื่องหลัก (Archon Quest)</li>
+                        <li>เปิดแมพ + เคลียร์เสาเทพเจ้า</li>
+                        <li>ฟาร์มกล่องสมบัติพื้นฐาน</li>
+                        <li>การันตี 1600+ Primogems</li>
+                    </ul>
+                    <a href="https://line.me/ti/p/~YOUR_LINE_ID?text=สนใจแพ็คเกจเริ่มต้น" target="_blank" class="btn btn-primary">สั่งซื้อเลย</a>
+                </div>
+
+                <div class="glass-card price-card">
+                    <h3>แพ็คเกจนักสำรวจ</h3>
+                    <div class="price">฿1,890</div>
+                    <ul class="price-features">
+                        <li>สำรวจแมพใหม่ 100% (เลือกเมืองได้)</li>
+                        <li>เก็บกล่องสมบัติครบ</li>
+                        <li>ทำความสำเร็จ (Achievement)</li>
+                        <li>การันตี 3200+ Primogems</li>
+                    </ul>
+                    <a href="https://line.me/ti/p/~YOUR_LINE_ID?text=สนใจแพ็คเกจนักสำรวจ" target="_blank" class="btn btn-primary">สั่งซื้อเลย</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="process" class="process">
+        <div class="container">
+            <h2 class="section-title">ขั้นตอนการให้บริการ</h2>
+            <div class="process-grid">
+                
+                <div class="process-item">
+                    <div class="icon-box">💬</div>
+                    <h4>1. ติดต่อสอบถาม</h4>
+                    <p>ทักแชท Line แจ้งแพ็คเกจที่คุณต้องการ หรือสอบถามรายละเอียดเพิ่มเติม</p>
+                </div>
+
+                <div class="process-item">
+                    <div class="icon-box">💳</div>
+                    <h4>2. ชำระเงิน</h4>
+                    <p>ชำระเงินผ่านช่องทางที่กำหนด (Banking/TrueWallet) เพื่อยืนยันออเดอร์</p>
+                </div>
+
+                <div class="process-item">
+                    <div class="icon-box">🔑</div>
+                    <h4>3. ส่งมอบไอดี</h4>
+                    <p>ส่ง ID/Password พร้อมรหัส OTP (หากมี) ทีมงานจะเริ่มฟาร์มทันที</p>
+                </div>
+
+                <div class="process-item">
+                    <div class="icon-box">✅</div>
+                    <h4>4. ตรวจสอบและส่งงาน</h4>
+                    <p>ทีมงานแจ้งเมื่อฟาร์มเสร็จสิ้น ลูกค้าตรวจสอบความเรียบร้อยก่อนรับไอดีคืน</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="logo">GENSHIN<span>GEMS</span></div>
+            <p>บริการรับฟาร์มเจม Genshin Impact โดยทีมงานมืออาชีพ ปลอดภัย ไร้กังวล</p>
+            <p style="margin-top: 10px;">ติดต่อเราได้ที่ LINE ID: <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" style="color:var(--accent-gold);">@YOUR_LINE_ID</a></p>
+            <p style="margin-top: 30px; font-size: 0.8rem;">&copy; 2024 GenshinGems Service. All rights reserved. This site is not affiliated with HoYoverse.</p>
+        </div>
+    </footer>
+
 </body>
 </html>
-
-
-/* การจัดวาง: CSS Grid หรือ Flexbox แบบลอย */
-.content-v2 {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* การจัดลำดับเลเยอร์ (z-index) */
-.background-image-glass {
-    position: absolute;
-    z-index: 1;
-    opacity: 0.7; /* ดูขลังขึ้น */
-}
-
-.main-display, .star-control {
-    position: relative;
-    z-index: 2; /* ลอยอยู่ด้านหน้า */
-}
-
-/* แผงควบคุมกลุ่มดาวด้านล่าง */
-.star-control {
-    width: 90%;
-    margin-bottom: 20px;
-    background: rgba(10, 15, 25, 0.6);
-}
-
