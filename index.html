@@ -1,34 +1,5 @@
 <!DOCTYPE html>
 
-/* การจัดวาง: CSS Grid หรือ Flexbox แบบลอย */
-.content-v2 {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* การจัดลำดับเลเยอร์ (z-index) */
-.background-image-glass {
-    position: absolute;
-    z-index: 1;
-    opacity: 0.7; /* ดูขลังขึ้น */
-}
-
-.main-display, .star-control {
-    position: relative;
-    z-index: 2; /* ลอยอยู่ด้านหน้า */
-}
-
-/* แผงควบคุมกลุ่มดาวด้านล่าง */
-.star-control {
-    width: 90%;
-    margin-bottom: 20px;
-    background: rgba(10, 15, 25, 0.6);
-}
-
-
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -61,3 +32,33 @@
     </main>
 </body>
 </html>
+
+
+/* การจัดวาง: CSS Grid หรือ Flexbox แบบลอย */
+.content-v2 {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* การจัดลำดับเลเยอร์ (z-index) */
+.background-image-glass {
+    position: absolute;
+    z-index: 1;
+    opacity: 0.7; /* ดูขลังขึ้น */
+}
+
+.main-display, .star-control {
+    position: relative;
+    z-index: 2; /* ลอยอยู่ด้านหน้า */
+}
+
+/* แผงควบคุมกลุ่มดาวด้านล่าง */
+.star-control {
+    width: 90%;
+    margin-bottom: 20px;
+    background: rgba(10, 15, 25, 0.6);
+}
+
