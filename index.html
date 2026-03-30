@@ -2,302 +2,421 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paimon Dashboard - Task Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ASTRAL TERMINAL: Paimon Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         :root {
-            --primary-pink: #ffe4e9;
-            --accent-pink: #ffb6c1;
-            --paimon-gold: #f4d03f;
-            --text-dark: #5d576b;
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --card-shadow: 0 8px 32px rgba(255, 182, 193, 0.2);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Kanit', sans-serif;
+            --bg-deep: #050714;
+            --neon-gold: #FFD700;
+            --neon-blue: #00E5FF;
+            --glass-bg: rgba(15, 20, 40, 0.4);
+            --glass-border: rgba(0, 229, 255, 0.2);
+            --text-main: #E2E8F0;
+            --text-muted: #828CA1;
         }
 
         body {
-            background-color: #fff5f7; /* ชมพูอ่อนมาก */
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            padding-bottom: 120px;
+            /* พื้นหลังแบบตารางโฮโลแกรม */
             background-image: 
-                radial-gradient(at 0% 0%, rgba(255, 228, 233, 0.5) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(244, 208, 63, 0.1) 0px, transparent 50%);
-            color: var(--text-dark);
-            min-height: 100vh;
-            padding: 20px;
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
         }
 
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        /* ฟอนต์ตัวเลขแบบเท่ๆ */
+        .num-font { font-family: 'Rajdhani', sans-serif; }
 
-        /* --- Header Section --- */
-        .header-nav {
+        /* อนิเมชั่นแสงวิบวับเบื้องหลัง */
+        .ambient-light {
+            position: fixed; top: -20%; left: -10%; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(0,229,255,0.15) 0%, transparent 70%);
+            border-radius: 50%; filter: blur(40px); z-index: -1;
+            animation: pulse 6s infinite alternate;
+        }
+        .ambient-light-2 {
+            position: fixed; bottom: 10%; right: -10%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            border-radius: 50%; filter: blur(50px); z-index: -1;
+            animation: pulse 8s infinite alternate-reverse;
+        }
+        @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.2); } }
+
+        /* --- HEADER & HUD --- */
+        .hud-header {
+            padding: 40px 20px 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-end;
+            position: relative;
+        }
+        .hud-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 28px; font-weight: 700;
+            color: var(--neon-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            line-height: 1;
+        }
+        .hud-subtitle { font-size: 12px; color: var(--neon-blue); letter-spacing: 1px; margin-top: 5px; }
+        
+        /* สเตตัสจำลองมุมขวาบน */
+        .sys-status {
+            text-align: right; font-size: 10px; color: var(--text-muted);
+            font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+        }
+        .sys-status span { color: #00E5FF; text-shadow: 0 0 5px rgba(0,229,255,0.5); }
+
+        /* --- CATEGORY PILLS (Horizontal Scroll) --- */
+        .cat-scroll {
+            display: flex; gap: 10px; padding: 0 20px 20px;
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-pill {
             background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px; border-radius: 20px;
+            font-size: 13px; font-weight: 500; color: var(--text-muted);
+            white-space: nowrap; cursor: pointer; transition: 0.3s;
             backdrop-filter: blur(10px);
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: 1px solid white;
-            box-shadow: var(--card-shadow);
+        }
+        .cat-pill.active {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
         }
 
-        .profile-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: var(--accent-pink);
-            border: 2px solid white;
-        }
-
-        .status-badge {
-            background: #e0f9f1;
-            color: #27ae60;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .dot { width: 8px; height: 8px; background: #27ae60; border-radius: 50%; }
-
-        /* --- Banner Section --- */
-        .banner {
-            width: 100%;
-            height: 150px;
-            background: linear-gradient(135deg, #ffc0cb, #ffe4e9);
-            border-radius: 25px;
-            border: 4px solid white;
-            overflow: hidden;
-            position: relative;
-            box-shadow: var(--card-shadow);
-        }
-
-        .banner-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.8;
-        }
-
-        /* --- Stats Cards --- */
-        .stats-grid {
+        /* --- PRODUCT GRID (Bento Box Style) --- */
+        .container { padding: 0 20px; }
+        .grid-bento {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            grid-auto-flow: dense; /* จัดเรียงช่องว่างอัตโนมัติ */
         }
 
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 25px;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-        }
-
-        .stat-card h3 {
-            font-size: 32px;
-            color: var(--accent-pink);
-        }
-
-        .stat-card p {
-            font-size: 12px;
-            color: #b5b5b5;
-        }
-
-        /* --- Task List Section --- */
-        .task-filter {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .search-bar {
-            flex: 1;
-            background: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: var(--card-shadow);
-            outline: none;
-        }
-
-        .task-card {
-            background: white;
-            padding: 20px;
-            border-radius: 25px;
-            box-shadow: var(--card-shadow);
-            position: relative;
-            border: 1px solid rgba(255, 182, 193, 0.1);
-        }
-
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .tag {
-            font-size: 10px;
-            padding: 3px 10px;
-            border-radius: 10px;
-            background: #fff0f3;
-            color: #ff4d6d;
-        }
-
-        .urgent { background: #ff4d6d; color: white; }
-
-        .date-box {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 15px;
-            text-align: center;
-            min-width: 80px;
-        }
-
-        .date-box span { display: block; font-size: 14px; font-weight: 600; }
-        .date-box small { font-size: 10px; color: #999; }
-
-        /* --- Floating Menu --- */
-        .floating-menu {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
+        /* การ์ดสไตล์ Sci-fi */
+        .cyber-card {
+            background: var(--glass-bg);
             backdrop-filter: blur(15px);
-            padding: 10px 30px;
-            border-radius: 50px;
-            display: flex;
-            gap: 30px;
-            box-shadow: 0 10px 40px rgba(255, 182, 193, 0.4);
-            border: 1px solid white;
-            z-index: 100;
-        }
-
-        .menu-item {
-            font-size: 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
             cursor: pointer;
-            transition: 0.3s;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column;
+        }
+        
+        /* ทำให้การ์ดใบแรกของหมวดหมู่ใหญ่กว่าเพื่อน (Span 2 คอลัมน์) */
+        .cyber-card.featured { grid-column: span 2; flex-direction: row; align-items: center; gap: 15px; }
+        .cyber-card.featured .card-icon { font-size: 40px; margin-bottom: 0; }
+        .cyber-card.featured .card-info { flex: 1; }
+
+        /* มุมตัดสไตล์ล้ำๆ (Clip-path ตัดมุมขวาบน) */
+        .cyber-card::before {
+            content: ''; position: absolute; top: 0; right: 0;
+            border-top: 20px solid rgba(255,255,255,0.05);
+            border-left: 20px solid transparent;
         }
 
-        .menu-item:hover { color: var(--accent-pink); }
-
-        .add-btn {
-            background: var(--accent-pink);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-top: -5px;
+        .cyber-card:active { transform: scale(0.96); }
+        .cyber-card.selected {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: var(--neon-gold);
+            box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.1), 0 0 15px rgba(255, 215, 0, 0.2);
         }
+
+        /* Checkbox โฮโลแกรม */
+        .cyber-check {
+            position: absolute; top: 10px; right: 10px;
+            width: 18px; height: 18px; border-radius: 3px;
+            border: 1px solid var(--text-muted);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .cyber-card.selected .cyber-check {
+            background: var(--neon-gold); border-color: var(--neon-gold);
+        }
+        .cyber-check::after {
+            content: ''; width: 6px; height: 10px;
+            border: solid #000; border-width: 0 2px 2px 0;
+            transform: rotate(45deg); opacity: 0;
+        }
+        .cyber-card.selected .cyber-check::after { opacity: 1; }
+
+        .card-icon { font-size: 30px; margin-bottom: 12px; }
+        .card-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .card-desc { font-size: 11px; color: var(--text-muted); flex-grow: 1; margin-bottom: 12px; }
+        .card-price {
+            align-self: flex-start;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px; font-weight: 700;
+            color: var(--neon-gold);
+            background: rgba(255, 215, 0, 0.1);
+            padding: 2px 10px; border-radius: 4px;
+            border-left: 2px solid var(--neon-gold);
+        }
+
+        /* --- FLOATING DOCK (แทนที่ Bottom Bar เดิม) --- */
+        .floating-dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150px);
+            background: rgba(5, 7, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 40px; padding: 10px 15px 10px 25px;
+            display: flex; align-items: center; gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(0, 229, 255, 0.2);
+            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000; width: 90%; max-width: 400px;
+        }
+        .floating-dock.active { transform: translateX(-50%) translateY(0); }
+        
+        .dock-info { flex: 1; }
+        .dock-count { font-size: 11px; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 1px; }
+        .dock-total { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: #fff; line-height: 1; }
+        
+        .dock-btn {
+            background: linear-gradient(135deg, var(--neon-gold), #FFA000);
+            color: #000; border: none; border-radius: 30px;
+            padding: 12px 24px; font-size: 15px; font-weight: 700;
+            cursor: pointer; font-family: 'Kanit', sans-serif;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        /* --- MODAL (Holographic Popup) --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: all; }
+        .modal-box {
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15), inset 0 0 20px rgba(0, 229, 255, 0.05);
+            border-radius: 16px; width: 90%; max-width: 380px; padding: 25px;
+            position: relative; overflow: hidden;
+            transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.show .modal-box { transform: scale(1); }
+        
+        /* สแกนไลน์จำลองใน Modal */
+        .modal-box::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,229,255,0.05) 50%);
+            background-size: 100% 4px; z-index: -1;
+        }
+
+        .modal-header { border-bottom: 1px dashed rgba(0,229,255,0.3); padding-bottom: 15px; margin-bottom: 15px; }
+        .modal-title { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; color: var(--neon-blue); }
+        .modal-items { max-height: 250px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--neon-blue) transparent; }
+        .modal-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; align-items: center;}
+        .modal-item span:last-child { font-family: 'Rajdhani', sans-serif; font-size: 16px; color: var(--neon-gold); font-weight: 600; }
+        
+        .modal-total { 
+            border-top: 1px dashed rgba(0,229,255,0.3); padding-top: 15px; margin-top: 15px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 16px;
+        }
+        .modal-total strong:last-child { font-family: 'Rajdhani', sans-serif; font-size: 24px; color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+
+        .modal-btn {
+            background: var(--neon-blue); color: #000; border: none; width: 100%;
+            padding: 15px; border-radius: 8px; font-weight: 700; font-size: 16px; margin-top: 20px;
+            cursor: pointer; box-shadow: 0 0 15px rgba(0,229,255,0.3); font-family: inherit;
+        }
+        .close-txt { text-align: center; margin-top: 15px; font-size: 12px; color: var(--text-muted); cursor: pointer; letter-spacing: 1px;}
 
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header-nav">
-            <div class="profile-info">
-                <div class="avatar"></div>
-                <span style="font-weight: 600;">Paimon Shop</span>
-            </div>
-            <div class="status-badge">
-                <div class="dot"></div> Queue Open
-            </div>
-        </div>
+<div class="ambient-light"></div>
+<div class="ambient-light-2"></div>
 
-        <div class="banner">
-            <div style="padding: 20px; color: white; position: relative; z-index: 2;">
-                <h2 style="text-shadow: 0 2px 10px rgba(0,0,0,0.1);">Welcome Traveler!</h2>
-                <p style="font-size: 12px; opacity: 0.9;">"อาหารฉุกเฉินพร้อมช่วยจัดการงานแล้ว!"</p>
-            </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <p>Total Tasks</p>
-                <h3>03</h3>
-                <p>2 waiting</p>
-            </div>
-            <div class="stat-card">
-                <p>Currently Queued</p>
-                <h3>02</h3>
-                <p>Being served</p>
-            </div>
-        </div>
-
-        <div class="task-filter">
-            <input type="text" class="search-bar" placeholder="Search tasks...">
-        </div>
-
-        <div class="task-card">
-            <div class="task-header">
-                <span style="font-weight: 600;">✨ ฟาร์ม Primogems</span>
-                <span class="tag urgent">🔥 Urgent</span>
-            </div>
-            <p style="font-size: 13px; color: #888;">Design & Farm</p>
-            <p style="font-size: 14px; margin-top: 5px;">Traveler Name: Lumine</p>
-            
-            <div class="date-box">
-                <small>DATE</small>
-                <span>30 MAR</span>
-                <small>2026</small>
-            </div>
-
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <span class="tag" style="background: #e0f9f1; color: #27ae60;">ชำระเงินแล้ว</span>
-            </div>
-        </div>
-
-        <div class="task-card">
-            <div class="task-header">
-                <span style="font-weight: 600;">📦 จัดการคลังสินค้า</span>
-                <span class="tag">Normal</span>
-            </div>
-            <p style="font-size: 13px; color: #888;">Management</p>
-            
-            <div class="date-box">
-                <small>DATE</small>
-                <span>05 APR</span>
-                <small>2026</small>
-            </div>
-        </div>
+<header class="hud-header">
+    <div>
+        <div class="hud-title">ASTRAL SHOP</div>
+        <div class="hud-subtitle">TERMINAL ONLINE // PAIMON_SYS</div>
     </div>
-
-    <div class="floating-menu">
-        <div class="menu-item">🏠</div>
-        <div class="add-btn">+</div>
-        <div class="menu-item">⚙️</div>
+    <div class="sys-status">
+        NETWORK: <span>STABLE</span><br>
+        UID: <span>GUEST_99</span>
     </div>
+</header>
 
+<div class="cat-scroll" id="catFilter">
+    <div class="cat-pill active" onclick="filterCat('all', this)">[ ALL_DATA ]</div>
+    <div class="cat-pill" onclick="filterCat('Genshin', this)">GENSHIN</div>
+    <div class="cat-pill" onclick="filterCat('Netflix', this)">NETFLIX</div>
+    <div class="cat-pill" onclick="filterCat('Disney', this)">DISNEY+</div>
+</div>
+
+<main class="container">
+    <div class="grid-bento" id="productGrid">
+        </div>
+</main>
+
+<div class="floating-dock" id="bottomBar">
+    <div class="dock-info">
+        <div class="dock-count" id="cartCount">0 ITEMS SELECTED</div>
+        <div class="dock-total">฿<span id="cartTotal">0</span></div>
+    </div>
+    <button class="dock-btn" onclick="openSummary()">
+        EXECUTE 
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </button>
+</div>
+
+<div class="modal-overlay" id="summaryModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">SYSTEM.CHECKOUT()</div>
+            <div style="font-size: 11px; color: var(--text-muted);">VERIFYING YOUR ORDER DATA...</div>
+        </div>
+        
+        <div class="modal-items" id="modalItemsList"></div>
+        
+        <div class="modal-total">
+            <strong>TOTAL_AMT:</strong>
+            <strong>฿<span id="modalTotalPrice">0</span></strong>
+        </div>
+        
+        <button class="modal-btn" onclick="checkout()">TRANSMIT TO LINE_APP</button>
+        <div class="close-txt" onclick="closeSummary()">[ ABORT_PROCESS ]</div>
+    </div>
+</div>
+
+<script>
+    // ข้อมูลสินค้า (จำลองให้ดูหลากหลายเพื่อจัด Bento Grid)
+    const products = [
+        { id: 'g1', cat: 'Genshin', name: 'แพ็คเกจรายวัน 7 วัน', desc: 'เคลียร์คอมมิชชั่น + ใช้เรซิน', price: 150, icon: '✨', featured: true },
+        { id: 'g2', cat: 'Genshin', name: 'สำรวจแมพ 100%', desc: 'เมือง Mondstadt', price: 300, icon: '🗺️', featured: false },
+        { id: 'g3', cat: 'Genshin', name: 'เก็บ Oculi ครบ', desc: 'ปลดเสาเทพเต็มระดับ', price: 250, icon: '🧿', featured: false },
+        { id: 'n1', cat: 'Netflix', name: 'Netflix 4K (30 วัน)', desc: 'จอส่วนตัว (ไม่ชน)', price: 140, icon: '🍿', featured: true },
+        { id: 'n2', cat: 'Netflix', name: 'Netflix 4K (7 วัน)', desc: 'จอส่วนตัว (ไม่ชน)', price: 45, icon: '📱', featured: false },
+        { id: 'd1', cat: 'Disney', name: 'Disney+ (30 วัน)', desc: 'หาร 4 (ดูได้ 1 จอ)', price: 125, icon: '🏰', featured: true },
+        { id: 'd2', cat: 'Disney', name: 'Disney+ (7 วัน)', desc: 'หาร 4', price: 40, icon: '🎬', featured: false },
+    ];
+
+    let cart = [];
+
+    // ฟังก์ชัน Filter หมวดหมู่
+    function filterCat(cat, element) {
+        // เปลี่ยนสถานะปุ่ม
+        document.querySelectorAll('.cat-pill').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        // Render ใหม่
+        renderProducts(cat);
+    }
+
+    // Render สินค้าแบบ Bento
+    function renderProducts(filter = 'all') {
+        const grid = document.getElementById('productGrid');
+        let html = '';
+        
+        const filtered = filter === 'all' ? products : products.filter(p => p.cat === filter);
+        
+        filtered.forEach(p => {
+            // ถ้าเป็น featured ให้ใส่ class เพิ่มเพื่อให้การ์ดกว้าง 2 ช่อง
+            const featClass = p.featured ? 'featured' : '';
+            const isSelected = cart.some(item => item.id === p.id) ? 'selected' : '';
+            
+            html += `
+                <div class="cyber-card ${featClass} ${isSelected}" id="card-${p.id}" onclick="toggleItem('${p.id}')">
+                    <div class="cyber-check"></div>
+                    <div class="card-icon">${p.icon}</div>
+                    <div class="card-info">
+                        <div class="card-title">${p.name}</div>
+                        <div class="card-desc">${p.desc}</div>
+                        <div class="card-price">฿${p.price}</div>
+                    </div>
+                </div>`;
+        });
+        grid.innerHTML = html;
+    }
+
+    // ระบบตะกร้าสินค้า
+    function toggleItem(id) {
+        const card = document.getElementById(`card-${id}`);
+        const product = products.find(p => p.id === id);
+        const index = cart.findIndex(item => item.id === id);
+        
+        if (index > -1) {
+            cart.splice(index, 1);
+            card.classList.remove('selected');
+        } else {
+            cart.push(product);
+            card.classList.add('selected');
+        }
+        updateDock();
+    }
+
+    function updateDock() {
+        const dock = document.getElementById('bottomBar');
+        if (cart.length > 0) {
+            dock.classList.add('active');
+            document.getElementById('cartCount').innerText = `DATA: ${cart.length} BLOCKS`;
+            document.getElementById('cartTotal').innerText = cart.reduce((sum, item) => sum + item.price, 0);
+        } else {
+            dock.classList.remove('active');
+        }
+    }
+
+    // ระบบ Modal ยืนยัน
+    function openSummary() {
+        const listEl = document.getElementById('modalItemsList');
+        let html = ''; let total = 0;
+        cart.forEach(item => {
+            html += `
+            <div class="modal-item">
+                <div style="flex:1">
+                    <div style="color:#fff">${item.name}</div>
+                    <div style="font-size:11px; color:var(--text-muted)">[${item.cat}] ${item.desc}</div>
+                </div>
+                <span>฿${item.price}</span>
+            </div>`;
+            total += item.price;
+        });
+        listEl.innerHTML = html;
+        document.getElementById('modalTotalPrice').innerText = total;
+        document.getElementById('summaryModal').classList.add('show');
+    }
+
+    function closeSummary() { document.getElementById('summaryModal').classList.remove('show'); }
+
+    // คัดลอกข้อความและไปที่ LINE
+    function checkout() {
+        let total = cart.reduce((sum, item) => sum + item.price, 0);
+        let text = "✨ ASTRAL TERMINAL ORDER ✨\n\n";
+        cart.forEach(i => text += `[${i.cat}] ${i.name}\n- ${i.desc} (฿${i.price})\n\n`);
+        text += `==================\n`;
+        text += `TOTAL: ฿${total}\n`;
+        text += `==================\n\nยืนยันคำสั่งซื้อครับ/ค่ะ`;
+        
+        const temp = document.createElement("textarea");
+        temp.value = text; document.body.appendChild(temp);
+        temp.select(); document.execCommand("copy");
+        document.body.removeChild(temp);
+        
+        // ใส่ลิงก์ LINE ของคุณตรงนี้
+        window.location.href = "https://lin.ee/Vt7DR6S"; 
+    }
+
+    // Initialize
+    renderProducts();
+</script>
 </body>
 </html>
