@@ -1,433 +1,597 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genshin Primogem Services - รับฟาร์มเจมราคาถูก ปลอดภัย 100%</title>
-    <style>
-        /* --- CSS Reset & Core Styles --- */
-        :root {
-            --bg-color: #050a14;
-            --primary-light: #4cddd3;
-            --primary-dark: #007bff;
-            --accent-gold: #f4d03f;
-            --text-main: #ffffff;
-            --text-muted: #a0aab5;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Wanderer Shop 🌌</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Mitr:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  /* โทนสี ฟ้า + ม่วง */
+  --primary: #b026ff; /* ม่วง */
+  --secondary: #00d2ff; /* ฟ้า */
+  --bg-main: #060513; /* พื้นหลังหน้าเว็บ */
+  --bg-card: #120e26; /* พื้นหลังการ์ด */
+  --border-color: rgba(176,38,255,0.25);
+  --text-muted: #8b8bba;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Kanit', sans-serif;
+  background: var(--bg-main); color: #fff;
+  overflow-x: hidden;
+  padding-bottom: 110px; /* เว้นที่ให้ตะกร้าล่างสุด */
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* Background Glow Effects */
+.bg-glow-1 {
+  position: fixed; top: -100px; left: -100px; width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(176,38,255,0.15) 0%, rgba(0,0,0,0) 70%);
+  z-index: -1; pointer-events: none;
+}
+.bg-glow-2 {
+  position: fixed; bottom: 20%; right: -150px; width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(0,210,255,0.1) 0%, rgba(0,0,0,0) 70%);
+  z-index: -1; pointer-events: none;
+}
 
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-            /* ฉากหลังลายดาวจางๆ */
-            background-image: 
-                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
-            background-size: 550px 550px, 350px 350px, 250px 250px;
-            background-position: 0 0, 40px 60px, 130px 270px;
-        }
+/* Particles */
+#pts { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.pt { position: absolute; animation: ptUp linear infinite; opacity: 0; }
+@keyframes ptUp {
+  0%   { transform: translateY(105vh); opacity: 0; }
+  8%   { opacity: 0.45; }
+  92%  { opacity: 0.45; }
+  100% { transform: translateY(-8vh) rotate(360deg); opacity: 0; }
+}
 
-        a { text-decoration: none; color: inherit; transition: 0.3s; }
-        ul { list-style: none; }
+/* --- HERO & TABS SECTION --- */
+.hero {
+  background: linear-gradient(135deg, rgba(176,38,255,0.2) 0%, rgba(0,210,255,0.1) 100%);
+  /* ปรับ Padding ให้ดันข้อความขึ้นไป และเว้นข้างล่างให้สมดุล */
+  padding: 40px 20px 55px; 
+  text-align: center;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 40px;
+  box-shadow: 0 4px 30px rgba(176,38,255,0.1);
+}
+.hero-title {
+  font-family: 'Mitr', sans-serif;
+  font-size: 32px; font-weight: 700; color: #fff; 
+  margin-bottom: 4px; letter-spacing: 0.5px;
+  text-shadow: 0 0 15px rgba(176,38,255,0.4);
+}
+.hero-sub {
+  font-size: 13px; color: rgba(255,255,255,0.85);
+}
 
-        /* --- Global Components --- */
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+/* แถบปุ่มสลับหน้าแบบแนวยาว เล็กกะทัดรัด (Segmented Control) */
+.tab-container {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  padding: 4px;
+  width: 260px; /* ความกว้างแนวยาว */
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.tab-btn {
+  flex: 1; /* แบ่งพื้นที่ปุ่มละ 50% */
+  padding: 8px 0; /* ปรับให้ปุ่มดูเตี้ยลง (เล็กขึ้น) */
+  border-radius: 25px;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--text-muted);
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(176,38,255,0.3);
+}
 
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
+/* --- CONTENT --- */
+.content { max-width: 600px; margin: 0 auto; padding: 0 20px 50px; position: relative; z-index: 5; }
+.tab-content { display: none; animation: fadeIn 0.3s ease; }
+.tab-content.active { display: block; }
 
-        .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
-        }
+/* --- INFO TAB --- */
+.info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 30px 24px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+.info-card-title {
+  font-size: 18px; font-weight: 700; color: var(--secondary); margin-bottom: 4px;
+}
+.info-card-sub {
+  font-size: 13px; color: var(--text-muted); margin-bottom: 24px;
+}
+.info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.1);
+  font-size: 14px;
+}
+.info-row:last-of-type { border-bottom: none; margin-bottom: 20px; }
+.info-row span:first-child { color: var(--primary); font-weight: 600; }
+.info-row span:last-child { color: #fff; font-weight: 500; }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.6);
-        }
+.review-placeholder {
+  border: 1.5px dashed rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.02);
+}
 
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--text-muted);
-            color: var(--text-muted);
-        }
+/* --- PRODUCTS TAB --- */
+.sh { 
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 0 5px;
+}
+.sh-line {
+  width: 4px; height: 22px;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 4px;
+}
+.sh h2 { font-size: 18px; font-weight: 700; color: #fff; }
 
-        .btn-secondary:hover {
-            border-color: #fff;
-            color: #fff;
-            background: rgba(255,255,255,0.05);
-        }
+.grid-container {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;
+}
+.item-card {
+  background: var(--bg-card); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 16px; position: relative;
+  cursor: pointer; transition: all 0.2s ease;
+  display: flex; flex-direction: column;
+}
+.item-card:active { transform: scale(0.96); }
+.item-card.selected {
+  border-color: var(--primary);
+  background: linear-gradient(145deg, rgba(176,38,255,0.1) 0%, var(--bg-card) 100%);
+  box-shadow: 0 0 15px rgba(176,38,255,0.2);
+}
 
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 50px;
-            background: linear-gradient(135deg, #fff, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+.check-circle {
+  position: absolute; top: 12px; right: 12px;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.15);
+  display: flex; justify-content: center; align-items: center;
+  transition: all 0.2s;
+}
+.item-card.selected .check-circle { background: var(--primary); border-color: var(--primary); }
+.check-circle::after {
+  content: '✓'; color: #fff; font-size: 12px; font-weight: bold;
+  opacity: 0; transform: scale(0.5); transition: all 0.2s;
+}
+.item-card.selected .check-circle::after { opacity: 1; transform: scale(1); }
 
-        /* --- Navigation --- */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(5, 10, 20, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            border-bottom: 1px solid var(--glass-border);
-        }
+.card-icon { font-size: 30px; margin-bottom: 10px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+.card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #fff; line-height: 1.2; }
+.card-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px; flex-grow: 1; }
+.card-price {
+  align-self: flex-start; background: rgba(176,38,255,0.15);
+  color: #e5a3ff; font-weight: 600; font-size: 13px;
+  padding: 4px 10px; border-radius: 8px;
+}
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
+.cat-divider { grid-column: 1 / -1; margin: 10px 0 5px; display: flex; align-items: center; gap: 10px; }
+.cat-divider span { font-size: 14px; font-weight: 600; color: var(--secondary); }
+.cat-divider::after { content: ''; flex: 1; height: 1px; background: rgba(0,210,255,0.2); }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-light);
-            letter-spacing: 1px;
-        }
+/* --- FLOATING BOTTOM BAR --- */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(18, 14, 38, 0.95); backdrop-filter: blur(15px);
+  border-top: 1px solid var(--primary); padding: 15px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 1000;
+}
+.bottom-bar.active { transform: translateY(0); }
+.bb-info { display: flex; flex-direction: column; }
+.bb-count { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+.bb-total { font-size: 20px; font-weight: 700; color: #fff; }
+.bb-total span { color: var(--primary); font-size: 16px; margin-right: 2px; }
+.bb-btn {
+  background: linear-gradient(135deg, var(--primary), #d946ef);
+  color: #fff; border: none; border-radius: 25px;
+  padding: 10px 24px; font-size: 16px; font-weight: 600; font-family: inherit;
+  box-shadow: 0 4px 15px rgba(176,38,255,0.4); cursor: pointer; transition: transform 0.2s;
+}
+.bb-btn:active { transform: scale(0.95); }
 
-        .logo span { color: var(--accent-gold); }
+/* --- MODAL SUMMARY --- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 2000; display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--bg-card); border: 2px solid var(--primary);
+  border-radius: 20px; width: 90%; max-width: 400px; padding: 24px;
+  position: relative; transform: scale(0.9); transition: transform 0.3s;
+  box-shadow: 0 10px 30px rgba(176,38,255,0.3);
+}
+.modal-overlay.show .modal-box { transform: scale(1); }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;
+}
+.modal-title { font-size: 18px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
+.modal-close { font-size: 24px; color: var(--text-muted); cursor: pointer; line-height: 1; }
 
-        .nav-links a:hover { color: var(--primary-light); }
+.modal-items { max-height: 250px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
+.modal-item {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 10px; font-size: 14px; color: #fff; gap: 10px;
+}
+.modal-item-name { flex: 1; line-height: 1.4; }
+.modal-item-price { color: #e5a3ff; font-weight: 600; }
 
-        /* --- Hero Section --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            padding-top: 80px; /* offset for nav */
-        }
+.modal-divider { border-top: 1px dashed rgba(176,38,255,0.4); margin: 15px 0; }
+.modal-total {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 24px;
+}
+.modal-total-price { font-size: 24px; color: var(--primary); font-weight: 700; }
 
-        .hero-content h1 {
-            font-size: 4rem;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            font-weight: 800;
-        }
+.modal-btn {
+  background: #00d300; color: #fff; border: none; width: 100%;
+  padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; font-family: inherit;
+  cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+  box-shadow: 0 4px 15px rgba(0,211,0,0.3); transition: transform 0.2s;
+}
+.modal-btn:active { transform: scale(0.97); }
 
-        .hero-content h1 span.highlight {
-            background: linear-gradient(135deg, var(--accent-gold), #fff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-content p {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto 40px auto;
-        }
-
-        .hero-btns {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        /* เอฟเฟกต์แสงด้านหลัง */
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: var(--primary-dark);
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.2;
-            z-index: -1;
-        }
-
-        /* --- Services/Pricing Section --- */
-        .services { padding: 100px 0; }
-
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .price-card {
-            text-align: center;
-            transition: transform 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .price-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary-light);
-        }
-
-        .price-card.featured {
-            border: 2px solid var(--accent-gold);
-        }
-
-        .badge {
-            position: absolute;
-            top: 20px;
-            right: -35px;
-            background: var(--accent-gold);
-            color: #000;
-            padding: 5px 40px;
-            transform: rotate(45deg);
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-
-        .price-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: var(--text-main);
-        }
-
-        .price-card .price {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--accent-gold);
-            margin-bottom: 20px;
-        }
-
-        .price-card .price span {
-            font-size: 1rem;
-            color: var(--text-muted);
-            font-weight: normal;
-        }
-
-        .price-features {
-            margin-bottom: 30px;
-            color: var(--text-muted);
-            text-align: left;
-            display: inline-block;
-        }
-
-        .price-features li {
-            margin-bottom: 10px;
-        }
-
-        .price-features li::before {
-            content: '✦';
-            color: var(--primary-light);
-            margin-right: 10px;
-        }
-
-        /* --- Process/Why Us Section --- */
-        .process {
-            padding: 100px 0;
-            background: rgba(255,255,255,0.01);
-        }
-
-        .process-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .process-item {
-            text-align: center;
-        }
-
-        .icon-box {
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px auto;
-            font-size: 2rem;
-            color: var(--primary-light);
-            border: 1px solid var(--glass-border);
-        }
-
-        .process-item h4 { margin-bottom: 10px; font-size: 1.25rem; }
-        .process-item p { color: var(--text-muted); font-size: 0.95rem; }
-
-        /* --- Footer --- */
-        footer {
-            padding: 50px 0;
-            border-top: 1px solid var(--glass-border);
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        footer .logo { margin-bottom: 20px; display: inline-block; }
-
-        /* --- Responsive Media Queries --- */
-        @media (max-width: 768px) {
-            .hero-content h1 { font-size: 2.5rem; }
-            .hero-content p { font-size: 1rem; }
-            .section-title { font-size: 2rem; }
-            .nav-links { display: none; } /* ซ่อนเมนูบนมือถือเพื่อความง่าย */
-        }
-    </style>
+/* Custom Scrollbar for modal */
+.modal-items::-webkit-scrollbar { width: 4px; }
+.modal-items::-webkit-scrollbar-track { background: var(--bg-main); }
+.modal-items::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+</style>
 </head>
 <body>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+<div id="pts"></div>
 
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">GENSHIN<span>GEMS</span></div>
-                <ul class="nav-links">
-                    <li><a href="#hero">หน้าแรก</a></li>
-                    <li><a href="#services">ราคา/บริการ</a></li>
-                    <li><a href="#process">ขั้นตอน</a></li>
-                    <li><a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" class="btn-contact-nav">ติดต่อเรา</a></li>
-                </ul>
-            </nav>
+<!-- HERO & TABS -->
+<div class="hero">
+  <div class="hero-title">Wanderer_shop</div>
+  <div class="hero-sub">ยินดีต้อนรับร้านละมุดรับสินค้าอะไรดีคะ</div>
+  
+  <div class="tab-container">
+    <button class="tab-btn" id="btn-info" onclick="switchTab('info')">ข้อมูลร้าน</button>
+    <button class="tab-btn active" id="btn-products" onclick="switchTab('products')">สินค้า</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- INFO TAB CONTENT -->
+  <div id="tab-info" class="tab-content">
+    <div class="info-card">
+      <h3 class="info-card-title">Showcase & Contact</h3>
+      <p class="info-card-sub">ช่องทางการติดต่อและรายละเอียดร้านค้า</p>
+      
+      <div class="info-row">
+        <span>Line</span>
+        <span>@997pfoig</span>
+      </div>
+      <div class="info-row">
+        <span>Facebook</span>
+        <span>Wanderer Shop</span>
+      </div>
+      <div class="info-row">
+        <span>เวลาทำการ</span>
+        <span>11:00 - 00:00 น.</span>
+      </div>
+      <div class="info-row">
+        <span>การรับประกัน</span>
+        <span>เคลมไวใน 24 ชม.</span>
+      </div>
+      <div class="info-row">
+        <span style="color:#e5a3ff;">หมายเหตุ</span>
+        <span style="font-size:12px; text-align:right;">Netflix ถ้าไม่ได้ซื้อราคาเคลม<br> = ไม่รับเคลมค่ะ</span>
+      </div>
+      
+      <div class="review-placeholder">
+        พื้นที่แสดงรีวิวลูกค้า (Coming Soon)
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS TAB CONTENT -->
+  <div id="tab-products" class="tab-content active">
+    <div class="sh">
+      <div class="sh-line"></div>
+      <h2>หมวดหมู่สินค้า / บริการ</h2>
+    </div>
+    
+    <div class="grid-container" id="productGrid">
+      <!-- JS จะใส่การ์ดสินค้าตรงนี้ -->
+    </div>
+  </div>
+
+</div>
+
+<!-- Floating Bottom Bar -->
+<div class="bottom-bar" id="bottomBar">
+  <div class="bb-info">
+    <div class="bb-count" id="cartCount">เลือก 0 รายการ</div>
+    <div class="bb-total"><span>฿</span><span id="cartTotal">0</span></div>
+  </div>
+  <button class="bb-btn" onclick="openSummary()">สั่งเลย ✨</button>
+</div>
+
+<!-- Summary Modal Popup -->
+<div class="modal-overlay" id="summaryModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">🛒 สรุปรายการสั่งซื้อ</div>
+      <div class="modal-close" onclick="closeSummary()">×</div>
+    </div>
+    <div class="modal-items" id="modalItemsList">
+      <!-- Items will be injected here -->
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-total">
+      <span>ยอดที่ต้องชำระ:</span>
+      <span class="modal-total-price">฿<span id="modalTotalPrice">0</span></span>
+    </div>
+    <button class="modal-btn" onclick="checkout()">
+      💬 คัดลอก & สั่งผ่าน LINE
+    </button>
+  </div>
+</div>
+
+<script>
+  // Particles Effect (Purple & Blue)
+  const P = document.getElementById('pts');
+  ['✦','★','✨','✧','★','🌌'].forEach(e => {
+    for (let j = 0; j < 3; j++) {
+      const d = document.createElement('div');
+      d.className = 'pt'; d.textContent = e;
+      d.style.cssText = `left:${Math.random()*100}vw;font-size:${8+Math.random()*6}px;color:${'#b026ff,#00d2ff,#e5a3ff'.split(',')[Math.floor(Math.random()*3)]};animation-duration:${10+Math.random()*15}s;animation-delay:${-Math.random()*25}s;`;
+      P.appendChild(d);
+    }
+  });
+
+  // --- TAB SWITCH LOGIC ---
+  function switchTab(tabId) {
+    // Buttons
+    document.getElementById('btn-info').classList.remove('active');
+    document.getElementById('btn-products').classList.remove('active');
+    document.getElementById(`btn-${tabId}`).classList.add('active');
+    
+    // Contents
+    document.getElementById('tab-info').classList.remove('active');
+    document.getElementById('tab-products').classList.remove('active');
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+  }
+
+  // --- PRODUCT DATA ---
+  const products = [
+    // Mono max - Basic
+    { id: 'm1', cat: 'Mono max (Basic)', name: '7 วัน (แอคสต.)', desc: 'ไม่ชน', price: 75, icon: '🍿' },
+    { id: 'm2', cat: 'Mono max (Basic)', name: '30 วัน (แอคสต.)', desc: 'ไม่ชน', price: 125, icon: '🍿' },
+    { id: 'm3', cat: 'Mono max (Basic)', name: '30 วัน (จอสต. หาร 2)', desc: 'ชน', price: 75, icon: '🍿' },
+    { id: 'm4', cat: 'Mono max (Basic)', name: '30 วัน (จอสต. หาร 3)', desc: 'ชน', price: 55, icon: '🍿' },
+    { id: 'm5', cat: 'Mono max (Basic)', name: 'สั่งทำแอค 30 วัน', desc: 'แอคสต.', price: 100, icon: '🎬' },
+    
+    // Mono max - Standard
+    { id: 'm6', cat: 'Mono max (Standard)', name: '30 วัน (จอสต. หาร 3)', desc: 'ชน', price: 80, icon: '⚽' },
+    { id: 'm7', cat: 'Mono max (Standard)', name: '30 วัน (จอสต. หาร 2)', desc: 'ชน', price: 130, icon: '⚽' },
+    { id: 'm8', cat: 'Mono max (Standard)', name: '30 วัน (แอคสต.)', desc: 'ไม่ชน', price: 270, icon: '⚽' },
+    { id: 'm9', cat: 'Mono max (Standard)', name: 'สั่งทำแอค 30 วัน', desc: 'แอคสต. ดูบอล', price: 200, icon: '⚽' },
+
+    // WeTV VIP
+    { id: 'w1', cat: 'WeTV VIP', name: '7 วัน (หาร 4)', desc: 'VIP ไม่มีโฆษณา', price: 20, icon: '🐧' },
+    { id: 'w2', cat: 'WeTV VIP', name: '30 วัน (หาร 4)', desc: 'VIP ไม่มีโฆษณา', price: 30, icon: '🐧' },
+    { id: 'w3', cat: 'WeTV VIP', name: '30 วัน (หาร 2)', desc: 'VIP ไม่มีโฆษณา', price: 60, icon: '🐧' },
+    { id: 'w4', cat: 'WeTV VIP', name: '30 วัน (จอส่วนตัว)', desc: 'VIP ไม่มีโฆษณา', price: 95, icon: '👑' },
+    
+    // WeTV VIP (90 วัน)
+    { id: 'w5', cat: 'WeTV VIP (90 วัน)', name: '90 วัน (หาร 4)', desc: 'VIP จุใจ', price: 80, icon: '🐧' },
+    { id: 'w6', cat: 'WeTV VIP (90 วัน)', name: '90 วัน (หาร 2)', desc: 'VIP จุใจ', price: 150, icon: '🐧' },
+    { id: 'w7', cat: 'WeTV VIP (90 วัน)', name: '90 วัน (จอส่วนตัว)', desc: 'VIP จุใจ', price: 250, icon: '👑' },
+
+    // Netflix - Mobile
+    { id: 'n1', cat: 'Netflix 4K (มือถือ/ไอแพด)', name: '1 วัน', desc: 'ปกติ', price: 10, icon: '📱' },
+    { id: 'n2', cat: 'Netflix 4K (มือถือ/ไอแพด)', name: '1 วัน (เคลมปิด)', desc: 'รับเคลม', price: 15, icon: '📱' },
+    { id: 'n3', cat: 'Netflix 4K (มือถือ/ไอแพด)', name: '3 วัน (เคลมปิด)', desc: 'รับเคลม', price: 30, icon: '📱' },
+    { id: 'n4', cat: 'Netflix 4K (มือถือ/ไอแพด)', name: '7 วัน', desc: 'ปกติ', price: 40, icon: '📱' },
+    { id: 'n5', cat: 'Netflix 4K (มือถือ/ไอแพด)', name: '7 วัน (เคลมปิด)', desc: 'รับเคลม', price: 50, icon: '📱' },
+    { id: 'n6', cat: 'Netflix 4K (มือถือ/ไอแพด)', name: '30 วัน', desc: 'ปกติ', price: 115, icon: '📱' },
+    { id: 'n7', cat: 'Netflix 4K (มือถือ/ไอแพด)', name: '30 วัน (เคลมปิด)', desc: 'รับเคลม', price: 140, icon: '📱' },
+
+    // Netflix - TV
+    { id: 'n8', cat: 'Netflix 4K (คอม/ทีวี)', name: '1 วัน', desc: 'ปกติ', price: 25, icon: '📺' },
+    { id: 'n9', cat: 'Netflix 4K (คอม/ทีวี)', name: '1 วัน (เคลมปิด)', desc: 'รับเคลม', price: 30, icon: '📺' },
+    { id: 'n10', cat: 'Netflix 4K (คอม/ทีวี)', name: '7 วัน', desc: 'ปกติ', price: 55, icon: '📺' },
+    { id: 'n11', cat: 'Netflix 4K (คอม/ทีวี)', name: '7 วัน (เคลมปิด)', desc: 'รับเคลม', price: 65, icon: '📺' },
+    { id: 'n12', cat: 'Netflix 4K (คอม/ทีวี)', name: '30 วัน', desc: 'ปกติ', price: 180, icon: '📺' },
+    { id: 'n13', cat: 'Netflix 4K (คอม/ทีวี)', name: '30 วัน (เคลมปิด)', desc: 'รับเคลม', price: 200, icon: '📺' },
+
+    // Netflix - จอเสริม
+    { id: 'n14', cat: 'Netflix 4K (จอเสริม)', name: '7 วัน', desc: 'ปกติ (ไม่ชน)', price: 65, icon: '✨' },
+    { id: 'n15', cat: 'Netflix 4K (จอเสริม)', name: '7 วัน (เคลมปิด)', desc: 'รับเคลม (ไม่ชน)', price: 85, icon: '✨' },
+    { id: 'n16', cat: 'Netflix 4K (จอเสริม)', name: '30 วัน', desc: 'ปกติ (ไม่ชน)', price: 200, icon: '✨' },
+    { id: 'n17', cat: 'Netflix 4K (จอเสริม)', name: '30 วัน (เคลมปิด)', desc: 'รับเคลม (ไม่ชน)', price: 220, icon: '✨' },
+    { id: 'n18', cat: 'Netflix 4K (จอเสริม)', name: '7 วัน (เมลลค.)', desc: 'เคลมปิด', price: 75, icon: '✨' },
+    { id: 'n19', cat: 'Netflix 4K (จอเสริม)', name: '30 วัน (เมลลค.)', desc: 'เคลมปิด', price: 200, icon: '✨' },
+
+    // Disney+ - หาร 4
+    { id: 'd1', cat: 'Disney+ (หาร 4 ไม่ชน)', name: '1 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 35, icon: '🏰' },
+    { id: 'd2', cat: 'Disney+ (หาร 4 ไม่ชน)', name: '3 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 45, icon: '🏰' },
+    { id: 'd3', cat: 'Disney+ (หาร 4 ไม่ชน)', name: '7 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 75, icon: '🏰' },
+    { id: 'd4', cat: 'Disney+ (หาร 4 ไม่ชน)', name: '30 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 125, icon: '🏰' },
+
+    // Disney+ - หาร 5
+    { id: 'd5', cat: 'Disney+ (หาร 5 มีโอกาสชน)', name: '1 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 30, icon: '🏰' },
+    { id: 'd6', cat: 'Disney+ (หาร 5 มีโอกาสชน)', name: '3 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 40, icon: '🏰' },
+    { id: 'd7', cat: 'Disney+ (หาร 5 มีโอกาสชน)', name: '7 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 60, icon: '🏰' },
+    { id: 'd8', cat: 'Disney+ (หาร 5 มีโอกาสชน)', name: '30 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 105, icon: '🏰' },
+
+    // Disney+ - หาร 6
+    { id: 'd9', cat: 'Disney+ (หาร 6 มีโอกาสชน)', name: '1 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 25, icon: '🏰' },
+    { id: 'd10', cat: 'Disney+ (หาร 6 มีโอกาสชน)', name: '3 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 35, icon: '🏰' },
+    { id: 'd11', cat: 'Disney+ (หาร 6 มีโอกาสชน)', name: '7 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 55, icon: '🏰' },
+    { id: 'd12', cat: 'Disney+ (หาร 6 มีโอกาสชน)', name: '30 วัน', desc: 'ดูได้ทุกอุปกรณ์', price: 90, icon: '🏰' },
+
+    // Disney+ - ยกแอค
+    { id: 'd13', cat: 'Disney+ (ยกแอค)', name: '1 วัน', desc: 'เบอร์ร้านหาร 4', price: 80, icon: '👑' },
+    { id: 'd14', cat: 'Disney+ (ยกแอค)', name: '3 วัน', desc: 'เบอร์ร้านหาร 4', price: 125, icon: '👑' },
+    { id: 'd15', cat: 'Disney+ (ยกแอค)', name: '7 วัน', desc: 'เบอร์ร้านหาร 4', price: 175, icon: '👑' },
+    { id: 'd16', cat: 'Disney+ (ยกแอค)', name: '30 วัน', desc: 'เบอร์ร้านหาร 4 (ลด 360฿)', price: 360, icon: '👑' }
+  ];
+
+  let cart = [];
+
+  // Render Grid
+  function renderProducts() {
+    const grid = document.getElementById('productGrid');
+    let currentCat = '';
+    let html = '';
+
+    products.forEach(p => {
+      if (p.cat !== currentCat) {
+        html += `<div class="cat-divider"><span>${p.cat}</span></div>`;
+        currentCat = p.cat;
+      }
+      html += `
+        <div class="item-card" id="card-${p.id}" onclick="toggleItem('${p.id}')">
+          <div class="check-circle"></div>
+          <div class="card-icon">${p.icon}</div>
+          <div class="card-title">${p.name}</div>
+          <div class="card-desc">${p.desc}</div>
+          <div class="card-price">฿${p.price}</div>
         </div>
-    </header>
+      `;
+    });
+    grid.innerHTML = html;
+  }
 
-    <section id="hero" class="hero">
-        <div class="container hero-content">
-            <h1>รับฟาร์มเจม <span class="highlight">Genshin Impact</span><br>ราคาถูก ปลอดภัย มืออาชีพ</h1>
-            <p>ประหยัดเวลาการเล่นของคุณ ให้เราดูแลไอดี ทีมงานมืออาชีพ ฟาร์มไว ได้เจมครบตามกำหนด การันตีความปลอดภัย 100%</p>
-            <div class="hero-btns">
-                <a href="#services" class="btn btn-primary">ดูแพ็คเกจราคา</a>
-                <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" class="btn btn-secondary">สอบถามเพิ่มเติม</a>
-            </div>
+  // Toggle Selection
+  function toggleItem(id) {
+    const card = document.getElementById(`card-${id}`);
+    const product = products.find(p => p.id === id);
+    const index = cart.findIndex(item => item.id === id);
+
+    if (index > -1) {
+      cart.splice(index, 1);
+      card.classList.remove('selected');
+    } else {
+      cart.push(product);
+      card.classList.add('selected');
+    }
+    updateBottomBar();
+  }
+
+  // Update Bottom Bar
+  function updateBottomBar() {
+    const bar = document.getElementById('bottomBar');
+    if (cart.length > 0) {
+      bar.classList.add('active');
+      document.getElementById('cartCount').innerText = `เลือก ${cart.length} รายการ`;
+      document.getElementById('cartTotal').innerText = cart.reduce((sum, item) => sum + item.price, 0);
+    } else {
+      bar.classList.remove('active');
+      closeSummary();
+    }
+  }
+
+  // Open Summary Modal
+  function openSummary() {
+    if(cart.length === 0) return;
+    const listEl = document.getElementById('modalItemsList');
+    let html = '';
+    let total = 0;
+    
+    cart.forEach(item => {
+      html += `
+        <div class="modal-item">
+          <div class="modal-item-name">• ${item.name} <br><span style="font-size:11px; color:var(--text-muted)">${item.desc}</span></div>
+          <div class="modal-item-price">฿${item.price}</div>
         </div>
-    </section>
+      `;
+      total += item.price;
+    });
+    
+    listEl.innerHTML = html;
+    document.getElementById('modalTotalPrice').innerText = total;
+    document.getElementById('summaryModal').classList.add('show');
+  }
 
-    <section id="services" class="services">
-        <div class="container">
-            <h2 class="section-title">แพ็คเกจฟาร์มเจมยอดนิยม</h2>
-            <div class="price-grid">
-                
-                <div class="glass-card price-card">
-                    <h3>สายชิลล์รายสัปดาห์</h3>
-                    <div class="price">฿299 <span>/ สัปดาห์</span></div>
-                    <ul class="price-features">
-                        <li>เคลียร์เควสรายวันครบ 7 วัน</li>
-                        <li>เคลียร์เรซินรายวัน (ไม่ดอง)</li>
-                        <li>เคลียร์กิจกรรมจำกัดเวลา (Event)</li>
-                        <li>ประมาณ 420+ Primogems</li>
-                    </ul>
-                    <a href="https://line.me/ti/p/~YOUR_LINE_ID?text=สนใจแพ็คเกจสายชิลล์" target="_blank" class="btn btn-primary">สั่งซื้อเลย</a>
-                </div>
+  function closeSummary() {
+    document.getElementById('summaryModal').classList.remove('show');
+  }
 
-                <div class="glass-card price-card featured">
-                    <div class="badge">คุ้มสุด!</div>
-                    <h3>แพ็คเกจเริ่มต้น</h3>
-                    <div class="price">฿990</div>
-                    <ul class="price-features">
-                        <li>ฟาร์มเนื้อเรื่องหลัก (Archon Quest)</li>
-                        <li>เปิดแมพ + เคลียร์เสาเทพเจ้า</li>
-                        <li>ฟาร์มกล่องสมบัติพื้นฐาน</li>
-                        <li>การันตี 1600+ Primogems</li>
-                    </ul>
-                    <a href="https://line.me/ti/p/~YOUR_LINE_ID?text=สนใจแพ็คเกจเริ่มต้น" target="_blank" class="btn btn-primary">สั่งซื้อเลย</a>
-                </div>
+  // Checkout (Copy Text & Redirect Immediate)
+  function checkout() {
+    let total = 0;
+    
+    // ข้อความสรุปยอดแบบเป็นทางการ ลดอิโมจิ
+    let text = "สรุปรายการสั่งซื้อ\n\n";
+    
+    cart.forEach(item => {
+      text += `สินค้า: ${item.cat} - ${item.name}\n`;
+      text += `รายละเอียด: ${item.desc}\n`;
+      text += `ราคา: ${item.price} บาท\n\n`;
+      total += item.price;
+    });
+    
+    text += `--------------------\n`;
+    text += `ยอดที่ต้องชำระทั้งหมด: ${total} บาท\n\n`;
+    text += `ขอบคุณที่ไว้วางใจค่ะ\n`;
+    text += `กรุณารอแอดมินตอบกลับภายใน 5-10 นาที`;
 
-                <div class="glass-card price-card">
-                    <h3>แพ็คเกจนักสำรวจ</h3>
-                    <div class="price">฿1,890</div>
-                    <ul class="price-features">
-                        <li>สำรวจแมพใหม่ 100% (เลือกเมืองได้)</li>
-                        <li>เก็บกล่องสมบัติครบ</li>
-                        <li>ทำความสำเร็จ (Achievement)</li>
-                        <li>การันตี 3200+ Primogems</li>
-                    </ul>
-                    <a href="https://line.me/ti/p/~YOUR_LINE_ID?text=สนใจแพ็คเกจนักสำรวจ" target="_blank" class="btn btn-primary">สั่งซื้อเลย</a>
-                </div>
+    // Copy logic
+    const tempInput = document.createElement("textarea");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    
+    try {
+      document.execCommand("copy");
+    } catch (err) {}
+    document.body.removeChild(tempInput);
+    
+    closeSummary();
 
-            </div>
-        </div>
-    </section>
+    // เด้งไปหน้า LINE ทันที
+    window.location.href = "https://lin.ee/Vt7DR6S";
+  }
 
-    <section id="process" class="process">
-        <div class="container">
-            <h2 class="section-title">ขั้นตอนการให้บริการ</h2>
-            <div class="process-grid">
-                
-                <div class="process-item">
-                    <div class="icon-box">💬</div>
-                    <h4>1. ติดต่อสอบถาม</h4>
-                    <p>ทักแชท Line แจ้งแพ็คเกจที่คุณต้องการ หรือสอบถามรายละเอียดเพิ่มเติม</p>
-                </div>
-
-                <div class="process-item">
-                    <div class="icon-box">💳</div>
-                    <h4>2. ชำระเงิน</h4>
-                    <p>ชำระเงินผ่านช่องทางที่กำหนด (Banking/TrueWallet) เพื่อยืนยันออเดอร์</p>
-                </div>
-
-                <div class="process-item">
-                    <div class="icon-box">🔑</div>
-                    <h4>3. ส่งมอบไอดี</h4>
-                    <p>ส่ง ID/Password พร้อมรหัส OTP (หากมี) ทีมงานจะเริ่มฟาร์มทันที</p>
-                </div>
-
-                <div class="process-item">
-                    <div class="icon-box">✅</div>
-                    <h4>4. ตรวจสอบและส่งงาน</h4>
-                    <p>ทีมงานแจ้งเมื่อฟาร์มเสร็จสิ้น ลูกค้าตรวจสอบความเรียบร้อยก่อนรับไอดีคืน</p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <div class="logo">GENSHIN<span>GEMS</span></div>
-            <p>บริการรับฟาร์มเจม Genshin Impact โดยทีมงานมืออาชีพ ปลอดภัย ไร้กังวล</p>
-            <p style="margin-top: 10px;">ติดต่อเราได้ที่ LINE ID: <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" style="color:var(--accent-gold);">@YOUR_LINE_ID</a></p>
-            <p style="margin-top: 30px; font-size: 0.8rem;">&copy; 2024 GenshinGems Service. All rights reserved. This site is not affiliated with HoYoverse.</p>
-        </div>
-    </footer>
-
+  // Init
+  renderProducts();
+</script>
 </body>
 </html>
+
+
+
+
