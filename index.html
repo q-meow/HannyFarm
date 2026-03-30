@@ -1,308 +1,357 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEFER | WANDERER SYSTEM</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
-<style>
-:root {
-    --nefer-green: #00ffaa;
-    --nefer-glow: rgba(0, 255, 170, 0.4);
-    --dark-void: #020504;
-    --glass: rgba(0, 20, 15, 0.7);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChiiSAnA ♡ 花 | Home - Pastel Glass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --main-pink: #ffdae9;
+            --soft-purple: #f4eaff;
+            --text-main: #5d5151;
+            --accent-pink: #ff85b3;
+            --dark-menu: #332d2d;
+            --glass: rgba(255, 255, 255, 0.7); 
+            --glow-color: rgba(255, 133, 179, 0.6);
+        }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Prompt', sans-serif; }
 
-body {
-    background: var(--dark-void);
-    color: #fff;
-    font-family: 'Kanit', sans-serif;
-    overflow-x: hidden;
-    min-height: 100vh;
-    /* Hexagon Pattern Background */
+        body {
+    /* 1. เปลี่ยนสีพื้นหลังเป็น #FFEEF9 */
+    background-color: #FFEEF9; 
+    
+    /* ลายจุด (ใช้สีเทาอ่อนเพื่อให้ดูละมุนเข้ากับสีชมพู) */
     background-image: 
-        radial-gradient(circle at 50% 50%, rgba(0, 255, 170, 0.1) 0%, transparent 80%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cpath fill='%2300ffaa' fill-opacity='0.03' d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l11-6.35 11 6.35v12.7l-11 6.35-11-6.35v-12.7z'/%3E%3C/svg%3E");
-}
+        radial-gradient(#d3d3d3 1px, transparent 1px), 
+        radial-gradient(#d3d3d3 1px, transparent 1px); 
+    
+    background-size: 20px 20px; 
+    background-position: 0 0, 10px 10px; 
 
-/* --- HUD HEADER --- */
-header {
-    padding: 40px 20px;
-    text-align: center;
-    position: relative;
-    border-bottom: 1px solid var(--nefer-glow);
-}
-
-.brand {
-    font-family: 'Syncopate', sans-serif;
-    font-size: 24px;
-    letter-spacing: 8px;
-    color: var(--nefer-green);
-    text-shadow: 0 0 20px var(--nefer-glow);
-    text-transform: uppercase;
-}
-
-.status-bar {
+    background-attachment: fixed; 
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 10px;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--nefer-green);
-    opacity: 0.7;
-}
-
-/* --- NAV TABS (Tactical Style) --- */
-.nav-hud {
-    display: flex;
-    justify-content: center;
-    margin: -15px auto 30px;
+    padding-bottom: 110px; 
+    color: var(--text-main);
     position: relative;
-    z-index: 10;
+    overflow-x: hidden;
 }
 
-.nav-btn {
-    background: var(--glass);
-    border: 1px solid var(--nefer-glow);
-    color: #fff;
-    padding: 10px 25px;
-    font-family: 'Syncopate', sans-serif;
-    font-size: 10px;
-    cursor: pointer;
-    transition: 0.4s;
-    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
-    margin: 0 -5px;
-}
+        /* --- Container หลัก --- */
+        .container { 
+            width: 100%; 
+            max-width: 480px; 
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
 
-.nav-btn.active {
-    background: var(--nefer-green);
-    color: #000;
-    box-shadow: 0 0 25px var(--nefer-glow);
-}
+        /* --- Profile Card --- */
+        .profile-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 35px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
 
-/* --- PRODUCT GRID --- */
-.container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        .banner-area {
+            width: 100%;
+            height: 150px;
+            
+            background-image: url('cover.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-color: var(--main-pink);
+            position: relative;
+        }
 
-.section-title {
-    font-size: 12px;
-    color: var(--nefer-green);
-    margin: 30px 0 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px 30px;
+            position: relative;
+            margin-top: -60px;
+            z-index: 10;
+        }
 
-.section-title::before {
-    content: ''; width: 4px; height: 15px; background: var(--nefer-green);
-}
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 6px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            object-fit: cover;
+            background-color: white;
+        }
 
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .profile-name {
+            font-size: 26px;
+            font-weight: 500;
+            color: var(--accent-pink);
+            margin-top: 15px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
+            display: inline-block;
+            animation: dookDik 2.5s ease-in-out infinite;
+        }
 
-/* Tactical Card Design */
-.nefer-card {
-    background: var(--glass);
-    border: 1px solid rgba(0, 255, 170, 0.1);
-    padding: 20px;
-    position: relative;
-    transition: 0.3s;
-    overflow: hidden;
-    /* ตัดมุมเฉียง */
-    clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 15% 100%, 0 85%);
-}
+        @keyframes dookDik {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-1px, -2px) rotate(-1deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            60% { transform: translate(-1px, 1px) rotate(-0.5deg); }
+            80% { transform: translate(1px, 2px) rotate(0.5deg); }
+        }
 
-.nefer-card::after {
-    content: ''; position: absolute; top: 0; right: 0;
-    width: 20px; height: 20px; background: var(--nefer-green);
-    clip-path: polygon(100% 0, 0 0, 100% 100%); opacity: 0.2;
-}
+        .profile-desc { font-size: 14px; line-height: 1.6; margin-bottom: 20px; padding: 0 10px; }
+        .status-badge { background: #fff9e6; color: #d4a017; padding: 8px 25px; border-radius: 50px; font-size: 13px; font-weight: 500; border: 1px solid #ffeeba; }
 
-.nefer-card.selected {
-    border-color: var(--nefer-green);
-    background: rgba(0, 255, 170, 0.1);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-}
+        /* --- 🎵 ระบบเครื่องเล่นเพลง (Music Player) --- */
+        .music-player-container {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 25px;
+            padding: 15px;
+            margin: 10px 0 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.15);
+            text-align: center;
+        }
 
-.card-icon { font-size: 28px; margin-bottom: 10px; opacity: 0.8; }
-.card-name { font-size: 14px; font-weight: 300; margin-bottom: 5px; color: #e0eee0; }
-.card-price { 
-    font-family: 'Syncopate', sans-serif; 
-    color: var(--nefer-green); 
-    font-size: 16px; 
-}
+        .music-info {
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: var(--accent-pink);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
 
-/* --- BOTTOM TOTAL HUD --- */
-.bottom-hud {
-    position: fixed; bottom: 20px; left: 20px; right: 20px;
-    background: rgba(0, 40, 30, 0.9);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--nefer-green);
-    padding: 15px 25px;
-    display: flex; justify-content: space-between; align-items: center;
-    border-radius: 2px;
-    transform: translateY(150px); transition: 0.5s cubic-bezier(0.17, 0.8, 0.3, 1.2);
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
-}
+        audio {
+            width: 100%;
+            height: 35px;
+            filter: sepia(20%) saturate(70%) hue-rotate(280deg) brightness(105%); /* ปรับสี Audio ให้ชมพู */
+        }
 
-.bottom-hud.active { transform: translateY(0); }
+        /* --- หัวข้อ Section --- */
+        .section-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin: 20px 0 15px 10px;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title img { width: 24px; height: 24px; object-fit: contain; }
 
-.hud-total-text { font-size: 10px; color: var(--nefer-green); text-transform: uppercase; }
-.hud-total-price { font-family: 'Syncopate', sans-serif; font-size: 22px; }
+        /* --- Service Grid --- */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-.deploy-btn {
-    background: transparent;
-    border: 1px solid var(--nefer-green);
-    color: var(--nefer-green);
-    padding: 10px 20px;
-    font-family: 'Syncopate', sans-serif;
-    font-size: 12px;
-    cursor: pointer;
-    transition: 0.3s;
-    overflow: hidden;
-    position: relative;
-}
+        .service-card {
+            background: var(--glass);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            padding: 15px 10px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            min-height: 140px;
+        }
 
-.deploy-btn:hover, .deploy-btn:active {
-    background: var(--nefer-green);
-    color: #000;
-    box-shadow: 0 0 20px var(--nefer-green);
-}
+        .service-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.95); }
 
-/* --- MODAL --- */
-#modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-    z-index: 1000; display: none; place-items: center;
-}
+        .service-card img {
+            width: 75px; /* ปรับขนาดให้สมดุลตามที่คุยกันไว้ */
+            height: 75px;
+            margin-bottom: 8px;
+            object-fit: contain;
+        }
 
-.modal-box {
-    background: var(--dark-void);
-    border: 1px solid var(--nefer-green);
-    width: 85%; padding: 30px; position: relative;
-}
-</style>
+        .service-text { font-size: 14px; font-weight: 500; }
+
+        /* --- อื่นๆ --- */
+        .btn-pastel { display: block; background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.5); color: var(--text-main); text-decoration: none; padding: 12px; border-radius: 50px; margin-bottom: 25px; text-align: center; font-weight: 500; transition: 0.3s; }
+        .btn-pastel:hover { background: var(--main-pink); border-color: var(--accent-pink); }
+
+        .gallery-container { width: 100%; overflow-x: auto; display: flex; gap: 15px; padding: 10px 5px 15px 5px; scrollbar-width: none; }
+        .gallery-item { min-width: 250px; aspect-ratio: 1 / 1; background: var(--glass); border-radius: 25px; overflow: hidden; border: 3px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-hint { text-align: center; font-size: 12px; opacity: 0.5; margin-bottom: 30px; }
+
+       /* --- Nav & Animation (ปรับแก้ให้เท่า Index เป๊ะๆ) --- */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 90%; 
+            max-width: 420px; 
+            background: var(--dark-menu); 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 12px 5px; 
+            border-radius: 20px; 
+            z-index: 1000; 
+        }
+
+        .nav-item { 
+            text-decoration: none; 
+            color: white; 
+            font-size: 10px; 
+            text-align: center; 
+            opacity: 0.7; 
+            transition: 0.3s; 
+            flex: 1; 
+        }
+
+        .nav-item.active { 
+            opacity: 1; 
+            color: var(--main-pink); 
+        }
+
+        .nav-item i { 
+            font-size: 18px; 
+            display: block; 
+            margin-bottom: 3px; 
+            color: var(--main-pink); 
+            font-style: normal; 
+        }
+
+        .floating-sticker { position: fixed; bottom: 95px; right: 25px; width: 85px; z-index: 999; pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); }
+        .bg-chiikawa { position: fixed; pointer-events: none; z-index: 1; opacity: 0.25; animation: floatRandom linear infinite; }
+    </style>
 </head>
 <body>
 
-<header>
-    <div class="brand">NEFER_OPS</div>
-    <div class="status-bar">
-        <span>● SYSTEM: ONLINE</span>
-        <span>● ENCRYPTION: ACTIVE</span>
-    </div>
-</header>
+    <img src="จิบิจิ๋ว (27).png" alt="Chiikawa Sticker" class="floating-sticker">
 
-<div class="nav-hud">
-    <button class="nav-btn" onclick="switchTab('info', this)">INFO</button>
-    <button class="nav-btn active" onclick="switchTab('market', this)">MARKET</button>
-</div>
 
 <div class="container">
-    <div id="tab-info" style="display:none; animation: fadeIn 0.5s;">
-        <div class="nefer-card" style="clip-path:none; width: 100%;">
-            <p style="color:var(--nefer-green); margin-bottom:15px;">ACCESSING DATABASE...</p>
-            <div style="font-size:14px; line-height:2;">
-                LINE: @997pfoig<br>
-                FB: Wanderer Shop<br>
-                TIME: 11:00 - 00:00
+    <div class="profile-card">
+        <div class="banner-area"></div>
+        <div class="profile-info">
+            <img src="หัว.jpg" class="profile-img" alt="Avatar">
+            <h1 class="profile-name">ChiiSAnA ♡ 花</h1>
+            <div class="profile-desc">
+                ♡ ยินดีต้อนรับสู่ร้านของเค้าค่า ♡<br>
+                มีกลุ่มงานป้ายมากกว่า 30 กลุ่มให้เลือกเลย<br>
+                สอบถามได้เสมอนะคะ (˶˃ᆺ˂˶)
             </div>
+            <div class="status-badge">เปิดรับคิว</div>
         </div>
     </div>
 
-    <div id="tab-market">
-        <div id="shop-items"></div>
+    <div class="music-player-container">
+        <div class="music-info">
+            <span>♫ Now Playing: ちいかわ BGM ♡</span>
+        </div>
+        <audio controls loop>
+            <source src="【サントラ】アニメちいかわ BGM (耳コピ).mp3" type="audio/mpeg">
+            เบราว์เซอร์ของคุณไม่รองรับการเล่นเพลง
+        </audio>
     </div>
+         
+
+    <div class="service-grid">
+        <a href="https://www.facebook.com/share/p/174dQzj6zt/" class="service-card">
+            <img src="Ex.png" alt="Check Credit">
+            <div class="service-text">Check Credit</div>
+        </a>
+        <a href="https://drive.google.com/drive/folders/1wexcwQzuEBLOmnjQ2BTh6aHRbtc1T-2j" class="service-card">
+            <img src="Ex 1.png" alt="Example Work">
+            <div class="service-text">Example Work</div>
+        </a>
+
+    </div>
+
+        <h2 class="section-title">
+        <img src="icon-1.png" alt="icon"> 
+        บริการของร้านเรา
+    </h2>
+
+    <div class="service-grid">
+        <a href="rent-rov.html" class="service-card">
+            <img src="rentid 1.png" alt="Rent ID ROV">
+            <div class="service-text">Rent ID ROV</div>
+        </a>
+        <a href="#" class="service-card">
+            <img src="topup 1.png" alt="Top Up Game">
+            <div class="service-text">Top Up Game</div>
+        </a>
+    </div>
+
+    <a href="https://docs.google.com/spreadsheets/d/1JApKZ3mbzG4qEdyYD_CAhoOfNA3R7UD5PvgXo1_ko7I/edit?gid=1963409705#gid=1963409705" class="btn-pastel">♡ check w♡rk q ♡</a>
+    <a href="https://drive.google.com/drive/folders/1_venlW4-gw2ZiJNoIizKFpnwsDuXL0jA" class="btn-pastel">♡ เลือกตูนห้องเอฟ ♡</a>
+
+    <h2 class="section-title">
+        <img src="icon-2.png" alt="icon">
+        ตัวอย่างงานล่าสุด
+    </h2>
+    <div class="gallery-container">
+        <div class="gallery-item"><img src="ตัวอย่าง 1.jpg"></div>
+        <div class="gallery-item"><img src="ตัวอย่าง 2.png"></div>
+        <div class="gallery-item"><img src="ตัวอย่าง 3.jpg"></div>
+        <div class="gallery-item"><img src="ตัวอย่าง 4.jpg"></div>
+        <div class="gallery-item"><img src="ตัวอย่าง 5.jpg"></div>
+    </div>
+    <p class="gallery-hint">⇠ เเกลเลอรี่สไลด์ได้นะค้าบ ⇢</p>
 </div>
 
-<div class="bottom-hud" id="hud">
-    <div>
-        <div class="hud-total-text">Credits Required</div>
-        <div class="hud-total-price">฿<span id="total">0</span></div>
-    </div>
-    <button class="deploy-btn" onclick="openOrder()">DEPLOY ORDER</button>
-</div>
-
-<div id="modal" onclick="if(event.target==this) closeOrder()">
-    <div class="modal-box">
-        <h3 style="font-family:'Syncopate'; color:var(--nefer-green); margin-bottom:20px;">CONFIRM DATA?</h3>
-        <div id="summary" style="margin-bottom:30px; font-size:14px; opacity:0.8;"></div>
-        <button class="deploy-btn" style="width:100%" onclick="checkout()">EXECUTE ORDER</button>
-    </div>
-</div>
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item active"><i>♥</i>Home ♡</a>
+    <a href="group.html" class="nav-item"><i>♥</i>เค้าดึงเมลเอง ♡</a>
+    <a href="anothergroup.html" class="nav-item"><i>♥</i>กลุ่มอื่นๆ ♡</a>
+    <a href="work.html" class="nav-item"><i>♥</i>สั่งป้าย ♡</a>
+    <a href="contact.html" class="nav-item"><i>♥</i>Contact ♡</a>
+</nav>
 
 <script>
-const data = [
-    { cat: 'NETFLIX PREMIUM', name: 'Mobile 30D', price: 140, icon: '📱' },
-    { cat: 'NETFLIX PREMIUM', name: 'TV/PC 30D', price: 200, icon: '📺' },
-    { cat: 'DISNEY+ HOTSTAR', name: 'Private 30D', price: 280, icon: '🏰' },
-    { cat: 'WETV VIP', name: 'Shared 30D', price: 30, icon: '🐧' }
-];
-
-let cart = [];
-
-function render() {
-    const list = document.getElementById('shop-items');
-    let html = '';
-    let currentCat = '';
-
-    data.forEach((item, i) => {
-        if(item.cat !== currentCat) {
-            html += `<div class="section-title">${item.cat}</div><div class="grid">`;
-            currentCat = item.cat;
-        }
-        html += `
-            <div class="nefer-card" id="card-${i}" onclick="toggleItem(${i})">
-                <div class="card-icon">${item.icon}</div>
-                <div class="card-name">${item.name}</div>
-                <div class="card-price">฿${item.price}</div>
-            </div>
-        `;
-        if(!data[i+1] || data[i+1].cat !== currentCat) html += `</div>`;
-    });
-    list.innerHTML = html;
-}
-
-function toggleItem(idx) {
-    const item = data[idx];
-    const el = document.getElementById(`card-${idx}`);
-    const find = cart.findIndex(c => c.name === item.name);
-    
-    if(find > -1) {
-        cart.splice(find, 1);
-        el.classList.remove('selected');
-    } else {
-        cart.push(item);
-        el.classList.add('selected');
+    // สคริปต์ Chiikawa พื้นหลังเหมือนเดิม
+    const numberOfBackgroundChiikawas = 12;
+    const bgContainer = document.getElementById('bg-chiikawa-container');
+    for (let i = 0; i < numberOfBackgroundChiikawas; i++) {
+        const img = document.createElement('img');
+        img.src = 'chiikawa 3.gif';
+        img.classList.add('bg-chiikawa');
+        const size = Math.random() * (90 - 45) + 45; 
+        img.style.width = `${size}px`;
+        img.style.left = `${Math.random() * 100}vw`;
+        img.style.top = `${Math.random() * 100}vh`;
+        const duration = Math.random() * (30 - 15) + 15;
+        img.style.animationDuration = `${duration}s`;
+        const animName = `float-${i}`;
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `@keyframes ${animName} {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(50px, 50px) rotate(30deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }`;
+        document.head.appendChild(styleSheet);
+        img.style.animationName = animName;
+        bgContainer.appendChild(img);
     }
-    
-    const total = cart.reduce((a, b) => a + b.price, 0);
-    document.getElementById('total').innerText = total;
-    document.getElementById('hud').classList.toggle('active', cart.length > 0);
-}
-
-function switchTab(tab, btn) {
-    document.getElementById('tab-info').style.display = tab === 'info' ? 'block' : 'none';
-    document.getElementById('tab-market').style.display = tab === 'market' ? 'block' : 'none';
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-function openOrder() {
-    document.getElementById('summary').innerHTML = cart.map(i => `<div>> ${i.name} [${i.price} THB]</div>`).join('');
-    document.getElementById('modal').style.display = 'grid';
-}
-
-function closeOrder() { document.getElementById('modal').style.display = 'none'; }
-
-function checkout() {
-    window.location.href = "https://lin.ee/Vt7DR6S";
-}
-
-render();
 </script>
 
 </body>
