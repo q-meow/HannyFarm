@@ -1,139 +1,31 @@
 <!DOCTYPE html>
 
-/* การตั้งค่าพื้นฐาน */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-    background-color: #0f0f0f; /* พื้นหลังสีเข้มตามสไตล์ในรูป */
-    color: #ffffff;
-    line-height: 1.6;
-}
-
-/* Navbar */
-.navbar {
+/* การจัดวาง: CSS Grid หรือ Flexbox แบบลอย */
+.content-v2 {
+    position: relative;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 10%;
-}
-
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
-.nav-links {
-    list-style: none;
-    display: flex;
-    align-items: center;
-}
-
-.nav-links li {
-    margin-left: 2rem;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: #ccc;
-    transition: 0.3s;
-}
-
-.nav-links a:hover {
-    color: #fff;
-}
-
-.btn-contact {
-    background: #fff;
-    color: #000 !important;
-    padding: 0.6rem 1.5rem;
-    border-radius: 50px;
-}
-
-/* Hero Section */
-.hero {
-    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 5rem 10%;
-    min-height: 80vh;
 }
 
-.hero-content {
-    flex: 1;
-    padding-right: 5rem;
+/* การจัดลำดับเลเยอร์ (z-index) */
+.background-image-glass {
+    position: absolute;
+    z-index: 1;
+    opacity: 0.7; /* ดูขลังขึ้น */
 }
 
-.hero-content h1 {
-    font-size: 4rem;
-    margin-bottom: 1.5rem;
-    line-height: 1.1;
+.main-display, .star-control {
+    position: relative;
+    z-index: 2; /* ลอยอยู่ด้านหน้า */
 }
 
-.highlight {
-    color: #007bff; /* สีเน้นข้อความ */
-}
-
-.hero-content p {
-    font-size: 1.2rem;
-    color: #aaa;
-    margin-bottom: 2rem;
-    max-width: 500px;
-}
-
-/* ปุ่มกด */
-.btn-primary {
-    display: inline-block;
-    background: #007bff;
-    color: #fff;
-    padding: 1rem 2rem;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-right: 1rem;
-    transition: 0.3s;
-}
-
-.btn-secondary {
-    display: inline-block;
-    color: #fff;
-    text-decoration: underline;
-}
-
-/* รูปภาพฝั่งขวา */
-.hero-image {
-    flex: 1;
-    text-align: right;
-}
-
-.hero-image img {
-    width: 100%;
-    max-width: 500px;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
-
-/* ปรับแต่งสำหรับมือถือ */
-@media (max-width: 768px) {
-    .hero {
-        flex-direction: column;
-        text-align: center;
-        padding-top: 2rem;
-    }
-    .hero-content {
-        padding-right: 0;
-        margin-bottom: 3rem;
-    }
-    .hero-content h1 {
-        font-size: 2.5rem;
-    }
-    .nav-links {
-        display: none; /* ซ่อนเมนูบนมือถือเพื่อความง่าย */
-    }
+/* แผงควบคุมกลุ่มดาวด้านล่าง */
+.star-control {
+    width: 90%;
+    margin-bottom: 20px;
+    background: rgba(10, 15, 25, 0.6);
 }
 
 
@@ -141,36 +33,31 @@ body {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Minimalist Portfolio</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Teyvat Odyssey - Narrative Overlay</title>
+    <link rel="stylesheet" href="style-v2.css">
 </head>
 <body>
+    <div class="background-overlay"></div>
 
-    <nav class="navbar">
-        <div class="logo">CREATIVE.</div>
-        <ul class="nav-links">
-            <li><a href="#">หน้าแรก</a></li>
-            <li><a href="#">ผลงาน</a></li>
-            <li><a href="#">เกี่ยวกับเรา</a></li>
-            <li><a href="#" class="btn-contact">ติดต่อ</a></li>
-        </ul>
-    </nav>
-
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Design the <span class="highlight">Future</span></h1>
-            <p>เราสร้างสรรค์ประสบการณ์ดิจิทัลที่เรียบง่ายแต่ทรงพลัง เพื่อขับเคลื่อนธุรกิจของคุณสู่ความสำเร็จ</p>
-            <div class="hero-btns">
-                <a href="#" class="btn-primary">เริ่มโปรเจกต์</a>
-                <a href="#" class="btn-secondary">ดูผลงานเพิ่มเติม</a>
+    <main class="content-v2">
+        <div class="background-image-glass" style="grid-area: bg;">
             </div>
-        </div>
-        <div class="hero-image">
-            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80" alt="Tech Setup">
-        </div>
-    </header>
 
-    
+        <div class="glass-panel main-display" style="grid-area: main;">
+            <nav class="inline-nav">
+                <ul>
+                    <li><a href="#">หน้าแรก</a></li>
+                    <li><a href="#">คู่มือ</a></li>
+                </ul>
+            </nav>
+            <h1>สำรวจมหากาพย์ TEYVAT</h1>
+            <p>คู่มือสู่การผจญภัยระดับคอสมิกกับไพมอน</p>
+            <button class="glass-btn btn-crystal">เริ่มการผจญภัย</button>
+        </div>
 
+        <div class="mirror-card star-control" style="grid-area: map;">
+            <div class="control-header">เลือกภูมิภาค</div>
+            </div>
+    </main>
 </body>
 </html>
