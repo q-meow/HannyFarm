@@ -1,198 +1,204 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cazeen - Payment Links</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        /* ตั้งค่าพื้นฐาน */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #eaf4fd; /* สีพื้นหลังฟ้าอ่อน */
-            font-family: 'Kanit', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-        }
+import React, { useState, useEffect } from 'react';
+import { 
+  Play, 
+  Pause, 
+  ShoppingBag, 
+  ListOrdered, 
+  Home, 
+  Star, 
+  Settings,
+  Music,
+  ChevronRight
+} from 'lucide-react';
 
-        /* กล่องเนื้อหาสีขาวตรงกลาง */
-        .card {
-            background-color: #ffffff;
-            width: 300px;
-            border-radius: 35px;
-            padding: 40px 20px 30px 20px;
-            box-shadow: 0 10px 30px rgba(162, 203, 237, 0.2);
-            text-align: center;
-            position: relative;
-        }
+const customStyles = `
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+  }
+`;
 
-        /* ส่วนหัวชื่อร้าน cazeen */
-        .shop-name {
-            color: #92c9f0;
-            font-size: 38px;
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 0px rgba(146, 201, 240, 0.15); /* เงาตัวหนังสือ */
-        }
+export default function App() {
+  const [isPlaying, setIsPlaying] = useState(false);
 
-        /* ป้ายชื่อบัญชี */
-        .account-badge {
-            background-color: #bce1fa;
-            color: #5c8aa3;
-            display: inline-block;
-            padding: 6px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-top: 10px;
-            margin-bottom: 30px;
-        }
+  useEffect(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = customStyles;
+    document.head.appendChild(styleSheet);
+    return () => styleSheet.remove();
+  }, []);
 
-        /* รูปแบบปุ่มทั่วไป */
-        .btn-link {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            margin-bottom: 15px;
-            border-radius: 25px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-sizing: border-box;
-            transition: transform 0.1s, opacity 0.2s;
-        }
+  const toggleMusic = () => setIsPlaying(!isPlaying);
 
-        .btn-link:active {
-            transform: scale(0.97); /* เวลากดให้ปุ่มยุบลงเล็กน้อย */
-        }
-
-        /* ปุ่มหลัก (K plus) พื้นฟ้า */
-        .btn-primary {
-            background-color: #bce1fa;
-            color: #3b6b85;
-            border: 2px solid #bce1fa;
-        }
-
-        /* ปุ่มรอง (วอเล็ต, โน๊ตสลิป) พื้นขาว ขอบฟ้า */
-        .btn-outline {
-            background-color: #ffffff;
-            color: #3b6b85;
-            border: 2px solid #def0fc;
-        }
-
-        /* ไอคอนก๊อปปี้ท้ายปุ่ม */
-        .copy-icon {
-            width: 20px;
-            height: 20px;
-            background-color: #d1e5f0;
-            border: 1px solid #aebac2;
-            border-radius: 4px;
-            box-shadow: inset -2px -2px 0px rgba(255,255,255,0.5);
-        }
-
-        /* ส่วนน้องหมาด้านล่าง */
-        .mascot-area {
-            margin-top: 25px;
-        }
-
-        .mascot-emoji {
-            font-size: 32px;
-            margin-bottom: 5px;
-        }
-
-        .mascot-text {
-            color: #8b9eb0;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* ป๊อปอัปแจ้งเตือน (Toast) */
-        .toast {
-            position: fixed;
-            bottom: 40px;
-            background-color: #333333;
-            color: #ffffff;
-            padding: 14px 28px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 400;
-            opacity: 0; /* ซ่อนไว้ก่อน */
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        /* เมื่อต้องการแสดงป๊อปอัป จะใช้คลาสนี้ */
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
-</head>
-<body>
-
-    <div class="card">
-        <h1 class="shop-name">cazeen</h1>
-        
-        <div class="account-badge">ชื่อบัญชี สมหญิง เท่านั้น</div>
-
-        <button class="btn-link btn-primary" onclick="copyText('K plus', '0123456789')">
-            <span>K plus</span>
-            <div class="copy-icon"></div>
-        </button>
-
-        <button class="btn-link btn-outline" onclick="copyText('วอเล็ต', '0812345678')">
-            <span>วอเล็ต</span>
-            <div class="copy-icon"></div>
-        </button>
-
-        <button class="btn-link btn-outline" onclick="copyText('โน๊ตสลิป', 'รายละเอียดสลิป')">
-            <span>โน๊ตสลิป</span>
-            <div class="copy-icon"></div>
-        </button>
-
-        <div class="mascot-area">
-            <div class="mascot-emoji">🐶</div>
-            <div class="mascot-text">โฮ่งๆ รออยู่นะ!</div>
+  return (
+    <div className="max-w-md mx-auto bg-[#fff0f5] min-h-screen pb-28 font-sans relative shadow-2xl overflow-hidden text-gray-800 flex flex-col">
+      
+      {/* 1. Header Section */}
+      <header className="relative">
+        {/* Cover Photo */}
+        <div className="h-48 w-full bg-gradient-to-br from-pink-300 to-rose-300 rounded-b-3xl shadow-sm relative overflow-hidden">
+          <img 
+            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop" 
+            alt="Cover" 
+            className="w-full h-full object-cover opacity-60 mix-blend-overlay"
+          />
+          <div className="absolute inset-0 bg-pink-400/20"></div>
         </div>
-    </div>
 
-    <div id="toastMessage" class="toast">คัดลอกสำเร็จแล้ว!</div>
+        {/* Profile & Store Info Row */}
+        <div className="relative px-6 flex items-start">
+          {/* Profile Picture */}
+          <div className="shrink-0 -mt-12 mr-4 z-10 relative">
+            <img 
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=500&auto=format&fit=crop" 
+              alt="Profile" 
+              className="w-24 h-24 rounded-full border-4 border-[#fff0f5] shadow-lg object-cover"
+            />
+            {/* Status indicator */}
+            <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-400 border-2 border-[#fff0f5] rounded-full"></div>
+          </div>
 
-    <script>
-        let toastTimeout;
-
-        // ฟังก์ชันสำหรับกดปุ่มแล้วขึ้นแจ้งเตือน (พร้อมจำลองการก๊อปปี้)
-        function copyText(buttonName, textToCopy) {
-            // 1. สั่งให้ก๊อปปี้ข้อความลง Clipboard
-            navigator.clipboard.writeText(textToCopy);
-
-            // 2. จัดการตัวแจ้งเตือน (Toast)
-            const toast = document.getElementById("toastMessage");
-            toast.innerText = `คัดลอก ${buttonName} สำเร็จแล้ว!`; // เปลี่ยนข้อความตามปุ่มที่กด
+          {/* Store Info */}
+          <div className="flex-1 pt-2">
+            <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              Cute Sign Shop
+              <span className="text-xs font-semibold bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full">
+                (Open)
+              </span>
+            </h1>
+            <p className="text-sm text-gray-500 mt-1 leading-tight">
+              รับทำป้ายน่ารักๆ สไตล์มินิมอล ใส่รายละเอียดร้านได้ที่นี่
+            </p>
             
-            // แสดงป๊อปอัป
-            toast.classList.add("show");
+            {/* Music Player Toggle */}
+            <button 
+              onClick={toggleMusic}
+              className="mt-2 inline-flex items-center gap-2 bg-white/80 hover:bg-white text-pink-500 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm transition-all border border-pink-100"
+            >
+              {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+              <Music size={12} className={isPlaying ? "animate-bounce" : ""} />
+              {isPlaying ? 'กำลังเล่น...' : 'เล่นเพลง'}
+            </button>
+          </div>
+        </div>
+      </header>
 
-            // เคลียร์เวลานับถอยหลังเก่า (ถ้ามีการกดรัวๆ)
-            clearTimeout(toastTimeout);
+      {/* 2. Stats & Calendar Section */}
+      <section className="px-6 py-8 flex gap-4 items-stretch">
+        {/* Left: Stats */}
+        <div className="flex flex-col justify-center gap-3 w-1/2">
+          <div className="bg-white/60 px-4 py-3 rounded-2xl border border-pink-100 shadow-sm">
+            <span className="block text-[11px] text-gray-500 mb-0.5">จำนวนสินค้าทั้งหมด</span>
+            <span className="text-sm font-bold text-pink-600">50 รายการ</span>
+          </div>
+          <div className="bg-white/60 px-4 py-3 rounded-2xl border border-pink-100 shadow-sm">
+            <span className="block text-[11px] text-gray-500 mb-0.5">จำนวนคิวงานทั้งหมด</span>
+            <span className="text-sm font-bold text-pink-600">50 งาน</span>
+          </div>
+        </div>
 
-            // ซ่อนป๊อปอัปหลังจากผ่านไป 2 วินาที (2000 ms)
-            toastTimeout = setTimeout(() => {
-                toast.classList.remove("show");
-            }, 2000);
-        }
-    </script>
+        {/* Right: Calendar Card (Dark Theme to stand out) */}
+        <div className="w-1/2 bg-gradient-to-br from-pink-800 to-rose-900 text-pink-50 rounded-3xl p-4 shadow-lg shadow-pink-200/50 flex flex-col justify-center relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full blur-xl"></div>
+          <h3 className="font-bold text-sm mb-2 flex items-center gap-1">
+             ปฏิทินงาน 📅
+          </h3>
+          <p className="text-xs text-pink-100/80 leading-relaxed font-light">
+            เอาไว้บอกว่าวันไหนทำกี่งาน เปิด-ปิดวันไหนบ้าง 
+            แจ้งรายละเอียดคิวงาน
+          </p>
+        </div>
+      </section>
 
-</body>
-</html>
+      {/* 3. Portfolio / Work Gallery */}
+      <section className="px-6 py-2">
+        <div className="flex justify-between items-end mb-3 px-1">
+          <h2 className="font-bold text-gray-800 text-base">ตัวอย่างงาน</h2>
+          <button className="text-xs text-pink-500 font-medium hover:text-pink-600 flex items-center">
+            {">>"}ทั้งหมด{"<<"}
+          </button>
+        </div>
+
+        <div className="flex overflow-x-auto gap-3 hide-scrollbar pb-4 snap-x">
+          {[1, 2, 3, 4, 5].map((item) => (
+            <div key={item} className="snap-start shrink-0">
+              <div className="w-32 h-32 rounded-2xl overflow-hidden shadow-md border-2 border-white bg-white">
+                <img 
+                  src={`https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=400&auto=format&fit=crop&sig=${item}`} 
+                  alt={`Portfolio ${item}`}
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="relative flex justify-center items-center mt-2">
+          <div className="w-full h-2 bg-gradient-to-r from-pink-200 via-pink-400 to-pink-200 rounded-full opacity-60"></div>
+          <span className="absolute bg-[#fff0f5] px-4 text-[10px] text-pink-500 font-medium tracking-wide">
+            เลื่อนเพื่อดูตัวอย่างงาน
+          </span>
+        </div>
+      </section>
+
+      {/* 4. Details & Pricing */}
+      <section className="px-6 mt-8 mb-8 flex-1">
+        <h2 className="text-center text-sm font-bold text-gray-700 mb-4 tracking-wide">
+          รายละเอียดการสั่งงาน/เรทราคา
+        </h2>
+        <div className="glass-card w-full h-48 rounded-[2rem] p-6 shadow-sm flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-3 text-pink-400">
+            <span className="font-serif italic text-xl">฿</span>
+          </div>
+          <p className="text-gray-400 text-sm font-medium">
+            พื้นที่สำหรับใส่รายละเอียด<br/>ราคาและขั้นตอนการสั่งทำ
+          </p>
+        </div>
+      </section>
+
+      {/* 5. Bottom Navigation Bar */}
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-gradient-to-r from-pink-900 to-rose-950 text-pink-200 rounded-t-[2.5rem] flex justify-between items-end px-6 py-4 pb-6 z-50 shadow-[0_-10px_30px_rgba(255,192,203,0.3)] border-t border-pink-800/50">
+        
+        <button className="flex flex-col items-center gap-1 hover:text-white transition-colors group w-12">
+          <ShoppingBag size={22} className="group-hover:-translate-y-1 transition-transform" />
+          <span className="text-[10px] font-medium">สินค้า</span>
+        </button>
+        
+        <button className="flex flex-col items-center gap-1 hover:text-white transition-colors group w-12">
+          <ListOrdered size={22} className="group-hover:-translate-y-1 transition-transform" />
+          <span className="text-[10px] font-medium">คิวงาน</span>
+        </button>
+
+        {/* Center Highlighted Home Button */}
+        <div className="relative -top-6">
+          <button className="flex flex-col items-center justify-center w-16 h-16 bg-pink-400 text-white rounded-full shadow-xl shadow-pink-400/40 border-[6px] border-[#fff0f5] hover:scale-105 transition-transform">
+            <Home size={24} />
+          </button>
+          <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-medium text-pink-300 w-full text-center">โฮม</span>
+        </div>
+
+        <button className="flex flex-col items-center gap-1 hover:text-white transition-colors group w-12">
+          <Star size={22} className="group-hover:-translate-y-1 transition-transform" />
+          <span className="text-[10px] font-medium">รีวิว</span>
+        </button>
+
+        <button className="flex flex-col items-center gap-1 hover:text-white transition-colors group w-12">
+          <Settings size={22} className="group-hover:-translate-y-1 transition-transform" />
+          <span className="text-[10px] font-medium">ตั้งค่า</span>
+        </button>
+
+      </nav>
+
+    </div>
+  );
+}
