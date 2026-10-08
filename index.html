@@ -110,32 +110,54 @@
             <a href="#" class="text-xs text-pink-500 hover:underline">>> ทั้งหมด <<</a>
         </div>
 
-        <!-- แถบเลื่อนรูปภาพแนวนอน (กล่องดำตามแบบ) -->
+        <!-- แถบเลื่อนรูปภาพแนวนอน ปรับเป็นสัดส่วน 1:1 (w-32 h-32) -->
         <div class="flex gap-4 overflow-x-auto hide-scrollbar px-6 pb-2">
-            <!-- สร้างกล่องดำจำลองผลงาน 4 กล่อง -->
-            <div class="flex-none w-32 h-40 bg-gray-900 rounded-xl shadow-md border border-gray-800"></div>
-            <div class="flex-none w-32 h-40 bg-gray-900 rounded-xl shadow-md border border-gray-800"></div>
-            <div class="flex-none w-32 h-40 bg-gray-900 rounded-xl shadow-md border border-gray-800"></div>
-            <div class="flex-none w-32 h-40 bg-gray-900 rounded-xl shadow-md border border-gray-800"></div>
+            <!-- กล่องผลงานที่ 1 -->
+            <div class="flex-none w-32 h-32 bg-gray-900 rounded-xl shadow-md border border-gray-800 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover" alt="ผลงาน 1">
+            </div>
+            <!-- กล่องผลงานที่ 2 -->
+            <div class="flex-none w-32 h-32 bg-gray-900 rounded-xl shadow-md border border-gray-800 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover" alt="ผลงาน 2">
+            </div>
+            <!-- กล่องผลงานที่ 3 (รอใส่รูป) -->
+            <div class="flex-none w-32 h-32 bg-gray-900 rounded-xl shadow-md border border-gray-800 overflow-hidden"></div>
+            <!-- กล่องผลงานที่ 4 (รอใส่รูป) -->
+            <div class="flex-none w-32 h-32 bg-gray-900 rounded-xl shadow-md border border-gray-800 overflow-hidden"></div>
         </div>
         
-        <!-- แถบแจ้งเตือนให้เลื่อน -->
-        <div class="px-6 mt-2 flex justify-center">
-            <div class="w-full h-1.5 bg-pink-200 rounded-full flex justify-center items-center relative">
-                <span class="absolute bg-white px-2 text-[10px] text-pink-400 font-medium tracking-wider">เลื่อนเพื่อดูตัวอย่างงาน</span>
-            </div>
+        <!-- แถบแจ้งเตือนให้เลื่อน แบบมีเส้นซ้ายขวา -->
+        <div class="px-6 mt-4 flex items-center justify-center gap-2">
+            <div class="flex-1 h-[2px] bg-pink-200 rounded-full"></div>
+            <span class="text-[10px] text-pink-400 font-medium tracking-wider">เลื่อนเพื่อดูตัวอย่างงาน</span>
+            <div class="flex-1 h-[2px] bg-pink-200 rounded-full"></div>
         </div>
     </section>
 
     <!-- 4. รายละเอียดการสั่งงาน/เรทราคา -->
     <section class="px-6 mt-8 mb-6">
         <h2 class="font-medium text-lg mb-4 text-center">รายละเอียดการสั่งงาน/เรทราคา</h2>
-        <div class="bg-gray-900 rounded-2xl p-6 min-h-[250px] shadow-lg flex items-center justify-center border border-gray-800">
-            <p class="text-gray-400 text-sm text-center">
-                พื้นที่สำหรับใส่รูปเรทราคา<br>
-                หรือพิมพ์รายละเอียดการสั่งงาน
-            </p>
+        <!-- ใช้ img เพื่อให้ความสูงปรับตามอัตราส่วนของภาพเรทราคาโดยอัตโนมัติ -->
+        <div class="w-full rounded-2xl shadow-lg border border-gray-800 overflow-hidden bg-gray-900 flex items-center justify-center">
+            <!-- เปลี่ยนลิงก์รูปใน src เป็นไฟล์รูปเรทราคาของคุณ -->
+            <img src="https://images.unsplash.com/photo-1542204625-2dfb7e8cb3cc?q=80&w=800&auto=format&fit=crop" 
+                 alt="รายละเอียดเรทราคา" class="w-full h-auto object-contain">
         </div>
     </section>
 
-    <!-- 5. แถบเมนูด้านล่าง (Bottom Navigation) แบบกล
+    <!-- 5. แถบเมนูด้านล่าง (Bottom Navigation) -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-black text-white px-6 py-3 rounded-t-2xl flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-50">
+        
+        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-pink-400 transition">
+            <i class="fa-solid fa-box-open text-lg"></i>
+            <span class="text-[10px]">สินค้า</span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-pink-400 transition">
+            <i class="fa-solid fa-list-ul text-lg"></i>
+            <span class="text-[10px]">คิวงาน</span>
+        </button>
+
+        <!-- ปุ่ม Home (ปุ่มหลักตรงกลาง) -->
+        <button class="flex flex-col items-center gap-1 text-pink-400 -mt-6">
+            <div class="w-12 h-12 bg-white rounded-full flex
