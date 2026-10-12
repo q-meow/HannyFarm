@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบ Firebase Realtime</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบเรียลไทม์สมบูรณ์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- ไลบรารี Pickr สำหรับ Color Picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 
-    <!-- 🌟 นำเข้าไลบรารี Firebase -->
+    <!-- นำเข้าไลบรารี Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     
@@ -206,7 +205,7 @@
         <button id="settingsBtn" class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px]">ตั้งค่า</span></button>
     </nav>
 
-    <!-- Modals (Login, Image, Social) -->
+    <!-- Modals -->
     <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
             <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -283,7 +282,7 @@
                 <div class="space-y-2">
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerAccent"></div>
+                            <div id="pickerAccent" class="w-6 h-6 rounded-full overflow-hidden"></div>
                             <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
                         </div>
                         <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -291,7 +290,7 @@
 
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerBg"></div>
+                            <div id="pickerBg" class="w-6 h-6 rounded-full overflow-hidden"></div>
                             <span class="text-xs text-slate-600">พื้นหลังเว็บ</span>
                         </div>
                         <span id="hexColorBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -299,7 +298,7 @@
                     
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerAccentBg"></div>
+                            <div id="pickerAccentBg" class="w-6 h-6 rounded-full overflow-hidden"></div>
                             <span class="text-xs text-slate-600">สีพื้นหลังป้ายเล็กๆ</span>
                         </div>
                         <span id="hexColorAccentBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -307,7 +306,7 @@
                     
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerText"></div>
+                            <div id="pickerText" class="w-6 h-6 rounded-full overflow-hidden"></div>
                             <span class="text-xs text-slate-600">สีตัวอักษรหลัก</span>
                         </div>
                         <span id="hexColorText" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -341,13 +340,29 @@
         </div>
     </div>
 
-    <!-- ⚡️ โค้ดส่วนเชื่อมต่อ FIREBASE ⚡️ -->
+    <!-- ⚡️ โค้ดส่วนเชื่อมต่อ FIREBASE (ไฮบริด) สมบูรณ์แบบ ⚡️ -->
     <script>
-        // 1. ตั้งค่ากุญแจ Firebase (นำโค้ดที่คิวส่งมาประกอบร่างกับ URL ของเซิร์ฟเวอร์สิงคโปร์)
+        // 1. โหลดสีจากเครื่องก่อนเลยทันที (กันสีกะพริบ)
+        function loadLocalTheme() {
+            const saved = localStorage.getItem('myCuteSignActiveTheme');
+            if (saved) {
+                try {
+                    const theme = JSON.parse(saved);
+                    const root = document.documentElement;
+                    root.style.setProperty('--bg-color', theme.bg);
+                    root.style.setProperty('--accent-color', theme.accent);
+                    root.style.setProperty('--accent-bg', theme.accentBg);
+                    root.style.setProperty('--text-main', theme.text);
+                } catch(e) {}
+            }
+        }
+        loadLocalTheme(); 
+
+        // 2. ตั้งค่ากุญแจ Firebase แบบเต็มสูตร
         const firebaseConfig = {
             apiKey: "AIzaSyBCJ--ekt4btJYce_6MsXC3iDHt5X6b9ag",
             authDomain: "cutesignshop.firebaseapp.com",
-            databaseURL: "https://cutesignshop-default-rtdb.asia-southeast1.firebasedatabase.app", // <== เพิ่มบรรทัดนี้ให้แล้วครับ
+            databaseURL: "https://cutesignshop-default-rtdb.asia-southeast1.firebasedatabase.app", 
             projectId: "cutesignshop",
             storageBucket: "cutesignshop.firebasestorage.app",
             messagingSenderId: "945983696443",
@@ -355,39 +370,42 @@
             measurementId: "G-2JKK4RZQW8"
         };
 
-        // 2. ปลุกระบบฐานข้อมูลให้ทำงาน
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 3. ระบบซิงค์สีเรียลไทม์ (คอยดักฟังว่าแอดมินเปลี่ยนสีหรือยัง)
+        // 3. ระบบซิงค์สีเรียลไทม์กับฐานข้อมูล
         db.ref('theme/active').on('value', (snapshot) => {
             const theme = snapshot.val();
             if (theme) {
-                // ถ้ามีสีใน Database ให้เอาสีมาอัปเดตทั้งเว็บ
                 const root = document.documentElement;
                 root.style.setProperty('--bg-color', theme.bg);
                 root.style.setProperty('--accent-color', theme.accent);
                 root.style.setProperty('--accent-bg', theme.accentBg);
                 root.style.setProperty('--text-main', theme.text);
-
-                document.getElementById('hexColorBg').innerText = theme.bg;
-                document.getElementById('hexColorAccent').innerText = theme.accent;
-                document.getElementById('hexColorAccentBg').innerText = theme.accentBg;
-                document.getElementById('hexColorText').innerText = theme.text;
+                
+                // แอบอัปเดตลงความจำเครื่องด้วย
+                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(theme));
+                
+                // อัปเดตตัวหนังสือ HEX (ถ้าเปิดหน้าต่างแอดมินอยู่)
+                if(document.getElementById('hexColorBg')) {
+                    document.getElementById('hexColorBg').innerText = theme.bg;
+                    document.getElementById('hexColorAccent').innerText = theme.accent;
+                    document.getElementById('hexColorAccentBg').innerText = theme.accentBg;
+                    document.getElementById('hexColorText').innerText = theme.text;
+                }
             }
         });
 
-        // 4. เช็คก่อนว่ามีสีอยู่ในฐานข้อมูลหรือยัง ถ้ายังให้เซฟสีตั้งต้นเข้าไปครั้งแรก
+        // ถ้าเพิ่งสร้าง Database ครั้งแรก ให้ส่งสีตั้งต้นขึ้นไป
         db.ref('theme/active').once('value', (snapshot) => {
             if (!snapshot.exists()) {
                 saveCurrentTheme();
             }
         });
 
-        // 5. ฟังก์ชันส่งรหัสสีขึ้นไปเก็บใน Firebase
+        // 4. ฟังก์ชันส่งข้อมูลสีลงคอมพิวเตอร์ และ คลาวด์
         let saveTimeout;
         function saveCurrentTheme() {
-            // หน่วงเวลา 150ms เผื่อแอดมินลากเมาส์เปลี่ยนสีรัวๆ ระบบจะได้ไม่ค้าง
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
                 const root = getComputedStyle(document.documentElement);
@@ -397,7 +415,14 @@
                     accentBg: root.getPropertyValue('--accent-bg').trim(),
                     text: root.getPropertyValue('--text-main').trim()
                 };
-                db.ref('theme/active').set(currentTheme);
+                
+                // เซฟลงเครื่อง 
+                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(currentTheme));
+                
+                // ส่งขึ้นคลาวด์ 
+                if(typeof db !== 'undefined') {
+                    db.ref('theme/active').set(currentTheme).catch(err => console.log("Firebase Error:", err));
+                }
             }, 150);
         }
 
@@ -470,28 +495,27 @@
         const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
         const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
 
-        // พอกดลากสีปุ๊บ สั่งอัปเดตและส่งข้อมูลเข้าคลาวด์ทันที
         pickrAccent.on('change', (color) => { 
             const rgba = color.toRGBA().toString(0);
             document.documentElement.style.setProperty('--accent-color', rgba);
             document.getElementById('hexColorAccent').innerText = color.toHEXA().toString();
             generateSmartPalette(rgba); 
-            saveCurrentTheme(); // ☁️ ส่งข้อมูลขึ้น Firebase
+            saveCurrentTheme(); 
         });
         pickrBg.on('change', (color) => { 
             document.documentElement.style.setProperty('--bg-color', color.toRGBA().toString(0));
             document.getElementById('hexColorBg').innerText = color.toHEXA().toString();
-            saveCurrentTheme(); // ☁️
+            saveCurrentTheme(); 
         });
         pickrAccentBg.on('change', (color) => { 
             document.documentElement.style.setProperty('--accent-bg', color.toRGBA().toString(0));
             document.getElementById('hexColorAccentBg').innerText = color.toHEXA().toString();
-            saveCurrentTheme(); // ☁️
+            saveCurrentTheme(); 
         });
         pickrText.on('change', (color) => { 
             document.documentElement.style.setProperty('--text-main', color.toRGBA().toString(0));
             document.getElementById('hexColorText').innerText = color.toHEXA().toString();
-            saveCurrentTheme(); // ☁️
+            saveCurrentTheme(); 
         });
 
         function toggleThemeModal() {
@@ -525,7 +549,6 @@
             pickrAccentBg.setColor(accentBg);
             pickrText.setColor(text);
             
-            // รอระบบเซ็ตสีสักนิด แล้วส่งสีขึ้นไปเปลี่ยนให้ทุกคนใน Database
             setTimeout(saveCurrentTheme, 100); 
         }
 
@@ -598,7 +621,7 @@
             applyPresetTheme(currentSuggested.bg, currentSuggested.accent, currentSuggested.accentBg, currentSuggested.text);
         }
 
-        // ระบบบันทึก "ธีมของฉัน" (Custom Themes) แบบส่วนตัวลงเครื่อง
+        // ระบบบันทึก "ธีมของฉัน" (Custom Themes) 
         function saveCustomTheme() {
             const themeName = prompt("ตั้งชื่อธีมใหม่ของคุณ:");
             if(!themeName) return;
@@ -657,7 +680,7 @@
             if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes();
         };
 
-        // ระบบแก้ไขภาพ
+        // ฟังก์ชันแก้ไขภาพ
         let currentTargetId = '';
         function editImage(imgId, title) {
             if(!isAdmin) return; 
