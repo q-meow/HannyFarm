@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบสินค้า & ลากวาง</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบสมบูรณ์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -55,7 +55,6 @@
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto bg-white shadow-xl min-h-screen relative overflow-x-hidden">
 
-    <!-- 🌟 แก้ไข: เพิ่ม onclick="openLoginWindow()" ตรงนี้ 🌟 -->
     <button id="openLoginBtn" onclick="openLoginWindow()" class="absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5" style="color: var(--text-main)">
         <i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล
     </button>
@@ -298,23 +297,105 @@
         </div>
     </div>
 
-    <!-- Theme Modal -->
+    <!-- 🌟🌟 Modal แต่งสีเดิมที่คิวคุ้นเคยกลับมาครบถ้วน (Theme Modal) 🌟🌟 -->
     <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white rounded-2xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
-            <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 bg-slate-50 rounded-full"><i class="fa-solid fa-chevron-down text-sm"></i></button>
-            <div class="text-center mb-4 mt-1"><h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-palette text-pink-500"></i> ตกแต่งธีมสี</h2></div>
+            <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 transition bg-slate-50 hover:bg-slate-100 rounded-full">
+                <i class="fa-solid fa-chevron-down text-sm"></i>
+            </button>
             
-            <div class="mb-4">
-                <h4 class="text-[11px] font-bold text-slate-700 mb-2">ปรับแต่งสีเอง (คลิกที่วงกลมสี)</h4>
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center bg-white p-2 border rounded-xl"><div class="flex items-center gap-2"><div id="pickerAccent"></div><span class="text-xs">สีหลัก</span></div><span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono"></span></div>
-                    <div class="flex justify-between items-center bg-white p-2 border rounded-xl"><div class="flex items-center gap-2"><div id="pickerBg"></div><span class="text-xs">พื้นหลังเว็บ</span></div><span id="hexColorBg" class="text-[10px] text-slate-400 font-mono"></span></div>
-                    <div class="flex justify-between items-center bg-white p-2 border rounded-xl"><div class="flex items-center gap-2"><div id="pickerAccentBg"></div><span class="text-xs">สีพื้นหลังป้าย</span></div><span id="hexColorAccentBg" class="text-[10px] text-slate-400 font-mono"></span></div>
-                    <div class="flex justify-between items-center bg-white p-2 border rounded-xl"><div class="flex items-center gap-2"><div id="pickerText"></div><span class="text-xs">สีตัวอักษร</span></div><span id="hexColorText" class="text-[10px] text-slate-400 font-mono"></span></div>
+            <div class="text-center mb-6 mt-1">
+                <div class="w-10 h-10 mx-auto bg-pink-100 rounded-full flex items-center justify-center text-lg mb-3">
+                    <i class="fa-solid fa-palette text-pink-500"></i>
+                </div>
+                <h2 class="font-bold text-lg text-slate-800">ตกแต่งธีมสี</h2>
+                <p class="text-[11px] text-slate-500 mt-1">ปรับแต่งสีเว็บไซต์ตามต้องการ</p>
+            </div>
+            
+            <!-- ⚡ ธีมสำเร็จรูป -->
+            <div class="mb-5">
+                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-bolt text-yellow-400"></i> ธีมสำเร็จรูป</h4>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="applyPresetTheme('#f0f7ff', '#3b82f6', '#dbeafe', '#1e3a8a')" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-blue-400"></div> Bubble Blue</button>
+                    <button onclick="applyPresetTheme('#fdf2f8', '#f43f5e', '#ffe4e6', '#881337')" class="px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-xs font-medium border border-pink-100 hover:bg-pink-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-pink-400"></div> Rose Gold</button>
+                    <button onclick="applyPresetTheme('#f0fdf4', '#22c55e', '#dcfce7', '#14532d')" class="px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-medium border border-green-100 hover:bg-green-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-green-400"></div> Matcha</button>
+                    <button onclick="applyPresetTheme('#fef3c7', '#d97706', '#fde68a', '#78350f')" class="px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-medium border border-amber-100 hover:bg-amber-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-amber-400"></div> Chestnut</button>
+                    <button onclick="applyPresetTheme('#f8fafc', '#475569', '#e2e8f0', '#0f172a')" class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-xs font-medium border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-slate-400"></div> Minimal</button>
                 </div>
             </div>
-            <button onclick="toggleThemeModal()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-[11px] font-bold mt-2">นำไปใช้</button>
-            <button onclick="logoutAdmin()" class="w-full text-[11px] text-red-400 py-3 mt-2"><i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ</button>
+
+            <!-- 🌟 ธีมของฉัน -->
+            <div class="mb-5">
+                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-star text-yellow-400"></i> ธีมของฉัน</h4>
+                <div id="myThemesContainer" class="flex flex-wrap gap-2 text-xs text-slate-400"><span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span></div>
+            </div>
+
+            <hr class="border-slate-100 my-5">
+
+            <!-- 🎨 ปรับแต่งสีเอง -->
+            <div class="mb-5">
+                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่วงกลมสี)
+                </h4>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerAccent"></div>
+                            <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
+                        </div>
+                        <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerBg"></div>
+                            <span class="text-xs text-slate-600">พื้นหลังเว็บ</span>
+                        </div>
+                        <span id="hexColorBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerAccentBg"></div>
+                            <span class="text-xs text-slate-600">สีพื้นหลังป้ายเล็กๆ</span>
+                        </div>
+                        <span id="hexColorAccentBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerText"></div>
+                            <span class="text-xs text-slate-600">สีตัวอักษรหลัก</span>
+                        </div>
+                        <span id="hexColorText" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Palette Guide -->
+            <div class="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100 relative mt-8">
+                <div class="absolute -top-3 left-4 bg-white px-2 py-0.5 text-[10px] font-bold text-amber-500 border border-slate-100 rounded-full flex items-center gap-1 shadow-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> แนะนำเฉดสีที่เข้ากัน
+                </div>
+                <p class="text-[10px] text-slate-500 mb-2 mt-1 leading-relaxed">
+                    ปรับโทนสีอัตโนมัติตาม <b>"สีหลัก"</b> ด้านบน หากถูกใจสามารถคลิกที่แถบสีเพื่อนำไปใช้ได้เลย
+                </p>
+                <div id="suggestedPaletteContainer" onclick="applySuggestedPalette()" class="h-10 w-full rounded-xl overflow-hidden flex shadow-inner cursor-pointer hover:ring-2 ring-blue-300 transition-all">
+                </div>
+            </div>
+
+            <button onclick="saveCustomTheme()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 rounded-xl py-3 text-[11px] font-bold hover:bg-blue-100 transition mb-3 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-plus text-[10px]"></i> บันทึกการตั้งค่าสีปัจจุบันเป็นธีมใหม่
+            </button>
+            <button onclick="toggleThemeModal()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-[11px] font-bold hover:bg-black transition flex items-center justify-center gap-1.5 shadow-lg">
+                นำไปใช้
+            </button>
+            <div class="text-center mt-4">
+                <button onclick="logoutAdmin()" class="text-[11px] text-red-400 hover:text-red-600 transition flex items-center justify-center gap-1.5 mx-auto font-medium">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ Admin
+                </button>
+            </div>
         </div>
     </div>
 
@@ -338,14 +419,13 @@
         let productsList = []; 
         let activeTag = 'All'; 
 
-        // 🌟 เพิ่มฟังก์ชันเปิดหน้าต่างล็อกอินที่นี่ 🌟
         function openLoginWindow() {
             if(!isAdmin) {
                 document.getElementById('loginModal').classList.remove('hidden');
-                document.getElementById('adminPassword').value = ''; // เคลียร์รหัสผ่านเก่า
+                document.getElementById('adminPassword').value = '';
                 document.getElementById('adminPassword').focus();
             } else {
-                toggleThemeModal(); // ถ้าเป็นแอดมินแล้ว กดปุ่มผู้ดูแลให้เปิดแผงสีแทน
+                toggleThemeModal(); 
             }
         }
 
@@ -594,23 +674,93 @@
         }
 
         // ==========================================
-        // ระบบ Admin และ การตกแต่ง (โค้ดส่วนเดิม)
+        // ระบบแต่งสีเว็บ (Pickr & Firebase Sync)
         // ==========================================
+        function loadLocalTheme() {
+            const saved = localStorage.getItem('myCuteSignActiveTheme');
+            if (saved) {
+                try {
+                    const theme = JSON.parse(saved);
+                    const root = document.documentElement;
+                    root.style.setProperty('--bg-color', theme.bg);
+                    root.style.setProperty('--accent-color', theme.accent);
+                    root.style.setProperty('--accent-bg', theme.accentBg);
+                    root.style.setProperty('--text-main', theme.text);
+                } catch(e) {}
+            }
+        }
+        loadLocalTheme(); 
+
+        db.ref('theme/active').on('value', (snapshot) => {
+            const theme = snapshot.val();
+            if (theme) {
+                const root = document.documentElement;
+                root.style.setProperty('--bg-color', theme.bg);
+                root.style.setProperty('--accent-color', theme.accent);
+                root.style.setProperty('--accent-bg', theme.accentBg);
+                root.style.setProperty('--text-main', theme.text);
+                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(theme));
+                
+                if(document.getElementById('hexColorBg')) {
+                    document.getElementById('hexColorBg').innerText = theme.bg;
+                    document.getElementById('hexColorAccent').innerText = theme.accent;
+                    document.getElementById('hexColorAccentBg').innerText = theme.accentBg;
+                    document.getElementById('hexColorText').innerText = theme.text;
+                }
+            }
+        });
+
+        db.ref('theme/active').once('value', (snapshot) => {
+            if (!snapshot.exists()) saveCurrentTheme();
+        });
+
+        let saveTimeout;
+        function saveCurrentTheme() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                const root = getComputedStyle(document.documentElement);
+                const currentTheme = {
+                    bg: root.getPropertyValue('--bg-color').trim(),
+                    accent: root.getPropertyValue('--accent-color').trim(),
+                    accentBg: root.getPropertyValue('--accent-bg').trim(),
+                    text: root.getPropertyValue('--text-main').trim()
+                };
+                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(currentTheme));
+                if(typeof db !== 'undefined') {
+                    db.ref('theme/active').set(currentTheme).catch(err => console.log(err));
+                }
+            }, 150);
+        }
+
+        let isPlaying = false;
+        document.getElementById('musicToggle').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            document.getElementById('musicIcon').className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
+            document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
+        });
+
         function settingsClicked() {
-            if(isAdmin) document.getElementById('themeModal').classList.remove('hidden');
+            if(isAdmin) toggleThemeModal();
             else document.getElementById('loginModal').classList.remove('hidden');
         }
 
         function attemptLogin() {
             if(document.getElementById('adminPassword').value === '1234') {
                 isAdmin = true;
-                document.body.classList.add('admin-active');
+                document.body.classList.add('admin-active'); 
                 document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'true'));
                 document.getElementById('loginModal').classList.add('hidden');
-                document.getElementById('openLoginBtn').innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
-                document.getElementById('openLoginBtn').classList.add('bg-green-500', 'text-white', 'border-transparent');
-                filterProducts(); // รีเฟรชกริดเพื่อแสดงปุ่มแก้ไข
-            } else alert("รหัสผ่านไม่ถูกต้อง");
+                
+                let btn = document.getElementById('openLoginBtn');
+                btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
+                btn.classList.add('bg-green-500', 'text-white', 'border-transparent');
+                
+                syncPickersWithRoot();
+                loadCustomThemes(); 
+                filterProducts();
+            } else {
+                alert("รหัสผ่านไม่ถูกต้อง");
+            }
         }
 
         function logoutAdmin() {
@@ -618,35 +768,214 @@
             document.body.classList.remove('admin-active');
             document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'false'));
             document.getElementById('themeModal').classList.add('hidden');
-            document.getElementById('openLoginBtn').innerHTML = '<i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล';
-            document.getElementById('openLoginBtn').className = "absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5";
-            document.getElementById('openLoginBtn').style.color = "var(--text-main)";
-            filterProducts(); // ซ่อนปุ่มแก้ไข
+            
+            let btn = document.getElementById('openLoginBtn');
+            btn.innerHTML = '<i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล';
+            btn.className = "absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5";
+            btn.style.color = "var(--text-main)";
+            filterProducts();
         }
 
-        function toggleThemeModal() { document.getElementById('themeModal').classList.toggle('hidden'); }
+        const pickrConfig = {
+            theme: 'nano',
+            swatches: null,
+            components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: true, input: true } }
+        };
 
-        const savedTheme = localStorage.getItem('myCuteSignActiveTheme');
-        if (savedTheme) {
-            try {
-                const theme = JSON.parse(savedTheme);
-                document.documentElement.style.setProperty('--bg-color', theme.bg);
-                document.documentElement.style.setProperty('--accent-color', theme.accent);
-                document.documentElement.style.setProperty('--accent-bg', theme.accentBg);
-                document.documentElement.style.setProperty('--text-main', theme.text);
-            } catch(e) {}
-        }
-        
-        db.ref('theme/active').on('value', (snapshot) => {
-            const theme = snapshot.val();
-            if (theme) {
-                document.documentElement.style.setProperty('--bg-color', theme.bg);
-                document.documentElement.style.setProperty('--accent-color', theme.accent);
-                document.documentElement.style.setProperty('--accent-bg', theme.accentBg);
-                document.documentElement.style.setProperty('--text-main', theme.text);
-                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(theme));
-            }
+        const pickrAccent = Pickr.create({ el: '#pickerAccent', default: '#3b82f6', ...pickrConfig });
+        const pickrBg = Pickr.create({ el: '#pickerBg', default: '#f4f9ff', ...pickrConfig });
+        const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
+        const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
+
+        pickrAccent.on('change', (color) => { 
+            const rgba = color.toRGBA().toString(0);
+            document.documentElement.style.setProperty('--accent-color', rgba);
+            document.getElementById('hexColorAccent').innerText = color.toHEXA().toString();
+            generateSmartPalette(rgba); 
+            saveCurrentTheme(); 
         });
+        pickrBg.on('change', (color) => { 
+            document.documentElement.style.setProperty('--bg-color', color.toRGBA().toString(0));
+            document.getElementById('hexColorBg').innerText = color.toHEXA().toString();
+            saveCurrentTheme(); 
+        });
+        pickrAccentBg.on('change', (color) => { 
+            document.documentElement.style.setProperty('--accent-bg', color.toRGBA().toString(0));
+            document.getElementById('hexColorAccentBg').innerText = color.toHEXA().toString();
+            saveCurrentTheme(); 
+        });
+        pickrText.on('change', (color) => { 
+            document.documentElement.style.setProperty('--text-main', color.toRGBA().toString(0));
+            document.getElementById('hexColorText').innerText = color.toHEXA().toString();
+            saveCurrentTheme(); 
+        });
+
+        function toggleThemeModal() {
+            const modal = document.getElementById('themeModal');
+            if(modal.classList.contains('hidden')) {
+                syncPickersWithRoot(); 
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function syncPickersWithRoot() {
+            const root = getComputedStyle(document.documentElement);
+            const bg = root.getPropertyValue('--bg-color').trim();
+            const accent = root.getPropertyValue('--accent-color').trim();
+            const accentBg = root.getPropertyValue('--accent-bg').trim();
+            const text = root.getPropertyValue('--text-main').trim();
+
+            pickrBg.setColor(bg);
+            pickrAccent.setColor(accent);
+            pickrAccentBg.setColor(accentBg);
+            pickrText.setColor(text);
+            generateSmartPalette(accent); 
+        }
+
+        function applyPresetTheme(bg, accent, accentBg, text) {
+            pickrBg.setColor(bg);
+            pickrAccent.setColor(accent);
+            pickrAccentBg.setColor(accentBg);
+            pickrText.setColor(text);
+            setTimeout(saveCurrentTheme, 100); 
+        }
+
+        let currentSuggested = {};
+        function parseRGB(colorStr) {
+            let r=0, g=0, b=0;
+            if(colorStr.startsWith('rgba')) {
+                const parts = colorStr.match(/[\d.]+/g);
+                if(parts && parts.length >= 3) { r = parseInt(parts[0]); g = parseInt(parts[1]); b = parseInt(parts[2]); }
+            } else if(colorStr.startsWith('#')) {
+                let hex = colorStr.replace('#', '');
+                if(hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+                r = parseInt(hex.substring(0,2), 16); g = parseInt(hex.substring(2,4), 16); b = parseInt(hex.substring(4,6), 16);
+            }
+            return {r, g, b};
+        }
+
+        function RGBToHSL(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
+            if (delta == 0) h = 0; else if (cmax == r) h = ((g - b) / delta) % 6; else if (cmax == g) h = (b - r) / delta + 2; else h = (r - g) / delta + 4;
+            h = Math.round(h * 60); if (h < 0) h += 360; l = (cmax + cmin) / 2; s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            return {h, s: +(s * 100).toFixed(1), l: +(l * 100).toFixed(1)};
+        }
+
+        function HSLToRGB(h, s, l) {
+            s /= 100; l /= 100;
+            let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; } else if (60 <= h && h < 120) { r = x; g = c; b = 0; } else if (120 <= h && h < 180) { r = 0; g = c; b = x; } else if (180 <= h && h < 240) { r = 0; g = x; b = c; } else if (240 <= h && h < 300) { r = x; g = 0; b = c; } else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+            r = Math.round((r + m) * 255); g = Math.round((g + m) * 255); b = Math.round((b + m) * 255);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function generateSmartPalette(baseColorStr) {
+            const rgb = parseRGB(baseColorStr);
+            const hsl = RGBToHSL(rgb.r, rgb.g, rgb.b);
+            let textL = Math.max(15, hsl.l - 35);
+            const textCol = HSLToRGB(hsl.h, hsl.s, textL);
+            let accentBgL = Math.min(94, hsl.l + 35);
+            const accentBgCol = HSLToRGB(hsl.h, hsl.s, accentBgL);
+            let bgL = Math.min(98, hsl.l + 45);
+            const bgCol = HSLToRGB(hsl.h, Math.max(10, hsl.s - 20), bgL); 
+            
+            currentSuggested = { text: textCol, accent: baseColorStr, accentBg: accentBgCol, bg: bgCol };
+
+            document.getElementById('suggestedPaletteContainer').innerHTML = `
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${textCol}"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${baseColorStr}"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${accentBgCol}"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${bgCol}"></div>
+            `;
+        }
+
+        function applySuggestedPalette() { applyPresetTheme(currentSuggested.bg, currentSuggested.accent, currentSuggested.accentBg, currentSuggested.text); }
+
+        function saveCustomTheme() {
+            const themeName = prompt("ตั้งชื่อธีมใหม่ของคุณ:");
+            if(!themeName) return;
+            const root = getComputedStyle(document.documentElement);
+            const newTheme = {
+                id: Date.now().toString(),
+                name: themeName,
+                bg: root.getPropertyValue('--bg-color').trim(),
+                accent: root.getPropertyValue('--accent-color').trim(),
+                accentBg: root.getPropertyValue('--accent-bg').trim(),
+                text: root.getPropertyValue('--text-main').trim()
+            };
+            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
+            savedThemes.push(newTheme);
+            localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
+            loadCustomThemes();
+        }
+
+        function loadCustomThemes() {
+            const container = document.getElementById('myThemesContainer');
+            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
+            if(savedThemes.length === 0) {
+                container.innerHTML = '<span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span>';
+                return;
+            }
+            container.innerHTML = ''; 
+            savedThemes.forEach(theme => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-1.5 bg-slate-50 text-slate-700 rounded-full text-xs font-medium border border-slate-200 hover:bg-slate-100 transition flex items-center gap-1.5";
+                btn.innerHTML = `<div class="w-2 h-2 rounded-full shadow-inner" style="background-color: ${theme.accent}"></div> ${theme.name}`;
+                btn.onclick = () => applyPresetTheme(theme.bg, theme.accent, theme.accentBg, theme.text);
+                
+                const delBtn = document.createElement('span');
+                delBtn.className = "text-[9px] text-slate-300 hover:text-red-400 ml-1";
+                delBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm(`ต้องการลบธีม "${theme.name}" ใช่หรือไม่?`)) {
+                        savedThemes = savedThemes.filter(t => t.id !== theme.id);
+                        localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
+                        loadCustomThemes();
+                    }
+                };
+                btn.appendChild(delBtn);
+                container.appendChild(btn);
+            });
+        }
+        window.onload = () => { if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); };
+
+        let currentTargetId = '';
+        function editImage(imgId, title) {
+            if(!isAdmin) return; 
+            currentTargetId = imgId;
+            document.getElementById('inputModalTitle').innerText = title;
+            document.getElementById('modalInput').value = document.getElementById(imgId).src;
+            document.getElementById('inputModal').classList.remove('hidden');
+            document.getElementById('saveInputBtn').onclick = function() {
+                const newUrl = document.getElementById('modalInput').value;
+                if(newUrl) document.getElementById(currentTargetId).src = newUrl;
+                document.getElementById('inputModal').classList.add('hidden');
+            };
+        }
+
+        let portCount = 2; 
+        function addPortfolioImage() {
+            portCount++;
+            const newId = 'port' + portCount;
+            const newDiv = document.createElement('div');
+            newDiv.className = "flex-none w-32 h-32 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden editable-img";
+            newDiv.onclick = () => editImage(newId, 'เปลี่ยนตัวอย่างงาน ' + portCount);
+            const newImg = document.createElement('img');
+            newImg.id = newId;
+            newImg.src = "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=300&auto=format&fit=crop"; 
+            newImg.className = "w-full h-full object-cover";
+            newDiv.appendChild(newImg);
+            const container = document.getElementById('portfolioGallery');
+            const addBtn = document.getElementById('addPortfolioBtn');
+            container.insertBefore(newDiv, addBtn);
+            editImage(newId, 'ใส่รูปลิงก์งานใหม่');
+        }
+        function openSocialModal() { document.getElementById('socialModal').classList.remove('hidden'); }
+        function saveSocials() { document.getElementById('socialModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
