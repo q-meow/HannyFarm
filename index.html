@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบเรียลไทม์สมบูรณ์</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบเรียลไทม์สมบูรณ์ (วงกลม)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -68,25 +68,23 @@
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: flex !important; }
 
+        /* 🌟 แก้ไขให้ปุ่มเลือกสี Pickr เป็นวงกลม 100% 🌟 */
         .pickr { display: flex; align-items: center; justify-content: center; }
-        .pcr-button {
+        .pickr .pcr-button {
             width: 24px !important;
             height: 24px !important;
-            border-radius: 50% !important;
-            border: 1px solid #e2e8f0 !important;
+            border-radius: 50% !important; /* บังคับวงกลม */
+            border: 1px solid #cbd5e1 !important; /* สีขอบบางๆ */
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
+            overflow: hidden !important; /* ตัดสีที่ล้นขอบวงกลมทิ้ง */
         }
+        /* บังคับไส้ในของ Pickr ให้เป็นวงกลมด้วย */
+        .pickr .pcr-button::before,
+        .pickr .pcr-button::after {
+            border-radius: 50% !important; 
+        }
+
         .pcr-app { font-family: 'Prompt', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; border-radius: 12px !important; }
-        
-        input[type="color"] {
-            opacity: 0;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-        }
     </style>
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto bg-white shadow-xl min-h-screen relative overflow-x-hidden">
@@ -282,7 +280,7 @@
                 <div class="space-y-2">
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerAccent" class="w-6 h-6 rounded-full overflow-hidden"></div>
+                            <div id="pickerAccent"></div> <!-- Pickr จะวาดวงกลมตรงนี้ -->
                             <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
                         </div>
                         <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -290,7 +288,7 @@
 
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerBg" class="w-6 h-6 rounded-full overflow-hidden"></div>
+                            <div id="pickerBg"></div>
                             <span class="text-xs text-slate-600">พื้นหลังเว็บ</span>
                         </div>
                         <span id="hexColorBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -298,7 +296,7 @@
                     
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerAccentBg" class="w-6 h-6 rounded-full overflow-hidden"></div>
+                            <div id="pickerAccentBg"></div>
                             <span class="text-xs text-slate-600">สีพื้นหลังป้ายเล็กๆ</span>
                         </div>
                         <span id="hexColorAccentBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -306,7 +304,7 @@
                     
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div id="pickerText" class="w-6 h-6 rounded-full overflow-hidden"></div>
+                            <div id="pickerText"></div>
                             <span class="text-xs text-slate-600">สีตัวอักษรหลัก</span>
                         </div>
                         <span id="hexColorText" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
@@ -340,9 +338,9 @@
         </div>
     </div>
 
-    <!-- ⚡️ โค้ดส่วนเชื่อมต่อ FIREBASE (ไฮบริด) สมบูรณ์แบบ ⚡️ -->
+    <!-- ⚡️ โค้ดส่วนเชื่อมต่อ FIREBASE ⚡️ -->
     <script>
-        // 1. โหลดสีจากเครื่องก่อนเลยทันที (กันสีกะพริบ)
+        // โหลดสีจากเครื่องก่อนเลยทันที (กันสีกะพริบ)
         function loadLocalTheme() {
             const saved = localStorage.getItem('myCuteSignActiveTheme');
             if (saved) {
@@ -358,7 +356,6 @@
         }
         loadLocalTheme(); 
 
-        // 2. ตั้งค่ากุญแจ Firebase แบบเต็มสูตร
         const firebaseConfig = {
             apiKey: "AIzaSyBCJ--ekt4btJYce_6MsXC3iDHt5X6b9ag",
             authDomain: "cutesignshop.firebaseapp.com",
@@ -373,7 +370,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 3. ระบบซิงค์สีเรียลไทม์กับฐานข้อมูล
         db.ref('theme/active').on('value', (snapshot) => {
             const theme = snapshot.val();
             if (theme) {
@@ -383,10 +379,8 @@
                 root.style.setProperty('--accent-bg', theme.accentBg);
                 root.style.setProperty('--text-main', theme.text);
                 
-                // แอบอัปเดตลงความจำเครื่องด้วย
                 localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(theme));
                 
-                // อัปเดตตัวหนังสือ HEX (ถ้าเปิดหน้าต่างแอดมินอยู่)
                 if(document.getElementById('hexColorBg')) {
                     document.getElementById('hexColorBg').innerText = theme.bg;
                     document.getElementById('hexColorAccent').innerText = theme.accent;
@@ -396,14 +390,10 @@
             }
         });
 
-        // ถ้าเพิ่งสร้าง Database ครั้งแรก ให้ส่งสีตั้งต้นขึ้นไป
         db.ref('theme/active').once('value', (snapshot) => {
-            if (!snapshot.exists()) {
-                saveCurrentTheme();
-            }
+            if (!snapshot.exists()) saveCurrentTheme();
         });
 
-        // 4. ฟังก์ชันส่งข้อมูลสีลงคอมพิวเตอร์ และ คลาวด์
         let saveTimeout;
         function saveCurrentTheme() {
             clearTimeout(saveTimeout);
@@ -416,18 +406,13 @@
                     text: root.getPropertyValue('--text-main').trim()
                 };
                 
-                // เซฟลงเครื่อง 
                 localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(currentTheme));
-                
-                // ส่งขึ้นคลาวด์ 
                 if(typeof db !== 'undefined') {
-                    db.ref('theme/active').set(currentTheme).catch(err => console.log("Firebase Error:", err));
+                    db.ref('theme/active').set(currentTheme).catch(err => console.log(err));
                 }
             }, 150);
         }
 
-        // ==========================================
-        // ระบบตั้งค่าเว็บเดิม (เพลง, ล็อกอิน, รูป, Social)
         // ==========================================
         let isPlaying = false;
         document.getElementById('musicToggle').addEventListener('click', () => {
@@ -477,17 +462,12 @@
         }
 
         // ==========================================
-        // ระบบสี (Pickr)
+        // ระบบสี Pickr
         // ==========================================
         const pickrConfig = {
             theme: 'nano',
             swatches: null,
-            components: {
-                preview: true,
-                opacity: true, 
-                hue: true,
-                interaction: { hex: true, rgba: true, input: true }
-            }
+            components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: true, input: true } }
         };
 
         const pickrAccent = Pickr.create({ el: '#pickerAccent', default: '#3b82f6', ...pickrConfig });
@@ -548,13 +528,11 @@
             pickrAccent.setColor(accent);
             pickrAccentBg.setColor(accentBg);
             pickrText.setColor(text);
-            
             setTimeout(saveCurrentTheme, 100); 
         }
 
-        // ระบบคำนวณเฉดสีอัจฉริยะ 
+        // ==========================================
         let currentSuggested = {};
-
         function parseRGB(colorStr) {
             let r, g, b;
             if(colorStr.startsWith('rgba')) {
@@ -571,25 +549,15 @@
         function RGBToHSL(r, g, b) {
             r /= 255; g /= 255; b /= 255;
             let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
-            if (delta == 0) h = 0;
-            else if (cmax == r) h = ((g - b) / delta) % 6;
-            else if (cmax == g) h = (b - r) / delta + 2;
-            else h = (r - g) / delta + 4;
-            h = Math.round(h * 60); if (h < 0) h += 360;
-            l = (cmax + cmin) / 2;
-            s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            if (delta == 0) h = 0; else if (cmax == r) h = ((g - b) / delta) % 6; else if (cmax == g) h = (b - r) / delta + 2; else h = (r - g) / delta + 4;
+            h = Math.round(h * 60); if (h < 0) h += 360; l = (cmax + cmin) / 2; s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
             return {h: h, s: +(s * 100).toFixed(1), l: +(l * 100).toFixed(1)};
         }
 
         function HSLToRGB(h, s, l) {
             s /= 100; l /= 100;
             let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
-            if (0 <= h && h < 60) { r = c; g = x; b = 0; }
-            else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
-            else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
-            else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
-            else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
-            else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; } else if (60 <= h && h < 120) { r = x; g = c; b = 0; } else if (120 <= h && h < 180) { r = 0; g = c; b = x; } else if (180 <= h && h < 240) { r = 0; g = x; b = c; } else if (240 <= h && h < 300) { r = x; g = 0; b = c; } else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
             r = Math.round((r + m) * 255); g = Math.round((g + m) * 255); b = Math.round((b + m) * 255);
             return `rgb(${r}, ${g}, ${b})`;
         }
@@ -600,10 +568,8 @@
             
             let textL = Math.max(15, hsl.l - 35);
             const textCol = HSLToRGB(hsl.h, hsl.s, textL);
-            
             let accentBgL = Math.min(94, hsl.l + 35);
             const accentBgCol = HSLToRGB(hsl.h, hsl.s, accentBgL);
-            
             let bgL = Math.min(98, hsl.l + 45);
             const bgCol = HSLToRGB(hsl.h, Math.max(10, hsl.s - 20), bgL); 
             
@@ -617,11 +583,8 @@
             `;
         }
 
-        function applySuggestedPalette() {
-            applyPresetTheme(currentSuggested.bg, currentSuggested.accent, currentSuggested.accentBg, currentSuggested.text);
-        }
+        function applySuggestedPalette() { applyPresetTheme(currentSuggested.bg, currentSuggested.accent, currentSuggested.accentBg, currentSuggested.text); }
 
-        // ระบบบันทึก "ธีมของฉัน" (Custom Themes) 
         function saveCustomTheme() {
             const themeName = prompt("ตั้งชื่อธีมใหม่ของคุณ:");
             if(!themeName) return;
@@ -639,14 +602,12 @@
             let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
             savedThemes.push(newTheme);
             localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
-
             loadCustomThemes();
         }
 
         function loadCustomThemes() {
             const container = document.getElementById('myThemesContainer');
             let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
-            
             if(savedThemes.length === 0) {
                 container.innerHTML = '<span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span>';
                 return;
@@ -675,12 +636,8 @@
                 container.appendChild(btn);
             });
         }
+        window.onload = () => { if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); };
 
-        window.onload = () => {
-            if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes();
-        };
-
-        // ฟังก์ชันแก้ไขภาพ
         let currentTargetId = '';
         function editImage(imgId, title) {
             if(!isAdmin) return; 
@@ -712,7 +669,6 @@
             container.insertBefore(newDiv, addBtn);
             editImage(newId, 'ใส่รูปลิงก์งานใหม่');
         }
-
         function openSocialModal() { document.getElementById('socialModal').classList.remove('hidden'); }
         function saveSocials() { document.getElementById('socialModal').classList.add('hidden'); }
     </script>
