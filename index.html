@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบ Admin แบบคลิป</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบแก้ไข Social</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -30,7 +30,7 @@
             border: 2px solid var(--accent-bg);
         }
 
-        /* เอฟเฟกต์สำหรับโหมด Admin เมื่อเอาเมาส์ชี้สิ่งที่แก้ไขได้ */
+        /* เอฟเฟกต์สำหรับโหมด Admin */
         body.admin-active .editable-img { cursor: pointer; position: relative; }
         body.admin-active .editable-img::after {
             content: "\f030  เปลี่ยนรูป";
@@ -59,8 +59,8 @@
         body.admin-active .editable-text:hover { background: rgba(0,0,0,0.05); }
         
         /* ซ่อนปุ่มต่างๆ หากไม่ใช่ Admin */
-        .admin-only { display: none; }
-        body.admin-active .admin-only { display: flex; }
+        .admin-only { display: none !important; }
+        body.admin-active .admin-only { display: flex !important; }
     </style>
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto bg-white shadow-xl min-h-screen relative overflow-x-hidden">
@@ -73,14 +73,14 @@
     <!-- 1. ส่วนหัว (ปกและโปรไฟล์) -->
     <header class="relative">
         <div class="h-48 w-full relative overflow-hidden editable-img" onclick="editImage('coverImg', 'เปลี่ยนภาพปก')" style="background-color: var(--accent-color)">
-            <img id="coverImg" src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=1000&auto=format&fit=crop" alt="Cover" class="w-full h-full object-cover opacity-80 mix-blend-overlay">
+            <img id="coverImg" src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 mix-blend-overlay">
         </div>
 
         <div class="px-6 relative -mt-16">
             <div class="flex items-end justify-between">
                 <div class="relative">
                     <div class="w-32 h-32 rounded-full border-[5px] border-white overflow-hidden shadow-sm bg-white editable-img" onclick="editImage('profileImg', 'เปลี่ยนภาพโปรไฟล์')">
-                        <img id="profileImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" alt="Profile" class="w-full h-full object-cover">
+                        <img id="profileImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
@@ -88,17 +88,27 @@
             <div class="mt-4">
                 <h1 class="text-2xl font-semibold flex items-center gap-2" style="color: var(--text-main)">
                     <span id="shopName" class="editable-text" contenteditable="false">ชื่อร้าน ป้ายน่ารัก</span>
-                    <span id="statusBadge" class="text-xs px-2 py-1 rounded-full font-normal editable-text" contenteditable="false" style="background-color: var(--accent-bg); color: var(--accent-color);">เปิดรับงาน (Op)</span>
+                    <span class="text-xs px-2 py-1 rounded-full font-normal editable-text" contenteditable="false" style="background-color: var(--accent-bg); color: var(--accent-color);">เปิดรับงาน (Op)</span>
                 </h1>
-                <p id="shopDesc" class="text-sm mt-2 editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">
+                <p class="text-sm mt-2 editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">
                     รับทำป้ายไวนิล โปสเตอร์ โลโก้ สไตล์มินิมอลและน่ารักๆ สามารถใส่รายละเอียดร้านเพิ่มเติมได้ตรงนี้เลยค่ะ
                 </p>
 
-                <!-- เพิ่มช่องทางการติดต่อ -->
-                <div id="contactLinks" class="mt-3 flex flex-wrap gap-2">
-                    <a href="#" class="px-3 py-1 bg-green-50 text-green-500 rounded-full text-xs font-medium border border-green-100 flex items-center gap-1"><i class="fa-brands fa-line"></i> LINE</a>
-                    <a href="#" class="px-3 py-1 bg-blue-50 text-blue-500 rounded-full text-xs font-medium border border-blue-100 flex items-center gap-1"><i class="fa-brands fa-facebook"></i> Facebook</a>
-                    <button id="addContactBtn" class="admin-only px-3 py-1 bg-gray-50 text-gray-400 rounded-full text-xs font-medium border border-dashed border-gray-300 items-center gap-1 hover:bg-gray-100" onclick="addContact()">+ เพิ่มช่องทาง</button>
+                <!-- 🌟 ส่วนช่องทางการติดต่อโซเชียลมีเดีย (แบบไอคอนเล็ก) -->
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <div id="socialIcons" class="flex gap-2">
+                        <!-- ไอคอนจะถูกแสดง/ซ่อน ผ่าน JavaScript -->
+                        <a href="#" id="icon-line" class="w-7 h-7 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-line"></i></a>
+                        <a href="#" id="icon-facebook" class="w-7 h-7 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" id="icon-ig" class="w-7 h-7 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-sm transition hover:scale-110 hidden"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" id="icon-tiktok" class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-sm transition hover:scale-110 hidden"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" id="icon-x" class="w-7 h-7 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center text-[11px] transition hover:scale-110 hidden"><i class="fa-brands fa-x-twitter"></i></a>
+                    </div>
+                    
+                    <!-- ปุ่มแก้ไขช่องทางติดต่อ (แสดงเฉพาะ Admin) -->
+                    <button id="editSocialBtn" class="admin-only px-3 py-1 bg-white border border-dashed border-slate-300 text-slate-400 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" onclick="openSocialModal()">
+                        <i class="fa-solid fa-pen"></i> แก้ไขช่องทางติดต่อ
+                    </button>
                 </div>
 
                 <button id="musicToggle" class="mt-3 flex items-center gap-2 text-xs bg-white px-3 py-1.5 rounded-full shadow-sm" style="color: var(--accent-color); border: 1px solid var(--accent-bg)">
@@ -109,7 +119,7 @@
         </div>
     </header>
 
-    <!-- 2. สถิติและปฏิทินงาน -->
+    <!-- (เนื้อหาสถิติ ตัวอย่างงาน และเรทราคา คงเดิม) -->
     <section class="px-6 mt-6 flex gap-4">
         <div class="flex-1 flex flex-col gap-3">
             <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-50">
@@ -128,30 +138,24 @@
         </div>
     </section>
 
-    <!-- 3. ตัวอย่างผลงาน -->
+    <!-- ตัวอย่างผลงาน -->
     <section class="mt-8">
         <div class="px-6 flex justify-between items-end mb-4">
             <h2 class="font-medium text-lg" style="color: var(--text-main)">ตัวอย่างงาน</h2>
             <a href="#" class="text-xs hover:underline" style="color: var(--accent-color)">>> ทั้งหมด <<</a>
         </div>
-
-        <!-- แถบเลื่อนรูปภาพ 1:1 -->
         <div id="portfolioGallery" class="flex gap-4 overflow-x-auto hide-scrollbar px-6 pb-2">
-            <!-- งาน 1 -->
             <div class="flex-none w-32 h-32 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden editable-img" onclick="editImage('port1', 'เปลี่ยนตัวอย่างงาน 1')">
                 <img id="port1" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover">
             </div>
-            <!-- งาน 2 -->
             <div class="flex-none w-32 h-32 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden editable-img" onclick="editImage('port2', 'เปลี่ยนตัวอย่างงาน 2')">
                 <img id="port2" src="https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover">
             </div>
-            <!-- ปุ่มเพิ่มงาน (แสดงเฉพาะโหมด Admin) -->
             <button id="addPortfolioBtn" class="admin-only flex-none w-32 h-32 bg-slate-50 rounded-2xl shadow-sm border-2 border-dashed border-slate-300 overflow-hidden flex flex-col items-center justify-center text-slate-400 hover:bg-slate-100" onclick="addPortfolioImage()">
                 <i class="fa-solid fa-plus text-2xl mb-1"></i>
                 <span class="text-[10px]">เพิ่มรูปงาน</span>
             </button>
         </div>
-        
         <div class="px-6 mt-4 flex items-center justify-center gap-2">
             <div class="flex-1 h-[1px]" style="background-color: var(--accent-color); opacity: 0.3;"></div>
             <span class="text-[10px] font-medium tracking-wider" style="color: var(--accent-color)">เลื่อนเพื่อดูตัวอย่างงาน</span>
@@ -159,7 +163,7 @@
         </div>
     </section>
 
-    <!-- 4. รายละเอียดการสั่งงาน/เรทราคา -->
+    <!-- เรทราคา -->
     <section class="px-6 mt-8 mb-6">
         <h2 class="font-medium text-lg mb-4 text-center" style="color: var(--text-main)">รายละเอียดการสั่งงาน/เรทราคา</h2>
         <div class="w-full rounded-2xl shadow-sm border border-slate-100 overflow-hidden bg-white flex items-center justify-center editable-img" onclick="editImage('priceImg', 'เปลี่ยนรูปเรทราคา')">
@@ -167,11 +171,10 @@
         </div>
     </section>
 
-    <!-- 5. แถบเมนูด้านล่าง -->
+    <!-- แถบเมนูด้านล่าง -->
     <nav class="fixed bottom-0 w-full max-w-md bg-white px-4 py-3 rounded-t-3xl flex justify-between items-end shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-30 border-t border-slate-50" style="color: var(--accent-color)">
         <button class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-box-open text-xl"></i><span class="text-[10px]">สินค้า</span></button>
         <button class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-list-ul text-xl"></i><span class="text-[10px]">คิวงาน</span></button>
-        <!-- ปุ่ม Home -->
         <button class="flex flex-col items-center gap-1 -mt-8 w-[24%]">
             <div class="w-14 h-14 text-white rounded-full flex justify-center items-center shadow-lg border-[4px] border-white" style="background-color: var(--accent-color)">
                 <i class="fa-solid fa-house text-xl"></i>
@@ -179,42 +182,80 @@
             <span class="text-[10px] mt-1 font-medium">โฮม</span>
         </button>
         <button class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-star text-xl"></i><span class="text-[10px]">รีวิว</span></button>
-        <button id="settingsBtn" class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px]">ฟันเฟือง</span></button>
+        <button id="settingsBtn" class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px]">ตั้งค่า</span></button>
     </nav>
 
     <!-- ========================================== -->
-    <!-- ระบบ MODAL ต่างๆ -->
+    <!-- ระบบ MODAL (หน้าต่าง) ต่างๆ -->
     <!-- ========================================== -->
 
-    <!-- Modal เข้าสู่ระบบ Admin -->
+    <!-- Modal 1: เข้าสู่ระบบ Admin -->
     <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
-            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
             <div class="text-center mb-5 mt-2">
                 <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fa-solid fa-shield-halved"></i></div>
                 <h3 class="font-bold text-lg text-slate-800">เข้าสู่ระบบผู้ดูแล</h3>
                 <p class="text-xs text-slate-500 mt-1">รหัสผ่านคือ 1234</p>
             </div>
-            <input type="password" id="adminPassword" placeholder="รหัสผ่าน" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 mb-4 text-center tracking-widest">
+            <input type="password" id="adminPassword" placeholder="รหัสผ่าน" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm mb-4 text-center tracking-widest outline-none focus:border-blue-400">
             <button onclick="attemptLogin()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium hover:bg-black transition">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <!-- Modal เปลี่ยนรูปภาพ / ใส่ลิงก์ URL (แบบในคลิป) -->
+    <!-- Modal 2: เปลี่ยนรูปภาพ (Input URL) -->
     <div id="inputModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
-            <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
             <h3 id="inputModalTitle" class="font-bold text-lg text-slate-800 mb-4">เปลี่ยนรูปภาพ</h3>
-            <p class="text-xs text-slate-500 mb-2">วางลิงก์รูปภาพ (URL) ลงในช่องด้านล่าง</p>
-            <input type="text" id="modalInput" placeholder="https://..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 mb-4">
-            <button id="saveInputBtn" class="w-full bg-blue-500 text-white rounded-xl py-3 text-sm font-medium hover:bg-blue-600 transition shadow-lg shadow-blue-200">บันทึก (Save)</button>
+            <input type="text" id="modalInput" placeholder="https://..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm mb-4 outline-none focus:border-blue-400">
+            <button id="saveInputBtn" class="w-full bg-blue-500 text-white rounded-xl py-3 text-sm font-medium">บันทึก (Save)</button>
         </div>
     </div>
 
-    <!-- แผงตั้งค่าตกแต่งธีมสีขั้นสูง (เหมือนคลิป) -->
+    <!-- 🌟 Modal 3: ตั้งค่า Social Media (แบบฟอร์มในคลิป) -->
+    <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-3xl w-[90%] max-w-[340px] max-h-[85vh] overflow-y-auto shadow-2xl relative hide-scrollbar border border-slate-100">
+            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="font-bold text-slate-800 mb-1 text-sm"><i class="fa-solid fa-link text-blue-500"></i> ตั้งค่า SOCIAL LINKS</h3>
+            <p class="text-[10px] text-slate-500 mb-5">เว้นช่องว่างไว้หากไม่ต้องการแสดงไอคอน</p>
+            
+            <div class="space-y-4">
+                <!-- LINE -->
+                <div>
+                    <label class="text-[11px] font-medium text-green-600 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-line text-sm"></i> LINE</label>
+                    <input type="text" id="input-line" placeholder="https://line.me/ti/p/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-green-400">
+                </div>
+                <!-- Facebook -->
+                <div>
+                    <label class="text-[11px] font-medium text-blue-600 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-facebook text-sm"></i> Facebook</label>
+                    <input type="text" id="input-facebook" placeholder="https://facebook.com/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-400">
+                </div>
+                <!-- Instagram -->
+                <div>
+                    <label class="text-[11px] font-medium text-pink-600 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-instagram text-sm"></i> Instagram</label>
+                    <input type="text" id="input-ig" placeholder="https://instagram.com/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-pink-400">
+                </div>
+                <!-- TikTok -->
+                <div>
+                    <label class="text-[11px] font-medium text-slate-700 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-tiktok text-sm"></i> TikTok</label>
+                    <input type="text" id="input-tiktok" placeholder="https://tiktok.com/@..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-slate-400">
+                </div>
+                <!-- X (Twitter) -->
+                <div>
+                    <label class="text-[11px] font-medium text-slate-800 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-x-twitter text-sm"></i> X (Twitter)</label>
+                    <input type="text" id="input-x" placeholder="https://x.com/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-slate-500">
+                </div>
+            </div>
+            
+            <button onclick="saveSocials()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium hover:bg-black transition shadow-lg shadow-slate-200 mt-6">บันทึกการตั้งค่า</button>
+        </div>
+    </div>
+
+    <!-- แผงตั้งค่าสีสัน (Color Picker) -->
     <div id="adminPanel" class="hidden fixed bottom-24 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] z-[50]">
-        <div class="bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-5 relative">
-            <div class="absolute top-0 right-0 bg-green-500 text-white text-[9px] px-3 py-1 rounded-bl-lg font-medium">โหมดแก้ไข (EDIT MODE)</div>
+        <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 relative">
+            <div class="absolute top-0 right-0 bg-green-500 text-white text-[9px] px-3 py-1 rounded-bl-lg font-medium">โหมดแก้ไข (EDIT)</div>
             <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2 mt-1">
                 <i class="fa-solid fa-palette text-blue-500 text-lg"></i> ปรับแต่งสีและธีม
             </h3>
@@ -225,21 +266,17 @@
                     <input type="color" id="colorBg" value="#f4f9ff" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
                 </div>
                 <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <span class="text-xs text-slate-600 font-medium">สีหลัก (ปุ่ม, ไฮไลท์)</span>
+                    <span class="text-xs text-slate-600 font-medium">สีหลัก (ปุ่ม, ไอคอน)</span>
                     <input type="color" id="colorAccent" value="#93c5fd" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
                 </div>
                 <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <span class="text-xs text-slate-600 font-medium">สีพื้นหลังปุ่ม/ป้าย</span>
+                    <span class="text-xs text-slate-600 font-medium">สีพื้นหลังป้ายเล็กๆ</span>
                     <input type="color" id="colorAccentBg" value="#eff6ff" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
                 </div>
                 <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
                     <span class="text-xs text-slate-600 font-medium">สีตัวอักษร</span>
                     <input type="color" id="colorText" value="#4b5563" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
                 </div>
-            </div>
-            
-            <div class="bg-blue-50 text-blue-600 text-[10px] p-2 rounded-lg mb-3 leading-relaxed">
-                <i class="fa-solid fa-circle-info"></i> <b>เคล็ดลับ:</b> คุณสามารถคลิกที่ <b>ข้อความ</b> เพื่อพิมพ์แก้ไขได้ทันที และคลิกที่ <b>รูปภาพ</b> เพื่อเปลี่ยนลิงก์รูปได้เลย
             </div>
             
             <button onclick="logoutAdmin()" class="w-full text-slate-400 hover:text-red-500 text-xs py-2 flex items-center justify-center gap-2 transition bg-slate-50 rounded-xl">
@@ -252,18 +289,16 @@
     <script>
         // โลจิกปุ่มเพลง
         let isPlaying = false;
-        const musicBtn = document.getElementById('musicToggle');
-        musicBtn.addEventListener('click', () => {
+        document.getElementById('musicToggle').addEventListener('click', () => {
             isPlaying = !isPlaying;
             document.getElementById('musicIcon').className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
             document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
         });
 
         // ==========================================
-        // ระบบ ADMIN & การแก้ไข
+        // ระบบ ADMIN 
         // ==========================================
         let isAdmin = false;
-        let currentTargetId = '';
 
         document.getElementById('openLoginBtn').addEventListener('click', () => {
             if(!isAdmin) document.getElementById('loginModal').classList.remove('hidden');
@@ -278,17 +313,18 @@
         function attemptLogin() {
             if(document.getElementById('adminPassword').value === '1234') {
                 isAdmin = true;
-                document.body.classList.add('admin-active'); // เปิดโหมดโชว์ปุ่มแก้
-                
-                // ทำให้ข้อความพิมพ์แก้ได้ (เหมือนในคลิป)
+                document.body.classList.add('admin-active'); 
                 document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'true'));
                 
                 document.getElementById('loginModal').classList.add('hidden');
                 document.getElementById('adminPanel').classList.remove('hidden');
-                document.getElementById('openLoginBtn').innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
-                document.getElementById('openLoginBtn').classList.add('bg-green-500', 'text-white', 'border-transparent');
+                
+                let btn = document.getElementById('openLoginBtn');
+                btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
+                btn.classList.add('bg-green-500', 'text-white', 'border-transparent');
+                btn.style.color = 'white';
             } else {
-                alert("รหัสผ่านไม่ถูกต้อง (ลอง 1234)");
+                alert("รหัสผ่านไม่ถูกต้อง");
             }
         }
 
@@ -305,15 +341,48 @@
         }
 
         // ==========================================
-        // ระบบเปลี่ยนรูปภาพ (Modal Input แบบในคลิป)
+        // ระบบ Social Media Links แบบฟอร์ม
         // ==========================================
-        function editImage(imgId, title) {
-            if(!isAdmin) return; // ถ้าไม่ใช่ Admin กดรูปจะไม่เกิดอะไรขึ้น
+        function openSocialModal() {
+            // ดึงค่า href ปัจจุบันไปแสดงในช่องกรอก
+            document.getElementById('input-line').value = document.getElementById('icon-line').href !== window.location.href + "#" ? document.getElementById('icon-line').href : '';
+            document.getElementById('input-facebook').value = document.getElementById('icon-facebook').href !== window.location.href + "#" ? document.getElementById('icon-facebook').href : '';
+            document.getElementById('input-ig').value = document.getElementById('icon-ig').href !== window.location.href + "#" ? document.getElementById('icon-ig').href : '';
+            document.getElementById('input-tiktok').value = document.getElementById('icon-tiktok').href !== window.location.href + "#" ? document.getElementById('icon-tiktok').href : '';
+            document.getElementById('input-x').value = document.getElementById('icon-x').href !== window.location.href + "#" ? document.getElementById('icon-x').href : '';
             
+            document.getElementById('socialModal').classList.remove('hidden');
+        }
+
+        function saveSocials() {
+            const platforms = ['line', 'facebook', 'ig', 'tiktok', 'x'];
+            
+            platforms.forEach(p => {
+                const url = document.getElementById('input-' + p).value.trim();
+                const icon = document.getElementById('icon-' + p);
+                
+                if(url) {
+                    icon.href = url;
+                    icon.classList.remove('hidden'); // โชว์ไอคอนถ้ามีลิงก์
+                } else {
+                    icon.href = "#";
+                    icon.classList.add('hidden'); // ซ่อนไอคอนถ้าช่องว่าง
+                }
+            });
+            
+            document.getElementById('socialModal').classList.add('hidden');
+        }
+
+
+        // ==========================================
+        // ระบบเปลี่ยนรูป และ เพิ่มรูปงาน (จากเวอร์ชันที่แล้ว)
+        // ==========================================
+        let currentTargetId = '';
+        function editImage(imgId, title) {
+            if(!isAdmin) return; 
             currentTargetId = imgId;
             document.getElementById('inputModalTitle').innerText = title;
             document.getElementById('modalInput').value = document.getElementById(imgId).src;
-            document.getElementById('modalInput').placeholder = "ใส่ลิงก์รูปภาพ (URL) ที่นี่...";
             document.getElementById('inputModal').classList.remove('hidden');
             
             document.getElementById('saveInputBtn').onclick = function() {
@@ -323,76 +392,34 @@
             };
         }
 
-        // ==========================================
-        // ระบบเพิ่มตัวอย่างงานแบบอัตโนมัติ
-        // ==========================================
-        let portCount = 2; // เริ่มต้นที่ 2 รูป
+        let portCount = 2; 
         function addPortfolioImage() {
             portCount++;
             const newId = 'port' + portCount;
-            
-            // สร้างกล่องรูปใหม่
             const newDiv = document.createElement('div');
             newDiv.className = "flex-none w-32 h-32 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden editable-img";
             newDiv.onclick = () => editImage(newId, 'เปลี่ยนตัวอย่างงาน ' + portCount);
-            
             const newImg = document.createElement('img');
             newImg.id = newId;
-            newImg.src = "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=300&auto=format&fit=crop"; // ภาพตั้งต้น
+            newImg.src = "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=300&auto=format&fit=crop"; 
             newImg.className = "w-full h-full object-cover";
-            
             newDiv.appendChild(newImg);
             
-            // แทรกลงไปก่อนปุ่ม "+"
             const container = document.getElementById('portfolioGallery');
             const addBtn = document.getElementById('addPortfolioBtn');
             container.insertBefore(newDiv, addBtn);
-            
-            // เด้งให้กรอกลิงก์รูปใหม่ทันที
             editImage(newId, 'ใส่รูปลิงก์งานใหม่');
         }
 
         // ==========================================
-        // ระบบเพิ่มช่องทางการติดต่อ
-        // ==========================================
-        function addContact() {
-            currentTargetId = 'contactLinks';
-            document.getElementById('inputModalTitle').innerText = "เพิ่มช่องทางติดต่อ (ใส่ชื่อแพลตฟอร์ม)";
-            document.getElementById('modalInput').value = "";
-            document.getElementById('modalInput').placeholder = "เช่น Twitter, TikTok, Website...";
-            document.getElementById('inputModal').classList.remove('hidden');
-            
-            document.getElementById('saveInputBtn').onclick = function() {
-                const name = document.getElementById('modalInput').value;
-                if(name) {
-                    const a = document.createElement('a');
-                    a.href = "#";
-                    a.className = "px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-medium border border-gray-200 flex items-center gap-1 editable-text";
-                    a.innerHTML = `<i class="fa-solid fa-link"></i> ${name}`;
-                    
-                    const container = document.getElementById('contactLinks');
-                    const addBtn = document.getElementById('addContactBtn');
-                    container.insertBefore(a, addBtn); // ใส่ก่อนปุ่มเพิ่ม
-                }
-                document.getElementById('inputModal').classList.add('hidden');
-            };
-        }
-
-        // ==========================================
-        // ระบบ Color Picker ปรับแต่งสีแบบเรียลไทม์ (ขั้นสูง)
+        // Color Picker (เรียลไทม์)
         // ==========================================
         function updateColors() {
             const root = document.documentElement;
-            const bg = document.getElementById('colorBg').value;
-            const accent = document.getElementById('colorAccent').value;
-            const accentBg = document.getElementById('colorAccentBg').value;
-            const text = document.getElementById('colorText').value;
-
-            // ส่งค่าสีไปเปลี่ยนใน CSS Variables ทั่วทั้งเว็บ
-            root.style.setProperty('--bg-color', bg);
-            root.style.setProperty('--accent-color', accent);
-            root.style.setProperty('--accent-bg', accentBg);
-            root.style.setProperty('--text-main', text);
+            root.style.setProperty('--bg-color', document.getElementById('colorBg').value);
+            root.style.setProperty('--accent-color', document.getElementById('colorAccent').value);
+            root.style.setProperty('--accent-bg', document.getElementById('colorAccentBg').value);
+            root.style.setProperty('--text-main', document.getElementById('colorText').value);
         }
     </script>
 </body>
