@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบสมบูรณ์ครบถ้วน</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบสมบูรณ์ 100%</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -297,7 +297,7 @@
         </div>
     </div>
 
-    <!-- 🌟🌟 Modal แต่งสีเดิมที่คิวคุ้นเคยกลับมาครบถ้วน (พร้อมธีมสำเร็จรูป, ธีมของฉัน, และแถบแนะนำสี) 🌟🌟 -->
+    <!-- 🌟🌟 Modal แต่งสีเดิมแบบครบถ้วน (Theme Modal) 🌟🌟 -->
     <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white rounded-2xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
             <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 transition bg-slate-50 hover:bg-slate-100 rounded-full">
@@ -776,6 +776,7 @@
             filterProducts();
         }
 
+        // 🌟 สร้างตัวเลือกสี Pickr แบบสมบูรณ์ 🌟
         const pickrConfig = {
             theme: 'nano',
             swatches: null,
