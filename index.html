@@ -48,17 +48,15 @@
         .pickr .pcr-button::before, .pickr .pcr-button::after { border-radius: 50% !important; }
         .pcr-app { font-family: 'Prompt', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; border-radius: 12px !important; }
         
-        /* สไตล์สำหรับปุ่มแท็กที่ถูกเลือก */
         .tag-active { background-color: var(--accent-color) !important; color: white !important; }
-
-        /* เอฟเฟกต์ตอนลากไอเทม (Drag and Drop) */
         .dragging { opacity: 0.5; transform: scale(0.95); }
         .drag-over { border: 2px dashed var(--accent-color) !important; }
     </style>
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto bg-white shadow-xl min-h-screen relative overflow-x-hidden">
 
-    <button id="openLoginBtn" class="absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5" style="color: var(--text-main)">
+    <!-- 🌟 แก้ไข: เพิ่ม onclick="openLoginWindow()" ตรงนี้ 🌟 -->
+    <button id="openLoginBtn" onclick="openLoginWindow()" class="absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5" style="color: var(--text-main)">
         <i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล
     </button>
 
@@ -130,22 +128,19 @@
         </section>
     </div>
 
-
     <!-- ========================================== -->
     <!-- 📦 หน้าที่ 2: หน้ารายการสินค้า (PRODUCTS) -->
     <!-- ========================================== -->
     <div id="productsSection" class="hidden px-5 pt-8 min-h-screen">
         <h2 class="text-2xl font-bold mb-4" style="color: var(--text-main)">หมวดหมู่สินค้า</h2>
         
-        <!-- แถบค้นหา -->
         <div class="relative mb-4">
             <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
             <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="ค้นหาสินค้า..." class="w-full bg-white border border-slate-200 rounded-full py-3 pl-11 pr-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" style="color: var(--text-main)">
         </div>
 
-        <!-- แถบเลื่อน Tags -->
         <div id="tagContainer" class="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-2">
-            <!-- สร้างปุ่มแท็กอัตโนมัติจาก JS -->
+            <!-- สร้างปุ่มแท็กอัตโนมัติ -->
         </div>
 
         <div class="flex justify-between items-end mb-4">
@@ -155,9 +150,7 @@
             </button>
         </div>
 
-        <!-- Grid แสดงสินค้า -->
         <div id="productGrid" class="grid grid-cols-2 gap-4 pb-10">
-            <!-- การ์ดสินค้าจะถูกโหลดมาใส่ตรงนี้ -->
             <div class="col-span-2 text-center py-10 text-slate-400 text-sm">
                 <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><br>กำลังโหลดสินค้า...
             </div>
@@ -170,7 +163,6 @@
     <!-- ========================================== -->
     <nav class="fixed bottom-0 w-full max-w-md bg-white px-4 py-3 rounded-t-3xl flex justify-between items-end shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-30 border-t border-slate-50" style="color: var(--accent-color)">
         
-        <!-- ปุ่มไปหน้าสินค้า -->
         <button onclick="switchTab('products')" class="flex flex-col items-center gap-1 transition w-[18%] pb-1 hover:opacity-70">
             <i class="fa-solid fa-box-open text-xl"></i>
             <span class="text-[10px]">สินค้า</span>
@@ -181,7 +173,6 @@
             <span class="text-[10px]">คิวงาน</span>
         </button>
         
-        <!-- ปุ่มไปหน้าแรก (Home) -->
         <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 -mt-8 w-[24%] hover:scale-105 transition-transform">
             <div class="w-14 h-14 text-white rounded-full flex justify-center items-center shadow-lg border-[4px] border-white transition-colors" style="background-color: var(--accent-color)">
                 <i class="fa-solid fa-house text-xl"></i>
@@ -194,7 +185,6 @@
             <span class="text-[10px]">รีวิว</span>
         </button>
         
-        <!-- ปุ่มตั้งค่า (เปิดแผงสีถ้าเป็น Admin) -->
         <button onclick="settingsClicked()" class="flex flex-col items-center gap-1 transition w-[18%] pb-1 hover:opacity-70">
             <i class="fa-solid fa-gear text-xl"></i>
             <span class="text-[10px]">ตั้งค่า</span>
@@ -241,12 +231,10 @@
                         <label class="text-xs flex items-center gap-1 cursor-pointer"><input type="radio" name="prodType" value="adopt" onchange="togglePriceFields()"> ปล่อยเอฟ (2 ราคา)</label>
                     </div>
                     
-                    <!-- ช่องราคากลุ่ม -->
                     <div id="priceGroupMode">
                         <label class="text-[10px] text-slate-500 block">ราคาเข้ากลุ่ม (บาท)</label>
                         <input type="number" id="prodPriceSingle" placeholder="เช่น 129" class="w-full border rounded-lg px-3 py-2 text-xs mt-1">
                     </div>
-                    <!-- ช่องราคาปล่อยเอฟ -->
                     <div id="priceAdoptMode" class="hidden flex gap-2">
                         <div class="flex-1">
                             <label class="text-[10px] text-slate-500 block">ราคาใช้เอง (บาท)</label>
@@ -273,8 +261,7 @@
         </div>
     </div>
 
-    <!-- (Modals เดิม: Login, ตั้งค่าสี, เปลี่ยนรูป) -->
-    <!-- Login -->
+    <!-- Login Modal -->
     <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
             <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
@@ -287,7 +274,7 @@
         </div>
     </div>
 
-    <!-- เปลี่ยนรูป -->
+    <!-- Input Modal -->
     <div id="inputModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
             <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
@@ -297,7 +284,21 @@
         </div>
     </div>
 
-    <!-- แผงตั้งค่าสี (Pickr) ย่อไว้เพื่อประหยัดบรรทัด -->
+    <!-- Social Modal -->
+    <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-3xl w-[90%] max-w-[340px] max-h-[85vh] overflow-y-auto shadow-2xl relative hide-scrollbar border border-slate-100">
+            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="font-bold text-slate-800 mb-1 text-sm"><i class="fa-solid fa-link text-blue-500"></i> SOCIAL LINKS</h3>
+            <div class="space-y-4 mt-4">
+                <div><label class="text-[11px] font-medium text-green-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-line"></i> LINE</label><input type="text" id="input-line" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
+                <div><label class="text-[11px] font-medium text-blue-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-facebook"></i> Facebook</label><input type="text" id="input-facebook" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
+                <div><label class="text-[11px] font-medium text-pink-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-instagram"></i> Instagram</label><input type="text" id="input-ig" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
+            </div>
+            <button onclick="saveSocials()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium mt-6">บันทึก</button>
+        </div>
+    </div>
+
+    <!-- Theme Modal -->
     <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white rounded-2xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
             <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 bg-slate-50 rounded-full"><i class="fa-solid fa-chevron-down text-sm"></i></button>
@@ -334,10 +335,21 @@
         const db = firebase.database();
 
         let isAdmin = false;
-        let productsList = []; // เก็บสินค้าทั้งหมดจาก Database
-        let activeTag = 'All'; // แท็กที่กำลังเลือก
+        let productsList = []; 
+        let activeTag = 'All'; 
 
-        // --- 2. ระบบสลับหน้า (SPA Navigation) ---
+        // 🌟 เพิ่มฟังก์ชันเปิดหน้าต่างล็อกอินที่นี่ 🌟
+        function openLoginWindow() {
+            if(!isAdmin) {
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('adminPassword').value = ''; // เคลียร์รหัสผ่านเก่า
+                document.getElementById('adminPassword').focus();
+            } else {
+                toggleThemeModal(); // ถ้าเป็นแอดมินแล้ว กดปุ่มผู้ดูแลให้เปิดแผงสีแทน
+            }
+        }
+
+        // --- 2. ระบบสลับหน้า ---
         function switchTab(tab) {
             document.getElementById('homeSection').classList.add('hidden');
             document.getElementById('productsSection').classList.add('hidden');
@@ -348,9 +360,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- 3. ระบบจัดการสินค้า (Product Manager) ---
-        
-        // ดึงข้อมูลสินค้าจาก Firebase แบบ Real-time
+        // --- 3. ระบบจัดการสินค้า ---
         db.ref('products').orderByChild('order').on('value', (snapshot) => {
             productsList = [];
             snapshot.forEach(child => {
@@ -359,26 +369,21 @@
             document.getElementById('totalProductCount').innerText = productsList.length;
             document.getElementById('homeProductCount').innerText = productsList.length;
             renderTags();
-            filterProducts(); // สั่งวาด UI สินค้าใหม่
+            filterProducts(); 
         });
 
-        // ฟังก์ชันสร้างปุ่มแท็กอัตโนมัติพร้อมนับจำนวน
         function renderTags() {
             const tagContainer = document.getElementById('tagContainer');
-            // รวบรวมแท็กทั้งหมด
             let tagCounts = { 'All': productsList.length };
             productsList.forEach(p => {
                 const tags = p.tags.split(',').map(t => t.trim()).filter(t => t);
-                tags.forEach(t => {
-                    tagCounts[t] = (tagCounts[t] || 0) + 1;
-                });
+                tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
             });
 
             tagContainer.innerHTML = '';
-            // วาดปุ่มแท็ก
             Object.keys(tagCounts).forEach(tag => {
                 const btn = document.createElement('button');
-                btn.innerText = `${tag} (${tagCounts[tag]})`; // วงเล็บจำนวน[cite: 27]
+                btn.innerText = `${tag} (${tagCounts[tag]})`; 
                 const isActive = (tag === activeTag) ? 'tag-active border-transparent' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50';
                 btn.className = `flex-none px-4 py-1.5 rounded-full text-xs font-medium border shadow-sm transition ${isActive}`;
                 btn.onclick = () => { activeTag = tag; renderTags(); filterProducts(); };
@@ -386,7 +391,6 @@
             });
         }
 
-        // กรองและวาดการ์ดสินค้าลง Grid
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('productGrid');
@@ -404,11 +408,9 @@
             }
 
             filtered.forEach(p => {
-                // สร้างการ์ดสินค้า[cite: 27]
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl p-2 shadow-sm border border-slate-100 flex flex-col relative transition-all duration-300";
                 
-                // สำหรับ Admin ลากวาง
                 if(isAdmin) {
                     card.setAttribute('draggable', 'true');
                     card.dataset.id = p.id;
@@ -422,7 +424,6 @@
                 if(p.isFeatured) badgesHTML += `<div class="absolute top-0 left-0 bg-yellow-300 text-yellow-800 text-[9px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-xl z-10 shadow-sm">ยอดฮิต (Featured)</div>`;
                 if(p.isPromo) badgesHTML += `<div class="absolute top-0 right-0 bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg rounded-tr-xl z-10 shadow-sm">ราคาโปร!</div>`;
                 
-                // ปุ่มลบ & ปุ่มลาก (โชว์เฉพาะแอดมิน)[cite: 31]
                 let adminControls = '';
                 if(isAdmin) {
                     adminControls = `
@@ -438,7 +439,6 @@
                     `;
                 }
 
-                // การแสดงราคา
                 let priceHTML = '';
                 if(p.type === 'group') {
                     priceHTML = `<p class="text-sm font-bold text-center mt-1" style="color: var(--accent-color)">฿${p.priceSingle}</p>`;
@@ -451,7 +451,6 @@
                     `;
                 }
 
-                // Tag ย่อยใต้รูป[cite: 27]
                 const tagChips = p.tags.split(',').slice(0,2).map(t => `<span class="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md text-[8px] truncate whitespace-nowrap max-w-[60px] inline-block">${t.trim()}</span>`).join('');
 
                 card.innerHTML = `
@@ -471,7 +470,6 @@
             });
         }
 
-        // --- ระบบสลับฟอร์มราคาใน Modal ---
         function togglePriceFields() {
             const isGroup = document.querySelector('input[name="prodType"]:checked').value === 'group';
             if(isGroup) {
@@ -483,7 +481,6 @@
             }
         }
 
-        // --- การบันทึก/แก้ไขสินค้า ---
         function openProductModal() {
             document.getElementById('prodId').value = '';
             document.getElementById('prodImage').value = '';
@@ -546,9 +543,9 @@
             }
 
             if(id) {
-                db.ref('products/' + id).update(productData); // อัปเดตของเดิม
+                db.ref('products/' + id).update(productData); 
             } else {
-                productData.order = Date.now(); // สร้างของใหม่ เอาเวลาตั้งเป็น order ให้อยู่ล่างสุด
+                productData.order = Date.now(); 
                 db.ref('products').push(productData); 
             }
             document.getElementById('productModal').classList.add('hidden');
@@ -560,7 +557,7 @@
             }
         }
 
-        // --- ระบบลากวาง (Drag & Drop) เพื่อสลับตำแหน่ง[cite: 31] ---
+        // --- ระบบลากวาง (Drag & Drop) ---
         let dragSrcId = null;
 
         function handleDragStart(e) {
@@ -581,11 +578,9 @@
             const targetId = this.dataset.id;
             
             if (dragSrcId !== targetId) {
-                // หาสินค้าทั้ง 2 ชิ้น
                 const srcItem = productsList.find(p => p.id === dragSrcId);
                 const targetItem = productsList.find(p => p.id === targetId);
                 
-                // สลับค่า order กัน
                 const tempOrder = srcItem.order;
                 db.ref('products/' + dragSrcId).update({ order: targetItem.order });
                 db.ref('products/' + targetId).update({ order: tempOrder });
@@ -631,7 +626,6 @@
 
         function toggleThemeModal() { document.getElementById('themeModal').classList.toggle('hidden'); }
 
-        // โหลดสีจาก LocalStorage
         const savedTheme = localStorage.getItem('myCuteSignActiveTheme');
         if (savedTheme) {
             try {
