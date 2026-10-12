@@ -6,35 +6,49 @@
     <title>ร้านป้ายสไตล์น่ารัก</title>
     <!-- นำเข้า Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- นำเข้า FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- นำเข้าฟอนต์ Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
+        /* 1. ตั้งค่าตัวแปรสี (CSS Variables) เพื่อให้เปลี่ยนธีมได้ผ่าน JS */
+        :root {
+            --page-bg: #f4f9ff;         /* สีพื้นหลังหลัก */
+            --box-bg: #ffffff;          /* สีพื้นหลังกล่อง */
+            --text-main: #4b5563;       /* สีตัวอักษรหลัก */
+            --accent-main: #60a5fa;     /* สีหลัก (เช่น ไอคอน, ตัวเลข) */
+            --accent-light: #dbeafe;    /* สีอ่อน (เช่น พื้นหลังปุ่ม, เส้นขอบ) */
+            --accent-soft: #bfdbfe;     /* สีอ่อนปานกลาง */
+        }
+
         body {
             font-family: 'Prompt', sans-serif;
-            color: #4b5563; 
-            transition: background-color 0.5s ease; /* เพิ่มความสมูทตอนเปลี่ยนสีพื้นหลัง */
+            background-color: var(--page-bg);
+            color: var(--text-main);
+            transition: background-color 0.3s ease;
         }
+
+        /* คลาสที่ผูกกับตัวแปรสี */
+        .theme-bg-box { background-color: var(--box-bg); }
+        .theme-bg-light { background-color: var(--accent-light); }
+        .theme-bg-main { background-color: var(--accent-main); }
+        .theme-text-main { color: var(--accent-main); }
+        .theme-border-light { border-color: var(--accent-light); }
+        .theme-shadow { box-shadow: 0 4px 6px -1px var(--accent-light); }
+
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* สไตล์สำหรับปุ่มที่ถูกเลือกในแผง Admin */
-        .theme-btn.active { border-color: #3b82f6; background-color: #eff6ff; }
     </style>
 </head>
-<body id="mainBody" class="pb-28 max-w-md mx-auto bg-[#f4f9ff] shadow-xl min-h-screen relative overflow-x-hidden">
+<body class="pb-28 max-w-md mx-auto shadow-xl min-h-screen relative overflow-x-hidden">
 
-    <!-- ปุ่มเข้าสู่ระบบ Admin (มุมขวาบน ลอยอยู่เหนือภาพปก) -->
-    <button id="openLoginBtn" class="absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm text-slate-500 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5">
-        <i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล
+    <!-- ปุ่มเปิดหน้าล็อกอิน Admin (มุมขวาบน) -->
+    <button onclick="openLoginModal()" class="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur text-xs px-3 py-1.5 rounded-full shadow-md text-gray-600 font-medium flex items-center gap-1 border border-gray-200 hover:bg-white transition">
+        <i class="fa-solid fa-lock text-gray-400"></i> ผู้ดูแลระบบ
     </button>
 
     <!-- 1. ส่วนหัว (ปกและโปรไฟล์) -->
     <header class="relative">
-        <!-- ใส่ ID ให้กล่องสีพื้นหลังปก เพื่อให้ JS เปลี่ยนสีได้ -->
-        <div id="headerBg" class="h-48 w-full bg-blue-100 relative overflow-hidden transition-colors duration-500">
+        <div class="h-48 w-full theme-bg-light relative overflow-hidden transition-colors duration-300">
             <img src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=1000&auto=format&fit=crop" 
                  alt="Cover" class="w-full h-full object-cover opacity-80 mix-blend-overlay">
         </div>
@@ -50,15 +64,15 @@
             </div>
 
             <div class="mt-4">
-                <h1 class="text-2xl font-semibold flex items-center gap-2 text-slate-700">
+                <h1 class="text-2xl font-semibold flex items-center gap-2">
                     ชื่อร้าน ป้ายน่ารัก
-                    <!-- ใส่ ID ให้ป้ายสถานะ -->
-                    <span id="statusBadge" class="text-xs px-2 py-1 bg-blue-100 text-blue-500 rounded-full font-normal transition-colors duration-500">เปิดรับงาน (Op)</span>
+                    <span class="text-xs px-2 py-1 theme-bg-light theme-text-main rounded-full font-normal">เปิดรับงาน (Op)</span>
                 </h1>
-                <p class="text-sm text-slate-500 mt-2 line-clamp-2">
+                <p class="text-sm opacity-80 mt-2 line-clamp-2">
                     รับทำป้ายไวนิล โปสเตอร์ โลโก้ สไตล์มินิมอลและน่ารักๆ สามารถใส่รายละเอียดร้านเพิ่มเติมได้ตรงนี้เลยค่ะ
                 </p>
-                <button id="musicToggle" class="mt-3 flex items-center gap-2 text-xs bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full hover:bg-slate-50 transition shadow-sm">
+
+                <button id="musicToggle" class="mt-3 flex items-center gap-2 text-xs theme-bg-box theme-text-main border-2 theme-border-light px-3 py-1.5 rounded-full transition shadow-sm">
                     <i id="musicIcon" class="fa-solid fa-play"></i>
                     <span id="musicText">เล่นเพลงโปรด</span>
                 </button>
@@ -66,111 +80,144 @@
         </div>
     </header>
 
-    <!-- (ส่วนเนื้อหาอื่นๆ สถิติ, ปฏิทิน, ตัวอย่างงาน, เรทราคา คงเดิม) -->
+    <!-- 2. สถิติและปฏิทินงาน -->
     <section class="px-6 mt-6 flex gap-4">
         <div class="flex-1 flex flex-col gap-3">
-            <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-100">
-                <p class="text-[11px] text-slate-400">จำนวนสินค้า</p>
-                <p class="text-xl font-semibold text-slate-700 mt-1">50</p>
+            <div class="theme-bg-box rounded-2xl p-4 shadow-sm text-center border-2 theme-border-light transition-colors">
+                <p class="text-[11px] opacity-70">จำนวนสินค้าทั้งหมด</p>
+                <p class="text-xl font-semibold theme-text-main mt-1">50 <span class="text-sm opacity-70 font-normal">รายการ</span></p>
             </div>
-            <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-100">
-                <p class="text-[11px] text-slate-400">คิวงานทั้งหมด</p>
-                <p class="text-xl font-semibold text-slate-700 mt-1">50</p>
+            <div class="theme-bg-box rounded-2xl p-4 shadow-sm text-center border-2 theme-border-light transition-colors">
+                <p class="text-[11px] opacity-70">จำนวนคิวงานทั้งหมด</p>
+                <p class="text-xl font-semibold theme-text-main mt-1">50 <span class="text-sm opacity-70 font-normal">งาน</span></p>
             </div>
         </div>
-        <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm text-slate-600 flex flex-col justify-center relative overflow-hidden border border-slate-100">
-            <div class="absolute top-0 right-0 p-4 opacity-10 text-5xl"><i class="fa-regular fa-calendar-check"></i></div>
-            <h3 class="font-medium mb-2 relative z-10 text-slate-700">ปฏิทินงาน</h3>
-            <p class="text-[11px] text-slate-500 relative z-10 leading-relaxed">เช็คคิว วันหยุด ได้ที่นี่</p>
+
+        <div class="flex-1 theme-bg-box rounded-2xl p-4 shadow-sm flex flex-col justify-center relative overflow-hidden border-2 theme-border-light transition-colors">
+            <div class="absolute top-0 right-0 p-4 opacity-10 text-5xl theme-text-main">
+                <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <h3 class="font-medium mb-2 relative z-10 theme-text-main">ปฏิทินงาน</h3>
+            <p class="text-xs opacity-70 relative z-10 leading-relaxed">
+                เอาไว้บอกว่าวันไหนทำกี่งาน<br>
+                เปิด-ปิดวันไหนบ้าง
+            </p>
+        </div>
+    </section>
+
+    <!-- 3. ตัวอย่างผลงาน -->
+    <section class="mt-8">
+        <div class="px-6 flex justify-between items-end mb-4">
+            <h2 class="font-medium text-lg">ตัวอย่างงาน</h2>
+            <a href="#" class="text-xs theme-text-main hover:underline">>> ทั้งหมด <<</a>
+        </div>
+
+        <div class="flex gap-4 overflow-x-auto hide-scrollbar px-6 pb-2">
+            <!-- กล่องผลงาน -->
+            <div class="flex-none w-32 h-32 theme-bg-box rounded-2xl shadow-sm border-2 theme-border-light overflow-hidden flex items-center justify-center theme-text-main opacity-80">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover" alt="ผลงาน 1">
+            </div>
+            <div class="flex-none w-32 h-32 theme-bg-box rounded-2xl shadow-sm border-2 theme-border-light overflow-hidden flex items-center justify-center theme-text-main opacity-80">
+                <img src="https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover" alt="ผลงาน 2">
+            </div>
+            <div class="flex-none w-32 h-32 theme-bg-box rounded-2xl shadow-sm border-2 theme-border-light overflow-hidden flex items-center justify-center theme-text-main opacity-50">
+                <i class="fa-regular fa-image text-2xl"></i>
+            </div>
+            <div class="flex-none w-32 h-32 theme-bg-box rounded-2xl shadow-sm border-2 theme-border-light overflow-hidden flex items-center justify-center theme-text-main opacity-50">
+                <i class="fa-regular fa-image text-2xl"></i>
+            </div>
+        </div>
+        
+        <div class="px-6 mt-4 flex items-center justify-center gap-2">
+            <div class="flex-1 h-[2px] theme-bg-light rounded-full"></div>
+            <span class="text-[10px] theme-text-main font-medium tracking-wider">เลื่อนเพื่อดูตัวอย่างงาน</span>
+            <div class="flex-1 h-[2px] theme-bg-light rounded-full"></div>
+        </div>
+    </section>
+
+    <!-- 4. รายละเอียดการสั่งงาน/เรทราคา -->
+    <section class="px-6 mt-8 mb-6">
+        <h2 class="font-medium text-lg mb-4 text-center">รายละเอียดการสั่งงาน/เรทราคา</h2>
+        <div class="w-full rounded-2xl shadow-sm border-2 theme-border-light overflow-hidden theme-bg-box flex items-center justify-center p-2">
+            <img src="https://images.unsplash.com/photo-1542204625-2dfb7e8cb3cc?q=80&w=800&auto=format&fit=crop" 
+                 alt="รายละเอียดเรทราคา" class="w-full h-auto object-contain rounded-xl">
         </div>
     </section>
 
     <!-- 5. แถบเมนูด้านล่าง -->
-    <nav class="fixed bottom-0 w-full max-w-md bg-white text-slate-400 px-4 py-3 rounded-t-3xl flex justify-between items-end shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-30 border-t border-slate-100">
-        <button class="flex flex-col items-center gap-1 hover:text-slate-700 transition w-[18%] pb-1"><i class="fa-solid fa-box-open text-xl"></i><span class="text-[10px]">สินค้า</span></button>
-        <button class="flex flex-col items-center gap-1 hover:text-slate-700 transition w-[18%] pb-1"><i class="fa-solid fa-list-ul text-xl"></i><span class="text-[10px]">คิวงาน</span></button>
-        
-        <!-- ปุ่ม Home (จะเปลี่ยนสีตามธีม) -->
-        <button class="flex flex-col items-center gap-1 -mt-8 w-[24%]">
-            <div id="homeBtn" class="w-14 h-14 bg-blue-300 text-white rounded-full flex justify-center items-center shadow-lg shadow-blue-200 border-[4px] border-white transition-colors duration-500">
+    <nav class="fixed bottom-0 w-full max-w-md theme-bg-box px-4 py-3 rounded-t-3xl flex justify-between items-end shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40 border-t-2 theme-border-light transition-colors">
+        <button class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 theme-text-main transition w-[18%] pb-1">
+            <i class="fa-solid fa-box-open text-xl"></i>
+            <span class="text-[10px]">สินค้า</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 theme-text-main transition w-[18%] pb-1">
+            <i class="fa-solid fa-list-ul text-xl"></i>
+            <span class="text-[10px]">คิวงาน</span>
+        </button>
+        <!-- ปุ่ม Home (อิงสีธีมหลัก) -->
+        <button class="flex flex-col items-center gap-1 -mt-8 w-[24%] relative z-10">
+            <div class="w-14 h-14 theme-bg-main text-white rounded-full flex justify-center items-center shadow-lg border-[4px] border-white transition-colors">
                 <i class="fa-solid fa-house text-xl"></i>
             </div>
-            <span class="text-[10px] text-slate-500 mt-1 font-medium">โฮม</span>
+            <span class="text-[10px] theme-text-main mt-1 font-medium">โฮม</span>
         </button>
-
-        <button class="flex flex-col items-center gap-1 hover:text-slate-700 transition w-[18%] pb-1"><i class="fa-solid fa-star text-xl"></i><span class="text-[10px]">รีวิว</span></button>
-        
-        <!-- ปุ่มฟันเฟือง จะเปิดแผงตั้งค่าเมื่อเป็น Admin -->
-        <button id="settingsBtn" class="flex flex-col items-center gap-1 hover:text-slate-700 transition w-[18%] pb-1">
+        <button class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 theme-text-main transition w-[18%] pb-1">
+            <i class="fa-solid fa-star text-xl"></i>
+            <span class="text-[10px]">รีวิว</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 theme-text-main transition w-[18%] pb-1">
             <i class="fa-solid fa-gear text-xl"></i>
-            <span class="text-[10px]">ตั้งค่า</span>
+            <span class="text-[10px]">ฟันเฟือง</span>
         </button>
     </nav>
 
 
     <!-- ========================================== -->
-    <!-- ระบบ MODAL และ ADMIN PANEL ที่ซ่อนไว้ -->
+    <!-- ส่วนของระบบ Popup Admin (ซ่อนไว้เป็นค่าเริ่มต้น) -->
     <!-- ========================================== -->
 
-    <!-- 1. หน้าต่าง (Modal) เข้าสู่ระบบ Admin -->
-    <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative animate-bounce-short">
-            <button id="closeLoginBtn" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <div class="text-center mb-5 mt-2">
-                <div class="w-14 h-14 bg-slate-100 text-slate-700 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
-                    <i class="fa-solid fa-user-lock"></i>
-                </div>
-                <h3 class="font-bold text-lg text-slate-800">เข้าสู่ระบบ Admin</h3>
-                <p class="text-xs text-slate-500 mt-1">กรุณาใส่รหัสผ่านเพื่อแก้ไขหน้าเว็บ</p>
+    <!-- Modal เข้าสู่ระบบ (อ้างอิงจากคลิป) -->
+    <div id="loginModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+        <div class="bg-white w-[85%] max-w-sm rounded-3xl p-6 shadow-2xl transform scale-95 transition-transform duration-300 relative text-center">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
+                <i class="fa-solid fa-shield-halved text-2xl text-gray-700"></i>
             </div>
-            <div class="mb-4 relative">
-                <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                <input type="password" id="adminPassword" placeholder="ใส่รหัส (พิมพ์: 1234)" class="w-full border-2 border-slate-100 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-400 text-slate-700 transition-colors">
-            </div>
-            <button id="submitLoginBtn" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium hover:bg-black transition shadow-lg shadow-slate-300">
-                เข้าสู่ระบบ
-            </button>
-            <p id="loginError" class="text-red-500 text-[11px] text-center mt-3 hidden bg-red-50 py-1.5 rounded-lg"><i class="fa-solid fa-circle-exclamation"></i> รหัสผ่านไม่ถูกต้อง ลอง 1234</p>
+            <h2 class="text-lg font-bold text-gray-800 mb-1">เข้าสู่ระบบ Admin</h2>
+            <p class="text-xs text-gray-500 mb-6">กรอกรหัสผ่านเพื่อตั้งค่าหน้าเว็บ</p>
+
+            <input type="password" id="adminPassword" placeholder="รหัสผ่าน..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-4 text-center text-lg tracking-widest focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition">
+            
+            <button onclick="checkPassword()" class="w-full bg-gray-800 text-white rounded-xl py-3 font-medium shadow-md hover:bg-gray-700 transition">เข้าสู่ระบบ</button>
+            <p id="loginError" class="text-red-500 text-xs mt-3 hidden">รหัสผ่านไม่ถูกต้อง!</p>
         </div>
     </div>
 
-    <!-- 2. แผงตั้งค่าตกแต่งธีม (Admin Panel) - จะโชว์เมื่อปลดล็อกแล้วกดปุ่มฟันเฟือง -->
-    <div id="adminPanel" class="hidden fixed bottom-24 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] z-[50]">
-        <div class="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-5 relative overflow-hidden">
-            <!-- ป้าย Admin -->
-            <div class="absolute top-0 right-0 bg-green-500 text-white text-[9px] px-3 py-1 rounded-bl-lg font-medium tracking-wide">ADMIN MODE</div>
-            
-            <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2 mt-1">
-                <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-lg"></i> ตกแต่งธีมสี
-            </h3>
-            
-            <p class="text-xs text-slate-500 mb-2">เลือกสไตล์ที่คุณชอบ:</p>
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <!-- ปุ่มเลือกธีม -->
-                <button onclick="applyTheme('sky')" class="theme-btn active text-xs py-2.5 px-3 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center gap-2 transition">
-                    <div class="w-4 h-4 rounded-full bg-blue-300 shadow-inner"></div> Sky Butter
-                </button>
-                <button onclick="applyTheme('rose')" class="theme-btn text-xs py-2.5 px-3 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center gap-2 transition">
-                    <div class="w-4 h-4 rounded-full bg-pink-300 shadow-inner"></div> Rose Gold
-                </button>
-                <button onclick="applyTheme('matcha')" class="theme-btn text-xs py-2.5 px-3 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center gap-2 transition">
-                    <div class="w-4 h-4 rounded-full bg-green-300 shadow-inner"></div> Matcha
-                </button>
-                <button onclick="applyTheme('monochrome')" class="theme-btn text-xs py-2.5 px-3 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center gap-2 transition">
-                    <div class="w-4 h-4 rounded-full bg-slate-300 shadow-inner"></div> Minimal
-                </button>
+    <!-- Modal ตั้งค่าธีม (แผงควบคุมหลังล็อกอินผ่าน) -->
+    <div id="settingsModal" class="fixed inset-x-0 bottom-0 z-[90] bg-white rounded-t-3xl shadow-[0_-10px_50px_rgba(0,0,0,0.15)] transform translate-y-full transition-transform duration-500 hidden pb-safe">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-palette text-pink-400"></i> ตกแต่งหน้าเว็บ</h2>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600 bg-gray-100 w-8 h-8 rounded-full flex justify-center items-center"><i class="fa-solid fa-chevron-down"></i></button>
             </div>
-            
-            <hr class="border-slate-100 my-3">
-            <button id="logoutBtn" class="w-full text-slate-400 hover:text-red-500 text-xs py-2 flex items-center justify-center gap-2 transition">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ Admin
-            </button>
+
+            <p class="text-sm font-medium text-gray-600 mb-3">เลือกโทนสี (Theme presets)</p>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <!-- ปุ่มเปลี่ยนธีม -->
+                <button onclick="applyTheme('sky')" class="py-3 px-4 rounded-xl border-2 border-blue-100 bg-blue-50 text-blue-600 text-sm font-medium flex items-center gap-2 hover:bg-blue-100 transition"><div class="w-4 h-4 rounded-full bg-blue-400"></div> ฟ้าละมุน (Sky Butter)</button>
+                <button onclick="applyTheme('rose')" class="py-3 px-4 rounded-xl border-2 border-pink-100 bg-pink-50 text-pink-600 text-sm font-medium flex items-center gap-2 hover:bg-pink-100 transition"><div class="w-4 h-4 rounded-full bg-pink-400"></div> ชมพู (Rose Gold)</button>
+                <button onclick="applyTheme('matcha')" class="py-3 px-4 rounded-xl border-2 border-green-100 bg-green-50 text-green-600 text-sm font-medium flex items-center gap-2 hover:bg-green-100 transition"><div class="w-4 h-4 rounded-full bg-green-400"></div> ชาเขียว (Matcha)</button>
+                <button onclick="applyTheme('dark')" class="py-3 px-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 text-sm font-medium flex items-center gap-2 hover:bg-gray-100 transition"><div class="w-4 h-4 rounded-full bg-gray-800"></div> เรียบหรู (Dark Mode)</button>
+            </div>
+
+            <button onclick="logoutAdmin()" class="w-full py-3 text-red-500 font-medium border border-red-100 rounded-xl bg-red-50 hover:bg-red-100 transition">ออกจากระบบ Admin</button>
         </div>
     </div>
 
 
     <script>
-        // โลจิกปุ่มเพลง (เดิม)
+        // โลจิกเล่นเพลง
         let isPlaying = false;
         const musicBtn = document.getElementById('musicToggle');
         const musicIcon = document.getElementById('musicIcon');
@@ -179,120 +226,110 @@
         musicBtn.addEventListener('click', () => {
             isPlaying = !isPlaying;
             if(isPlaying) {
-                musicIcon.classList.remove('fa-play');
-                musicIcon.classList.add('fa-pause');
+                musicIcon.classList.replace('fa-play', 'fa-pause');
                 musicText.innerText = "กำลังเล่น...";
+                musicBtn.classList.add('animate-pulse');
             } else {
-                musicIcon.classList.remove('fa-pause');
-                musicIcon.classList.add('fa-play');
+                musicIcon.classList.replace('fa-pause', 'fa-play');
                 musicText.innerText = "เล่นเพลงโปรด";
+                musicBtn.classList.remove('animate-pulse');
             }
         });
 
         // ==========================================
-        // โลจิกระบบ ADMIN และการเปลี่ยนธีม
+        // ระบบ Login และตั้งค่าธีม
         // ==========================================
-        let isAdmin = false;
+        const modalLogin = document.getElementById('loginModal');
+        const modalSettings = document.getElementById('settingsModal');
+        const passwordInput = document.getElementById('adminPassword');
+        const errorText = document.getElementById('loginError');
 
-        // ดึง Element ต่างๆ
-        const openLoginBtn = document.getElementById('openLoginBtn');
-        const loginModal = document.getElementById('loginModal');
-        const closeLoginBtn = document.getElementById('closeLoginBtn');
-        const submitLoginBtn = document.getElementById('submitLoginBtn');
-        const adminPasswordInput = document.getElementById('adminPassword');
-        const loginError = document.getElementById('loginError');
-        const adminPanel = document.getElementById('adminPanel');
-        const settingsBtn = document.getElementById('settingsBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
+        // รหัสผ่านตั้งต้น (สามารถเปลี่ยนได้ที่นี่)
+        const ADMIN_PASSWORD = "1234"; 
 
-        // ฟังก์ชันเปิด/ปิด Modal Login
-        openLoginBtn.addEventListener('click', () => {
-            if(isAdmin) {
-                adminPanel.classList.toggle('hidden'); // ถ้าเป็น admin แล้วกดปุ่มล็อกอิน ให้เปิดแผงตั้งค่าแทน
-            } else {
-                loginModal.classList.remove('hidden');
-                adminPasswordInput.value = '';
-                loginError.classList.add('hidden');
-                adminPasswordInput.focus();
-            }
-        });
+        // เปิด/ปิด Popup ล็อกอิน
+        function openLoginModal() {
+            modalLogin.classList.remove('hidden');
+            // หน่วงเวลาให้ CSS Transition ทำงาน
+            setTimeout(() => {
+                modalLogin.classList.remove('opacity-0', 'pointer-events-none');
+                modalLogin.firstElementChild.classList.remove('scale-95');
+            }, 10);
+        }
 
-        closeLoginBtn.addEventListener('click', () => { loginModal.classList.add('hidden'); });
+        function closeLoginModal() {
+            modalLogin.classList.add('opacity-0', 'pointer-events-none');
+            modalLogin.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modalLogin.classList.add('hidden');
+                passwordInput.value = '';
+                errorText.classList.add('hidden');
+            }, 300);
+        }
 
         // ตรวจสอบรหัสผ่าน
-        function attemptLogin() {
-            if (adminPasswordInput.value === '1234') { // รหัสผ่านจำลองคือ 1234
-                isAdmin = true;
-                loginModal.classList.add('hidden');
-                openLoginBtn.innerHTML = '<i class="fa-solid fa-user-check text-[10px] text-green-500"></i> Admin';
-                
-                // โชว์แผงตั้งค่าทันทีที่ล็อกอินเสร็จ
-                adminPanel.classList.remove('hidden'); 
+        function checkPassword() {
+            if (passwordInput.value === ADMIN_PASSWORD) {
+                // รหัสถูก ปิดหน้าต่างล็อกอิน และเปิดหน้าต่างตั้งค่า
+                closeLoginModal();
+                openSettingsModal();
             } else {
-                loginError.classList.remove('hidden');
+                // รหัสผิด
+                errorText.classList.remove('hidden');
             }
         }
 
-        submitLoginBtn.addEventListener('click', attemptLogin);
-        adminPasswordInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') attemptLogin(); });
+        // เปิด/ปิด แผงตั้งค่า
+        function openSettingsModal() {
+            modalSettings.classList.remove('hidden');
+            setTimeout(() => {
+                modalSettings.classList.remove('translate-y-full');
+            }, 10);
+        }
 
-        // ปุ่มฟันเฟือง เปิด/ปิด แผงตกแต่งธีม
-        settingsBtn.addEventListener('click', () => {
-            if(isAdmin) {
-                adminPanel.classList.toggle('hidden');
-            } else {
-                alert("ต้องเข้าสู่ระบบ Admin ก่อนจึงจะตั้งค่าได้ค่ะ");
-                loginModal.classList.remove('hidden'); // เด้งหน้าล็อกอินให้
+        function closeSettingsModal() {
+            modalSettings.classList.add('translate-y-full');
+            setTimeout(() => {
+                modalSettings.classList.add('hidden');
+            }, 500);
+        }
+
+        function logoutAdmin() {
+            closeSettingsModal();
+            alert("ออกจากระบบสำเร็จ");
+        }
+
+        // ==========================================
+        // ระบบเปลี่ยนธีมสีผ่าน CSS Variables
+        // ==========================================
+        const themes = {
+            sky: {
+                pageBg: '#f4f9ff', boxBg: '#ffffff', textMain: '#4b5563', 
+                accentMain: '#60a5fa', accentLight: '#dbeafe', accentSoft: '#bfdbfe'
+            },
+            rose: {
+                pageBg: '#fff5f7', boxBg: '#ffffff', textMain: '#5c4b51', 
+                accentMain: '#f472b6', accentLight: '#fce7f3', accentSoft: '#fbcfe8'
+            },
+            matcha: {
+                pageBg: '#f2fbf5', boxBg: '#ffffff', textMain: '#4b5c4f', 
+                accentMain: '#4ade80', accentLight: '#dcfce7', accentSoft: '#bbf7d0'
+            },
+            dark: {
+                pageBg: '#111827', boxBg: '#1f2937', textMain: '#f3f4f6', 
+                accentMain: '#9ca3af', accentLight: '#374151', accentSoft: '#4b5563'
             }
-        });
+        };
 
-        // ออกจากระบบ
-        logoutBtn.addEventListener('click', () => {
-            isAdmin = false;
-            adminPanel.classList.add('hidden');
-            openLoginBtn.innerHTML = '<i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล';
-            alert("ออกจากระบบเรียบร้อย");
-        });
-
-        // ==========================================
-        // ฟังก์ชันจัดการเปลี่ยนธีมสี (Theme Manager)
-        // ==========================================
         function applyTheme(themeName) {
-            // อัปเดต UI ของปุ่มที่ถูกเลือก
-            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-
-            // Element ที่ต้องการเปลี่ยนสี
-            const body = document.getElementById('mainBody');
-            const headerBg = document.getElementById('headerBg');
-            const statusBadge = document.getElementById('statusBadge');
-            const homeBtn = document.getElementById('homeBtn');
-
-            // กำหนดค่าสีตามธีมที่เลือก
-            if (themeName === 'sky') {
-                body.style.backgroundColor = '#f4f9ff';
-                headerBg.className = 'h-48 w-full bg-blue-100 relative overflow-hidden transition-colors duration-500';
-                statusBadge.className = 'text-xs px-2 py-1 bg-blue-100 text-blue-500 rounded-full font-normal transition-colors duration-500';
-                homeBtn.className = 'w-14 h-14 bg-blue-300 text-white rounded-full flex justify-center items-center shadow-lg shadow-blue-200 border-[4px] border-white transition-colors duration-500';
-            } 
-            else if (themeName === 'rose') {
-                body.style.backgroundColor = '#fdf2f8'; // bg-pink-50
-                headerBg.className = 'h-48 w-full bg-pink-200 relative overflow-hidden transition-colors duration-500';
-                statusBadge.className = 'text-xs px-2 py-1 bg-pink-100 text-pink-500 rounded-full font-normal transition-colors duration-500';
-                homeBtn.className = 'w-14 h-14 bg-pink-300 text-white rounded-full flex justify-center items-center shadow-lg shadow-pink-200 border-[4px] border-white transition-colors duration-500';
-            }
-            else if (themeName === 'matcha') {
-                body.style.backgroundColor = '#f0fdf4'; // bg-green-50
-                headerBg.className = 'h-48 w-full bg-green-200 relative overflow-hidden transition-colors duration-500';
-                statusBadge.className = 'text-xs px-2 py-1 bg-green-100 text-green-600 rounded-full font-normal transition-colors duration-500';
-                homeBtn.className = 'w-14 h-14 bg-green-400 text-white rounded-full flex justify-center items-center shadow-lg shadow-green-200 border-[4px] border-white transition-colors duration-500';
-            }
-            else if (themeName === 'monochrome') {
-                body.style.backgroundColor = '#f8fafc'; // bg-slate-50
-                headerBg.className = 'h-48 w-full bg-slate-200 relative overflow-hidden transition-colors duration-500';
-                statusBadge.className = 'text-xs px-2 py-1 bg-slate-200 text-slate-600 rounded-full font-normal transition-colors duration-500';
-                homeBtn.className = 'w-14 h-14 bg-slate-800 text-white rounded-full flex justify-center items-center shadow-lg shadow-slate-300 border-[4px] border-white transition-colors duration-500';
-            }
+            const root = document.documentElement;
+            const t = themes[themeName];
+            root.style.setProperty('--page-bg', t.pageBg);
+            root.style.setProperty('--box-bg', t.boxBg);
+            root.style.setProperty('--text-main', t.textMain);
+            root.style.setProperty('--accent-main', t.accentMain);
+            root.style.setProperty('--accent-light', t.accentLight);
+            root.style.setProperty('--accent-soft', t.accentSoft);
         }
     </script>
 </body>
