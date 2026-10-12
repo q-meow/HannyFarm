@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบแก้ไขสีขั้นสูง</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบแก้ไขสีอัจฉริยะ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* สีตั้งต้น (Bubble Blue) */
             --bg-color: #f4f9ff;
             --text-main: #334155;
             --accent-color: #3b82f6;
@@ -63,13 +62,15 @@
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: flex !important; }
 
-        /* ซ่อนหน้าตาเดิมของ input color */
+        /* ซ่อนขอบของ input type color ให้เหลือแต่ปุ่มเนียนๆ */
         input[type="color"] {
             opacity: 0;
             position: absolute;
             width: 100%;
             height: 100%;
             cursor: pointer;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
@@ -131,7 +132,7 @@
         </div>
     </header>
 
-    <!-- 2. สถิติและปฏิทินงาน -->
+    <!-- (เนื้อหาสถิติ และ ปฏิทิน) -->
     <section class="px-6 mt-6 flex gap-4">
         <div class="flex-1 flex flex-col gap-3">
             <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-100">
@@ -241,12 +242,12 @@
         </div>
     </div>
 
-    <!-- 🌟🌟 Modal 4: แผงตกแต่งธีมสีขั้นสูง (THEME CUSTOMIZER) - ดีไซน์ใหม่ 🌟🌟 -->
+    <!-- 🌟🌟 Modal 4: แผงตกแต่งธีมสีขั้นสูง 🌟🌟 -->
     <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white rounded-2xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
             <!-- ปุ่มปิด -->
             <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 transition bg-slate-50 hover:bg-slate-100 rounded-full">
-                <i class="fa-solid fa-xmark text-sm"></i>
+                <i class="fa-solid fa-chevron-down text-sm"></i>
             </button>
             
             <div class="text-center mb-6 mt-1">
@@ -259,7 +260,7 @@
             
             <!-- ⚡ ธีมสำเร็จรูป -->
             <div class="mb-5">
-                <h4 class="text-xs font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-bolt text-yellow-400"></i> ธีมสำเร็จรูป
                 </h4>
                 <div class="flex flex-wrap gap-2">
@@ -281,33 +282,40 @@
                 </div>
             </div>
 
-            <hr class="border-slate-100 my-5">
-
             <!-- 🌟 ธีมของฉัน -->
             <div class="mb-5">
-                <h4 class="text-xs font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-star text-yellow-400"></i> ธีมของฉัน
                 </h4>
                 <div id="myThemesContainer" class="flex flex-wrap gap-2 text-xs text-slate-400">
-                    <!-- รายชื่อธีมที่เซฟจะมาโชว์ตรงนี้ -->
                     <span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span>
                 </div>
             </div>
 
             <hr class="border-slate-100 my-5">
 
-            <!-- 🎨 หัวข้อปรับสีเอง -->
-            <div class="mb-6">
-                <h4 class="text-xs font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่สี)
+            <!-- 🎨 ปรับแต่งสีเอง -->
+            <div class="mb-5">
+                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่กล่องสี)
                 </h4>
                 
                 <div class="space-y-2">
-                    <!-- สีพื้นหลังเว็บ -->
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200">
+                    <!-- สีหลัก (ย้ายมาไว้บนสุดเพื่อใช้คำนวณ) -->
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <!-- กล่องสีที่กดได้ -->
-                            <div class="w-6 h-6 rounded border border-slate-200 relative overflow-hidden" id="boxColorBg">
+                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccent">
+                                <input type="color" id="inputColorAccent" oninput="updateColorsManual()">
+                            </div>
+                            <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
+                        </div>
+                        <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#3B82F6</span>
+                    </div>
+
+                    <!-- พื้นหลังเว็บ -->
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorBg">
                                 <input type="color" id="inputColorBg" oninput="updateColorsManual()">
                             </div>
                             <span class="text-xs text-slate-600">พื้นหลังเว็บ</span>
@@ -315,21 +323,10 @@
                         <span id="hexColorBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#F4F9FF</span>
                     </div>
                     
-                    <!-- สีหลัก -->
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200">
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded border border-slate-200 relative overflow-hidden" id="boxColorAccent">
-                                <input type="color" id="inputColorAccent" oninput="updateColorsManual()">
-                            </div>
-                            <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
-                        </div>
-                        <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#3B82F6</span>
-                    </div>
-                    
                     <!-- สีพื้นหลังป้าย -->
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200">
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded border border-slate-200 relative overflow-hidden" id="boxColorAccentBg">
+                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccentBg">
                                 <input type="color" id="inputColorAccentBg" oninput="updateColorsManual()">
                             </div>
                             <span class="text-xs text-slate-600">สีพื้นหลังป้ายเล็กๆ</span>
@@ -338,15 +335,29 @@
                     </div>
                     
                     <!-- สีตัวอักษร -->
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200">
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded border border-slate-200 relative overflow-hidden" id="boxColorText">
+                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorText">
                                 <input type="color" id="inputColorText" oninput="updateColorsManual()">
                             </div>
-                            <span class="text-xs text-slate-600">สีตัวอักษร</span>
+                            <span class="text-xs text-slate-600">สีตัวอักษรหลัก</span>
                         </div>
                         <span id="hexColorText" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#334155</span>
                     </div>
+                </div>
+            </div>
+
+            <!-- 🌟🌟 ส่วนแนะนำเฉดสีอัจฉริยะ (Smart Palette Guide) 🌟🌟 -->
+            <div class="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100 relative">
+                <div class="absolute -top-3 left-4 bg-white px-2 text-[10px] font-bold text-amber-500 border border-slate-100 rounded-full flex items-center gap-1 shadow-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> แนะนำเฉดสีที่เข้ากัน
+                </div>
+                <p class="text-[10px] text-slate-500 mb-2 mt-1 leading-relaxed">
+                    ปรับโทนสีอัตโนมัติตาม <b>"สีหลัก"</b> ด้านบน หากถูกใจสามารถกดที่แถบสีเพื่อนำไปใช้ได้เลย
+                </p>
+                <!-- กล่องแสดงแถบสีที่แนะนำ -->
+                <div id="suggestedPaletteContainer" onclick="applySuggestedPalette()" class="h-10 w-full rounded-xl overflow-hidden flex shadow-inner cursor-pointer hover:ring-2 ring-blue-300 transition-all">
+                    <!-- สีจะถูกสร้างด้วย JS -->
                 </div>
             </div>
 
@@ -355,12 +366,12 @@
                 <i class="fa-solid fa-plus text-[10px]"></i> บันทึกการตั้งค่าสีปัจจุบันเป็นธีมใหม่
             </button>
             
-            <button onclick="toggleThemeModal()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-[11px] font-bold hover:bg-black transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-floppy-disk text-[10px]"></i> นำไปใช้
+            <button onclick="toggleThemeModal()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-[11px] font-bold hover:bg-black transition flex items-center justify-center gap-1.5 shadow-lg">
+                นำไปใช้
             </button>
             
             <div class="text-center mt-4">
-                <button onclick="logoutAdmin()" class="text-[11px] text-red-400 hover:text-red-600 transition flex items-center justify-center gap-1.5 mx-auto">
+                <button onclick="logoutAdmin()" class="text-[11px] text-red-400 hover:text-red-600 transition flex items-center justify-center gap-1.5 mx-auto font-medium">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ Admin
                 </button>
             </div>
@@ -369,9 +380,7 @@
 
 
     <script>
-        // ==========================================
-        // ระบบพื้นฐาน (เพลง, ล็อกอิน)
-        // ==========================================
+        // ระบบเพลง
         let isPlaying = false;
         document.getElementById('musicToggle').addEventListener('click', () => {
             isPlaying = !isPlaying;
@@ -379,6 +388,7 @@
             document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
         });
 
+        // ระบบ ADMIN 
         let isAdmin = false;
 
         document.getElementById('openLoginBtn').addEventListener('click', () => {
@@ -401,11 +411,9 @@
                 let btn = document.getElementById('openLoginBtn');
                 btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
                 btn.classList.add('bg-green-500', 'text-white', 'border-transparent');
-                btn.style.color = 'white';
                 
-                // อัปเดตสีตั้งต้นใน Modal
                 loadCurrentColorsToInputs();
-                loadCustomThemes(); // โหลดธีมที่เคยเซฟไว้
+                loadCustomThemes(); 
             } else {
                 alert("รหัสผ่านไม่ถูกต้อง");
             }
@@ -424,7 +432,7 @@
         }
 
         // ==========================================
-        // ระบบ THEME CUSTOMIZER (ดีไซน์ใหม่)
+        // ระบบ THEME CUSTOMIZER + SMART PALETTE
         // ==========================================
         
         function toggleThemeModal() {
@@ -444,6 +452,11 @@
             const accentBg = root.getPropertyValue('--accent-bg').trim();
             const text = root.getPropertyValue('--text-main').trim();
 
+            updateInputVisuals(bg, accent, accentBg, text);
+            generateSmartPalette(accent); // สร้างแถบสีแนะนำตอนเปิดหน้าต่าง
+        }
+
+        function updateInputVisuals(bg, accent, accentBg, text) {
             document.getElementById('inputColorBg').value = bg;
             document.getElementById('boxColorBg').style.backgroundColor = bg;
             document.getElementById('hexColorBg').innerText = bg;
@@ -463,6 +476,7 @@
 
         function applyPresetTheme(bg, accent, accentBg, text) {
             updateAllColors(bg, accent, accentBg, text);
+            generateSmartPalette(accent); // อัปเดตแถบสีแนะนำด้วย
         }
 
         function updateColorsManual() {
@@ -472,32 +486,94 @@
             const text = document.getElementById('inputColorText').value;
             
             updateAllColors(bg, accent, accentBg, text);
+            generateSmartPalette(accent); // อัปเดตแถบสีแนะนำทันทีที่เลือกสีหลัก
         }
 
         function updateAllColors(bg, accent, accentBg, text) {
             const root = document.documentElement;
-            // เปลี่ยนสีใน CSS
             root.style.setProperty('--bg-color', bg);
             root.style.setProperty('--accent-color', accent);
             root.style.setProperty('--accent-bg', accentBg);
             root.style.setProperty('--text-main', text);
 
-            // อัปเดตใน Input Modal
-            document.getElementById('inputColorBg').value = bg;
-            document.getElementById('boxColorBg').style.backgroundColor = bg;
-            document.getElementById('hexColorBg').innerText = bg;
+            updateInputVisuals(bg, accent, accentBg, text);
+        }
+
+        // --- ระบบคำนวณเฉดสีอัจฉริยะ ---
+        let currentSuggested = {};
+
+        // ฟังก์ชันแปลง HEX เป็น HSL เพื่อปรับความสว่าง
+        function hexToHSL(H) {
+            let r = 0, g = 0, b = 0;
+            if (H.length == 4) { r = "0x"+H[1]+H[1]; g = "0x"+H[2]+H[2]; b = "0x"+H[3]+H[3]; }
+            else if (H.length == 7) { r = "0x"+H[1]+H[2]; g = "0x"+H[3]+H[4]; b = "0x"+H[5]+H[6]; }
+            r /= 255; g /= 255; b /= 255;
+            let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
+            if (delta == 0) h = 0;
+            else if (cmax == r) h = ((g - b) / delta) % 6;
+            else if (cmax == g) h = (b - r) / delta + 2;
+            else h = (r - g) / delta + 4;
+            h = Math.round(h * 60);
+            if (h < 0) h += 360;
+            l = (cmax + cmin) / 2;
+            s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            s = +(s * 100).toFixed(1); l = +(l * 100).toFixed(1);
+            return {h, s, l};
+        }
+
+        // ฟังก์ชันแปลง HSL กลับเป็น HEX
+        function HSLToHex(h, s, l) {
+            s /= 100; l /= 100;
+            let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+            else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+            else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+            else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+            else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+            else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+            r = Math.round((r + m) * 255).toString(16);
+            g = Math.round((g + m) * 255).toString(16);
+            b = Math.round((b + m) * 255).toString(16);
+            if (r.length == 1) r = "0" + r;
+            if (g.length == 1) g = "0" + g;
+            if (b.length == 1) b = "0" + b;
+            return "#" + r + g + b;
+        }
+
+        function generateSmartPalette(baseHex) {
+            const hsl = hexToHSL(baseHex);
             
-            document.getElementById('inputColorAccent').value = accent;
-            document.getElementById('boxColorAccent').style.backgroundColor = accent;
-            document.getElementById('hexColorAccent').innerText = accent;
+            // คำนวณความสว่าง (Lightness) ใหม่สำหรับแต่ละส่วน
+            // Text Color: สีเข้มมาก (L ลดลง 35% ขั้นต่ำ 15%)
+            let textL = Math.max(15, hsl.l - 35);
+            const textHex = HSLToHex(hsl.h, hsl.s, textL);
             
-            document.getElementById('inputColorAccentBg').value = accentBg;
-            document.getElementById('boxColorAccentBg').style.backgroundColor = accentBg;
-            document.getElementById('hexColorAccentBg').innerText = accentBg;
+            // Accent Bg: สีอ่อน (L เพิ่ม 35% สูงสุด 94%)
+            let accentBgL = Math.min(94, hsl.l + 35);
+            const accentBgHex = HSLToHex(hsl.h, hsl.s, accentBgL);
             
-            document.getElementById('inputColorText').value = text;
-            document.getElementById('boxColorText').style.backgroundColor = text;
-            document.getElementById('hexColorText').innerText = text;
+            // Bg Color: สีอ่อนมากเกือบขาว (L เพิ่ม 45% สูงสุด 98%)
+            let bgL = Math.min(98, hsl.l + 45);
+            const bgHex = HSLToHex(hsl.h, Math.max(10, hsl.s - 20), bgL); // ลดความสดลงนิดหน่อยให้พื้นหลังดูสบายตา
+            
+            currentSuggested = {
+                text: textHex,
+                accent: baseHex,
+                accentBg: accentBgHex,
+                bg: bgHex
+            };
+
+            // แสดงผลในกล่องแถบสี
+            document.getElementById('suggestedPaletteContainer').innerHTML = `
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${textHex}"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${baseHex}"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${accentBgHex}"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${bgHex}"></div>
+            `;
+        }
+
+        function applySuggestedPalette() {
+            applyPresetTheme(currentSuggested.bg, currentSuggested.accent, currentSuggested.accentBg, currentSuggested.text);
         }
 
         // ==========================================
@@ -560,7 +636,7 @@
             if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes();
         };
 
-        // (ฟังก์ชันเปลี่ยนรูปและจัดการ Social ตัดทอนเพื่อความกระชับ สามารถใช้งานได้ตามเดิม)
+        // (ฟังก์ชันเปลี่ยนรูปและจัดการ Social ย่อไว้เพื่อความกระชับ สามารถใช้งานได้ตามเดิม)
         let currentTargetId = '';
         function editImage(imgId, title) {
             if(!isAdmin) return; 
