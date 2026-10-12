@@ -297,14 +297,14 @@
             <!-- 🎨 ปรับแต่งสีเอง -->
             <div class="mb-5">
                 <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่กล่องสี)
+                    <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่วงกลมสี)
                 </h4>
                 
                 <div class="space-y-2">
                     <!-- สีหลัก (ย้ายมาไว้บนสุดเพื่อใช้คำนวณ) -->
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccent">
+                            <div class="w-6 h-6 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccent">
                                 <input type="color" id="inputColorAccent" oninput="updateColorsManual()">
                             </div>
                             <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
@@ -315,7 +315,7 @@
                     <!-- พื้นหลังเว็บ -->
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorBg">
+                            <div class="w-6 h-6 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorBg">
                                 <input type="color" id="inputColorBg" oninput="updateColorsManual()">
                             </div>
                             <span class="text-xs text-slate-600">พื้นหลังเว็บ</span>
@@ -326,7 +326,7 @@
                     <!-- สีพื้นหลังป้าย -->
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccentBg">
+                            <div class="w-6 h-6 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccentBg">
                                 <input type="color" id="inputColorAccentBg" oninput="updateColorsManual()">
                             </div>
                             <span class="text-xs text-slate-600">สีพื้นหลังป้ายเล็กๆ</span>
@@ -337,7 +337,7 @@
                     <!-- สีตัวอักษร -->
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded-md border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorText">
+                            <div class="w-6 h-6 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorText">
                                 <input type="color" id="inputColorText" oninput="updateColorsManual()">
                             </div>
                             <span class="text-xs text-slate-600">สีตัวอักษรหลัก</span>
@@ -453,7 +453,7 @@
             const text = root.getPropertyValue('--text-main').trim();
 
             updateInputVisuals(bg, accent, accentBg, text);
-            generateSmartPalette(accent); // สร้างแถบสีแนะนำตอนเปิดหน้าต่าง
+            generateSmartPalette(accent); 
         }
 
         function updateInputVisuals(bg, accent, accentBg, text) {
@@ -476,7 +476,7 @@
 
         function applyPresetTheme(bg, accent, accentBg, text) {
             updateAllColors(bg, accent, accentBg, text);
-            generateSmartPalette(accent); // อัปเดตแถบสีแนะนำด้วย
+            generateSmartPalette(accent); 
         }
 
         function updateColorsManual() {
@@ -486,7 +486,7 @@
             const text = document.getElementById('inputColorText').value;
             
             updateAllColors(bg, accent, accentBg, text);
-            generateSmartPalette(accent); // อัปเดตแถบสีแนะนำทันทีที่เลือกสีหลัก
+            generateSmartPalette(accent); 
         }
 
         function updateAllColors(bg, accent, accentBg, text) {
@@ -502,7 +502,6 @@
         // --- ระบบคำนวณเฉดสีอัจฉริยะ ---
         let currentSuggested = {};
 
-        // ฟังก์ชันแปลง HEX เป็น HSL เพื่อปรับความสว่าง
         function hexToHSL(H) {
             let r = 0, g = 0, b = 0;
             if (H.length == 4) { r = "0x"+H[1]+H[1]; g = "0x"+H[2]+H[2]; b = "0x"+H[3]+H[3]; }
@@ -521,7 +520,6 @@
             return {h, s, l};
         }
 
-        // ฟังก์ชันแปลง HSL กลับเป็น HEX
         function HSLToHex(h, s, l) {
             s /= 100; l /= 100;
             let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
@@ -543,18 +541,14 @@
         function generateSmartPalette(baseHex) {
             const hsl = hexToHSL(baseHex);
             
-            // คำนวณความสว่าง (Lightness) ใหม่สำหรับแต่ละส่วน
-            // Text Color: สีเข้มมาก (L ลดลง 35% ขั้นต่ำ 15%)
             let textL = Math.max(15, hsl.l - 35);
             const textHex = HSLToHex(hsl.h, hsl.s, textL);
             
-            // Accent Bg: สีอ่อน (L เพิ่ม 35% สูงสุด 94%)
             let accentBgL = Math.min(94, hsl.l + 35);
             const accentBgHex = HSLToHex(hsl.h, hsl.s, accentBgL);
             
-            // Bg Color: สีอ่อนมากเกือบขาว (L เพิ่ม 45% สูงสุด 98%)
             let bgL = Math.min(98, hsl.l + 45);
-            const bgHex = HSLToHex(hsl.h, Math.max(10, hsl.s - 20), bgL); // ลดความสดลงนิดหน่อยให้พื้นหลังดูสบายตา
+            const bgHex = HSLToHex(hsl.h, Math.max(10, hsl.s - 20), bgL); 
             
             currentSuggested = {
                 text: textHex,
@@ -563,7 +557,6 @@
                 bg: bgHex
             };
 
-            // แสดงผลในกล่องแถบสี
             document.getElementById('suggestedPaletteContainer').innerHTML = `
                 <div class="flex-1 transition-colors duration-300" style="background-color: ${textHex}"></div>
                 <div class="flex-1 transition-colors duration-300" style="background-color: ${baseHex}"></div>
@@ -636,7 +629,9 @@
             if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes();
         };
 
-        // (ฟังก์ชันเปลี่ยนรูปและจัดการ Social ย่อไว้เพื่อความกระชับ สามารถใช้งานได้ตามเดิม)
+        // ==========================================
+        // เปลี่ยนรูปและ Social Links
+        // ==========================================
         let currentTargetId = '';
         function editImage(imgId, title) {
             if(!isAdmin) return; 
