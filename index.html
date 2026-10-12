@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบแก้ไขสีอัจฉริยะ (Pickr)</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบบันทึกสีถาวร</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,11 +13,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
     
     <style>
-        :root {
-            --bg-color: #f4f9ff;
-            --text-main: #334155;
-            --accent-color: rgba(59, 130, 246, 1);
-            --accent-bg: #dbeafe;
+         :root {
+            --bg-color: #f4f9ff;      /* เปลี่ยนตรงนี้เป็นรหัสสีพื้นหลังเว็บ */
+            --text-main: #334155;     /* เปลี่ยนตรงนี้เป็นรหัสสีตัวอักษร */
+            --accent-color: #3b82f6;  /* เปลี่ยนตรงนี้เป็นรหัสสีหลัก (ปุ่ม/ไอคอน) */
+            --accent-bg: #dbeafe;     /* เปลี่ยนตรงนี้เป็นรหัสสีพื้นหลังป้าย */
         }
         body {
             font-family: 'Prompt', sans-serif;
@@ -193,7 +193,7 @@
         <button id="settingsBtn" class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px]">ตั้งค่า</span></button>
     </nav>
 
-    <!-- Modals (Login, Image, Social) คงเดิม -->
+    <!-- Modals -->
     <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
             <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -229,7 +229,7 @@
         </div>
     </div>
 
-    <!-- 🌟 Modal 4: แผงตกแต่งธีมสีขั้นสูง (พร้อมวงกลมสี Pickr) 🌟 -->
+    <!-- 🌟 Modal 4: แผงตกแต่งธีมสีขั้นสูง -->
     <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white rounded-2xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
             <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 transition bg-slate-50 hover:bg-slate-100 rounded-full">
@@ -262,7 +262,6 @@
 
             <hr class="border-slate-100 my-5">
 
-            <!-- 🎨 ปรับแต่งสีเอง (วงกลม Pickr) -->
             <div class="mb-5">
                 <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่วงกลมสี)
@@ -331,6 +330,39 @@
 
 
     <script>
+        // ==========================================
+        // 💾 ระบบโหลด/บันทึกสีปัจจุบันอัตโนมัติ (LocalStorage)
+        // ==========================================
+        function loadCurrentTheme() {
+            const saved = localStorage.getItem('myCuteSignActiveTheme');
+            if (saved) {
+                try {
+                    const theme = JSON.parse(saved);
+                    const root = document.documentElement;
+                    root.style.setProperty('--bg-color', theme.bg);
+                    root.style.setProperty('--accent-color', theme.accent);
+                    root.style.setProperty('--accent-bg', theme.accentBg);
+                    root.style.setProperty('--text-main', theme.text);
+                } catch(e) { console.error("Error parsing theme", e); }
+            }
+        }
+
+        function saveCurrentTheme() {
+            const root = getComputedStyle(document.documentElement);
+            const currentTheme = {
+                bg: root.getPropertyValue('--bg-color').trim(),
+                accent: root.getPropertyValue('--accent-color').trim(),
+                accentBg: root.getPropertyValue('--accent-bg').trim(),
+                text: root.getPropertyValue('--text-main').trim()
+            };
+            localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(currentTheme));
+        }
+
+        // 🌟 โหลดสีทันทีที่สคริปต์เริ่มทำงาน เพื่อไม่ให้สีกะพริบเวลารีเฟรช
+        loadCurrentTheme();
+
+
+        // ระบบเพลง
         let isPlaying = false;
         document.getElementById('musicToggle').addEventListener('click', () => {
             isPlaying = !isPlaying;
@@ -338,11 +370,14 @@
             document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
         });
 
+        // ระบบ ADMIN 
         let isAdmin = false;
+
         document.getElementById('openLoginBtn').addEventListener('click', () => {
             if(!isAdmin) document.getElementById('loginModal').classList.remove('hidden');
             else toggleThemeModal();
         });
+
         document.getElementById('settingsBtn').addEventListener('click', () => {
             if(isAdmin) toggleThemeModal();
             else document.getElementById('loginModal').classList.remove('hidden');
@@ -379,43 +414,45 @@
         }
 
         // ==========================================
-        // สร้างระบบ Pickr (Color picker แบบมี Opacity)
+        // สร้างระบบ Pickr
         // ==========================================
         const pickrConfig = {
             theme: 'nano',
             swatches: null,
             components: {
                 preview: true,
-                opacity: true, // เปิดการใช้งานแถบโปร่งใส
+                opacity: true, 
                 hue: true,
                 interaction: { hex: true, rgba: true, input: true }
             }
         };
 
-        // สร้างตัวเลือกสี 4 ตัว
         const pickrAccent = Pickr.create({ el: '#pickerAccent', default: '#3b82f6', ...pickrConfig });
         const pickrBg = Pickr.create({ el: '#pickerBg', default: '#f4f9ff', ...pickrConfig });
         const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
         const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
 
-        // Event listener เมื่อผู้ใช้เลื่อนแถบสี
         pickrAccent.on('change', (color) => { 
             const rgba = color.toRGBA().toString(0);
             document.documentElement.style.setProperty('--accent-color', rgba);
             document.getElementById('hexColorAccent').innerText = color.toHEXA().toString();
             generateSmartPalette(rgba); 
+            saveCurrentTheme(); // 💾 บันทึกเมื่อมีการเปลี่ยนสี
         });
         pickrBg.on('change', (color) => { 
             document.documentElement.style.setProperty('--bg-color', color.toRGBA().toString(0));
             document.getElementById('hexColorBg').innerText = color.toHEXA().toString();
+            saveCurrentTheme(); // 💾 บันทึกเมื่อมีการเปลี่ยนสี
         });
         pickrAccentBg.on('change', (color) => { 
             document.documentElement.style.setProperty('--accent-bg', color.toRGBA().toString(0));
             document.getElementById('hexColorAccentBg').innerText = color.toHEXA().toString();
+            saveCurrentTheme(); // 💾 บันทึกเมื่อมีการเปลี่ยนสี
         });
         pickrText.on('change', (color) => { 
             document.documentElement.style.setProperty('--text-main', color.toRGBA().toString(0));
             document.getElementById('hexColorText').innerText = color.toHEXA().toString();
+            saveCurrentTheme(); // 💾 บันทึกเมื่อมีการเปลี่ยนสี
         });
 
         function toggleThemeModal() {
@@ -428,7 +465,6 @@
             }
         }
 
-        // ซิงค์สีจากหน้าเว็บเข้า Pickr (เช่น ตอนเข้าโหมดแอดมิน หรือกดเลือกธีม)
         function syncPickersWithRoot() {
             const root = getComputedStyle(document.documentElement);
             const bg = root.getPropertyValue('--bg-color').trim();
@@ -449,6 +485,9 @@
             pickrAccent.setColor(accent);
             pickrAccentBg.setColor(accentBg);
             pickrText.setColor(text);
+            
+            // ให้เซฟเมื่อกดปุ่ม Preset ด้วย
+            setTimeout(saveCurrentTheme, 100); 
         }
 
         // ==========================================
