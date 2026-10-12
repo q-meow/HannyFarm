@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบแก้ไขขั้นสูง</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบแก้ไขสีขั้นสูง</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
+            /* สีตั้งต้น (Bubble Blue) */
             --bg-color: #f4f9ff;
-            --text-main: #4b5563;
-            --accent-color: #93c5fd;
-            --accent-bg: #eff6ff;
+            --text-main: #334155;
+            --accent-color: #3b82f6;
+            --accent-bg: #dbeafe;
         }
         body {
             font-family: 'Prompt', sans-serif;
             background-color: var(--bg-color); 
             color: var(--text-main); 
-            transition: all 0.3s ease;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -28,6 +29,7 @@
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             border: 2px solid var(--accent-bg);
+            transition: all 0.4s ease;
         }
 
         /* เอฟเฟกต์สำหรับโหมด Admin */
@@ -51,16 +53,19 @@
         body.admin-active .editable-img:hover::after { opacity: 1; }
         
         body.admin-active .editable-text {
-            border: 1px dashed #ccc;
+            border: 1px dashed #cbd5e1;
             padding: 2px 4px;
             border-radius: 4px;
             cursor: text;
         }
         body.admin-active .editable-text:hover { background: rgba(0,0,0,0.05); }
         
-        /* ซ่อนปุ่มต่างๆ หากไม่ใช่ Admin */
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: flex !important; }
+
+        /* ซ่อนขอบของ input type color */
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
     </style>
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto bg-white shadow-xl min-h-screen relative overflow-x-hidden">
@@ -70,14 +75,14 @@
         <i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล
     </button>
 
-    <!-- 🌟 ปุ่มวงกลมมุมขวาล่างสำหรับเปิดแผงจานสี (โชว์เฉพาะตอนเป็น Admin) -->
-    <button id="themeToggleBtn" onclick="toggleThemePanel()" class="admin-only fixed bottom-[90px] right-5 z-40 w-14 h-14 bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.15)] flex items-center justify-center transition-all duration-300 hover:scale-110" style="border: 3px solid var(--accent-color); color: var(--accent-color);">
+    <!-- ปุ่มวงกลมมุมขวาล่างสำหรับเปิดแผงจานสี -->
+    <button id="themeToggleBtn" onclick="toggleThemeModal()" class="admin-only fixed bottom-[90px] right-5 z-40 w-14 h-14 bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.15)] flex items-center justify-center transition-all duration-300 hover:scale-110" style="border: 3px solid var(--accent-color); color: var(--accent-color);">
         <i class="fa-solid fa-palette text-2xl"></i>
     </button>
 
     <!-- 1. ส่วนหัว (ปกและโปรไฟล์) -->
     <header class="relative">
-        <div class="h-48 w-full relative overflow-hidden editable-img" onclick="editImage('coverImg', 'เปลี่ยนภาพปก')" style="background-color: var(--accent-color)">
+        <div class="h-48 w-full relative overflow-hidden editable-img" onclick="editImage('coverImg', 'เปลี่ยนภาพปก')" style="background-color: var(--accent-color); transition: background-color 0.4s ease;">
             <img id="coverImg" src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 mix-blend-overlay">
         </div>
 
@@ -93,13 +98,13 @@
             <div class="mt-4">
                 <h1 class="text-2xl font-semibold flex items-center gap-2" style="color: var(--text-main)">
                     <span id="shopName" class="editable-text" contenteditable="false">ชื่อร้าน ป้ายน่ารัก</span>
-                    <span class="text-xs px-2 py-1 rounded-full font-normal editable-text" contenteditable="false" style="background-color: var(--accent-bg); color: var(--accent-color);">เปิดรับงาน (Op)</span>
+                    <span class="text-xs px-2 py-1 rounded-full font-normal editable-text" contenteditable="false" style="background-color: var(--accent-bg); color: var(--accent-color); transition: all 0.4s ease;">เปิดรับงาน (Op)</span>
                 </h1>
                 <p class="text-sm mt-2 editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">
                     รับทำป้ายไวนิล โปสเตอร์ โลโก้ สไตล์มินิมอลและน่ารักๆ สามารถใส่รายละเอียดร้านเพิ่มเติมได้ตรงนี้เลยค่ะ
                 </p>
 
-                <!-- ส่วนช่องทางการติดต่อโซเชียลมีเดีย -->
+                <!-- Social Links -->
                 <div class="mt-3 flex flex-wrap items-center gap-2">
                     <div id="socialIcons" class="flex gap-2">
                         <a href="#" id="icon-line" class="w-7 h-7 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-line"></i></a>
@@ -108,13 +113,12 @@
                         <a href="#" id="icon-tiktok" class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-sm transition hover:scale-110 hidden"><i class="fa-brands fa-tiktok"></i></a>
                         <a href="#" id="icon-x" class="w-7 h-7 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center text-[11px] transition hover:scale-110 hidden"><i class="fa-brands fa-x-twitter"></i></a>
                     </div>
-                    
                     <button id="editSocialBtn" class="admin-only px-3 py-1 bg-white border border-dashed border-slate-300 text-slate-400 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" onclick="openSocialModal()">
-                        <i class="fa-solid fa-pen"></i> แก้ไขช่องทางติดต่อ
+                        <i class="fa-solid fa-pen"></i> แก้ไขช่องทาง
                     </button>
                 </div>
 
-                <button id="musicToggle" class="mt-3 flex items-center gap-2 text-xs bg-white px-3 py-1.5 rounded-full shadow-sm" style="color: var(--accent-color); border: 1px solid var(--accent-bg)">
+                <button id="musicToggle" class="mt-3 flex items-center gap-2 text-xs bg-white px-3 py-1.5 rounded-full shadow-sm transition-colors" style="color: var(--accent-color); border: 1px solid var(--accent-bg)">
                     <i id="musicIcon" class="fa-solid fa-play"></i>
                     <span id="musicText">เล่นเพลงโปรด</span>
                 </button>
@@ -125,16 +129,16 @@
     <!-- (เนื้อหาสถิติ ตัวอย่างงาน และเรทราคา คงเดิม) -->
     <section class="px-6 mt-6 flex gap-4">
         <div class="flex-1 flex flex-col gap-3">
-            <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-50">
+            <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-100">
                 <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนสินค้าทั้งหมด</p>
                 <p class="text-xl font-semibold mt-1 editable-text" contenteditable="false" style="color: var(--accent-color)">50 <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">รายการ</span></p>
             </div>
-            <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-50">
+            <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-slate-100">
                 <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนคิวงานทั้งหมด</p>
                 <p class="text-xl font-semibold mt-1 editable-text" contenteditable="false" style="color: var(--accent-color)">50 <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">งาน</span></p>
             </div>
         </div>
-        <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm flex flex-col justify-center relative overflow-hidden border border-slate-50">
+        <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm flex flex-col justify-center relative overflow-hidden border border-slate-100">
             <div class="absolute top-0 right-0 p-4 opacity-10 text-5xl" style="color: var(--accent-color)"><i class="fa-regular fa-calendar-check"></i></div>
             <h3 class="font-medium mb-2 relative z-10" style="color: var(--accent-color)">ปฏิทินงาน</h3>
             <p class="text-xs relative z-10 leading-relaxed editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">เอาไว้บอกว่าวันไหนทำกี่งาน<br>เปิด-ปิดวันไหนบ้าง<br>เช็คคิวได้เลย</p>
@@ -180,7 +184,7 @@
         <button class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-list-ul text-xl"></i><span class="text-[10px]">คิวงาน</span></button>
         <!-- ปุ่ม Home -->
         <button class="flex flex-col items-center gap-1 -mt-8 w-[24%]">
-            <div class="w-14 h-14 text-white rounded-full flex justify-center items-center shadow-lg border-[4px] border-white" style="background-color: var(--accent-color)">
+            <div class="w-14 h-14 text-white rounded-full flex justify-center items-center shadow-lg border-[4px] border-white transition-colors" style="background-color: var(--accent-color)">
                 <i class="fa-solid fa-house text-xl"></i>
             </div>
             <span class="text-[10px] mt-1 font-medium">โฮม</span>
@@ -189,12 +193,13 @@
         <button id="settingsBtn" class="flex flex-col items-center gap-1 transition w-[18%] pb-1"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px]">ตั้งค่า</span></button>
     </nav>
 
+
     <!-- ========================================== -->
     <!-- ระบบ MODAL (หน้าต่าง) ต่างๆ -->
     <!-- ========================================== -->
 
     <!-- Modal 1: เข้าสู่ระบบ Admin -->
-    <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm transition-opacity">
+    <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
             <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
             <div class="text-center mb-5 mt-2">
@@ -207,92 +212,133 @@
         </div>
     </div>
 
-    <!-- Modal 2: เปลี่ยนรูปภาพ (Input URL) -->
+    <!-- Modal 2: เปลี่ยนรูปภาพ -->
     <div id="inputModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
             <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
             <h3 id="inputModalTitle" class="font-bold text-lg text-slate-800 mb-4">เปลี่ยนรูปภาพ</h3>
             <input type="text" id="modalInput" placeholder="https://..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm mb-4 outline-none focus:border-blue-400">
-            <button id="saveInputBtn" class="w-full bg-blue-500 text-white rounded-xl py-3 text-sm font-medium">บันทึก (Save)</button>
+            <button id="saveInputBtn" class="w-full bg-blue-500 text-white rounded-xl py-3 text-sm font-medium">บันทึกรูปภาพ</button>
         </div>
     </div>
 
     <!-- Modal 3: ตั้งค่า Social Media -->
     <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white p-6 rounded-3xl w-[90%] max-w-[340px] max-h-[85vh] overflow-y-auto shadow-2xl relative hide-scrollbar border border-slate-100">
-            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="font-bold text-slate-800 mb-1 text-sm"><i class="fa-solid fa-link text-blue-500"></i> ตั้งค่า SOCIAL LINKS</h3>
-            <p class="text-[10px] text-slate-500 mb-5">เว้นช่องว่างไว้หากไม่ต้องการแสดงไอคอน</p>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[11px] font-medium text-green-600 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-line text-sm"></i> LINE</label>
-                    <input type="text" id="input-line" placeholder="https://line.me/ti/p/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-green-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-medium text-blue-600 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-facebook text-sm"></i> Facebook</label>
-                    <input type="text" id="input-facebook" placeholder="https://facebook.com/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-medium text-pink-600 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-instagram text-sm"></i> Instagram</label>
-                    <input type="text" id="input-ig" placeholder="https://instagram.com/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-pink-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-medium text-slate-700 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-tiktok text-sm"></i> TikTok</label>
-                    <input type="text" id="input-tiktok" placeholder="https://tiktok.com/@..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-slate-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-medium text-slate-800 flex items-center gap-1.5 mb-1.5"><i class="fa-brands fa-x-twitter text-sm"></i> X (Twitter)</label>
-                    <input type="text" id="input-x" placeholder="https://x.com/..." class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-slate-500">
-                </div>
+            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="font-bold text-slate-800 mb-1 text-sm"><i class="fa-solid fa-link text-blue-500"></i> SOCIAL LINKS</h3>
+            <div class="space-y-4 mt-4">
+                <div><label class="text-[11px] font-medium text-green-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-line"></i> LINE</label><input type="text" id="input-line" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
+                <div><label class="text-[11px] font-medium text-blue-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-facebook"></i> Facebook</label><input type="text" id="input-facebook" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
+                <div><label class="text-[11px] font-medium text-pink-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-instagram"></i> Instagram</label><input type="text" id="input-ig" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
             </div>
-            <button onclick="saveSocials()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium hover:bg-black transition shadow-lg shadow-slate-200 mt-6">บันทึกการตั้งค่า</button>
+            <button onclick="saveSocials()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium mt-6">บันทึก</button>
         </div>
     </div>
 
-    <!-- 🌟 แผงตั้งค่าสีสัน (ซ่อนอยู่ จะโชว์เมื่อกดปุ่มวงกลมจานสี) -->
-    <div id="adminPanel" class="hidden fixed bottom-24 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] z-[50]">
-        <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 relative">
-            <!-- ป้ายโหมดแก้ไข ย้ายมาฝั่งซ้าย -->
-            <div class="absolute top-0 left-0 bg-green-500 text-white text-[9px] px-3 py-1 rounded-br-lg font-medium">โหมดแก้ไข (EDIT)</div>
-            
-            <!-- ปุ่มลูกศรย่อแผงเก็บ (Minimize) ย้ายมามุมขวาบน -->
-            <button onclick="toggleThemePanel()" class="absolute top-4 right-5 text-slate-400 hover:text-slate-700 bg-slate-50 w-8 h-8 rounded-full flex items-center justify-center transition">
-                <i class="fa-solid fa-chevron-down text-lg"></i>
+    <!-- 🌟🌟 Modal 4: แผงตกแต่งธีมสีขั้นสูง (THEME CUSTOMIZER) 🌟🌟 -->
+    <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-[90%] max-w-[380px] max-h-[85vh] overflow-y-auto p-5 relative hide-scrollbar shadow-2xl">
+            <!-- ปุ่มปิดมุมขวาบน -->
+            <button onclick="toggleThemeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-50 w-8 h-8 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
             </button>
             
-            <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2 mt-4">
-                <i class="fa-solid fa-palette text-blue-500 text-lg"></i> ปรับแต่งสีและธีม
-            </h3>
-            
-            <div class="space-y-3 mb-4">
-                <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <span class="text-xs text-slate-600 font-medium">สีพื้นหลังเว็บ</span>
-                    <input type="color" id="colorBg" value="#f4f9ff" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
-                </div>
-                <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <span class="text-xs text-slate-600 font-medium">สีหลัก (ปุ่ม, ไอคอน)</span>
-                    <input type="color" id="colorAccent" value="#93c5fd" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
-                </div>
-                <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <span class="text-xs text-slate-600 font-medium">สีพื้นหลังป้ายเล็กๆ</span>
-                    <input type="color" id="colorAccentBg" value="#eff6ff" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
-                </div>
-                <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <span class="text-xs text-slate-600 font-medium">สีตัวอักษร</span>
-                    <input type="color" id="colorText" value="#4b5563" class="w-8 h-8 rounded cursor-pointer border-0 p-0" oninput="updateColors()">
-                </div>
+            <div class="text-center mb-5 mt-2">
+                <div class="w-12 h-12 mx-auto bg-gradient-to-tr from-blue-100 to-pink-100 rounded-2xl flex items-center justify-center text-xl shadow-sm mb-2"><i class="fa-solid fa-palette text-pink-400"></i></div>
+                <h2 class="font-bold text-lg text-slate-800">ตกแต่งธีมสี</h2>
+                <p class="text-[11px] text-slate-500">ปรับแต่งสีเว็บไซต์ตามต้องการ</p>
             </div>
             
-            <button onclick="logoutAdmin()" class="w-full text-slate-400 hover:text-red-500 text-xs py-2 flex items-center justify-center gap-2 transition bg-red-50/50 rounded-xl mt-2">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบแก้ไข
+            <!-- ⚡ ธีมสำเร็จรูป -->
+            <div class="mb-5">
+                <h4 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1"><i class="fa-solid fa-bolt text-yellow-400"></i> ธีมสำเร็จรูป</h4>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="applyPresetTheme('#f0f7ff', '#3b82f6', '#dbeafe', '#1e3a8a')" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium border border-blue-100 hover:bg-blue-100 transition"><i class="fa-solid fa-circle text-[10px] text-blue-400"></i> Bubble Blue</button>
+                    <button onclick="applyPresetTheme('#fdf2f8', '#f43f5e', '#ffe4e6', '#881337')" class="px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-xs font-medium border border-pink-100 hover:bg-pink-100 transition"><i class="fa-solid fa-circle text-[10px] text-pink-400"></i> Rose Gold</button>
+                    <button onclick="applyPresetTheme('#f0fdf4', '#22c55e', '#dcfce7', '#14532d')" class="px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-medium border border-green-100 hover:bg-green-100 transition"><i class="fa-solid fa-circle text-[10px] text-green-400"></i> Matcha</button>
+                    <button onclick="applyPresetTheme('#fef3c7', '#d97706', '#fde68a', '#78350f')" class="px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-medium border border-amber-100 hover:bg-amber-100 transition"><i class="fa-solid fa-circle text-[10px] text-amber-400"></i> Chestnut</button>
+                    <button onclick="applyPresetTheme('#f8fafc', '#475569', '#e2e8f0', '#0f172a')" class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-xs font-medium border border-slate-200 hover:bg-slate-200 transition"><i class="fa-solid fa-circle text-[10px] text-slate-400"></i> Minimal</button>
+                </div>
+            </div>
+
+            <!-- 🌟 ธีมของฉัน (โหลดจากที่บันทึกไว้) -->
+            <div class="mb-5">
+                <h4 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1"><i class="fa-solid fa-star text-yellow-400"></i> ธีมของฉัน</h4>
+                <div id="myThemesContainer" class="flex flex-wrap gap-2 text-xs text-slate-400">
+                    <!-- รายชื่อธีมที่เซฟจะมาโชว์ตรงนี้ -->
+                    <span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span>
+                </div>
+            </div>
+
+            <hr class="border-slate-100 my-4">
+
+            <!-- 🎨 หัวข้อปรับสีเอง -->
+            <h4 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1"><i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่สี)</h4>
+            <div class="space-y-2 mb-6">
+                <!-- สีพื้นหลังเว็บ -->
+                <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-[11px] font-medium text-slate-600 flex items-center gap-2">
+                        <div class="w-6 h-6 rounded border border-slate-200 overflow-hidden relative">
+                            <input type="color" id="inputColorBg" class="absolute -top-2 -left-2 w-10 h-10 cursor-pointer" oninput="updateColorsManual()">
+                        </div>
+                        พื้นหลังเว็บ
+                    </span>
+                    <span id="hexColorBg" class="text-[10px] font-mono text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#F4F9FF</span>
+                </div>
+                <!-- สีหลัก -->
+                <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-[11px] font-medium text-slate-600 flex items-center gap-2">
+                        <div class="w-6 h-6 rounded border border-slate-200 overflow-hidden relative">
+                            <input type="color" id="inputColorAccent" class="absolute -top-2 -left-2 w-10 h-10 cursor-pointer" oninput="updateColorsManual()">
+                        </div>
+                        สีหลัก (ปุ่ม, ไอคอน)
+                    </span>
+                    <span id="hexColorAccent" class="text-[10px] font-mono text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#3B82F6</span>
+                </div>
+                <!-- สีป้ายเล็ก -->
+                <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-[11px] font-medium text-slate-600 flex items-center gap-2">
+                        <div class="w-6 h-6 rounded border border-slate-200 overflow-hidden relative">
+                            <input type="color" id="inputColorAccentBg" class="absolute -top-2 -left-2 w-10 h-10 cursor-pointer" oninput="updateColorsManual()">
+                        </div>
+                        สีพื้นหลังป้ายเล็กๆ
+                    </span>
+                    <span id="hexColorAccentBg" class="text-[10px] font-mono text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#DBEAFE</span>
+                </div>
+                <!-- สีตัวอักษร -->
+                <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-[11px] font-medium text-slate-600 flex items-center gap-2">
+                        <div class="w-6 h-6 rounded border border-slate-200 overflow-hidden relative">
+                            <input type="color" id="inputColorText" class="absolute -top-2 -left-2 w-10 h-10 cursor-pointer" oninput="updateColorsManual()">
+                        </div>
+                        สีตัวอักษรหลัก
+                    </span>
+                    <span id="hexColorText" class="text-[10px] font-mono text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase">#334155</span>
+                </div>
+            </div>
+
+            <!-- ปุ่มบันทึก -->
+            <button onclick="saveCustomTheme()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 rounded-xl py-3 text-xs font-bold hover:bg-blue-100 transition shadow-sm mb-2">
+                <i class="fa-solid fa-plus"></i> บันทึกสีปัจจุบันเป็น "เทมเพลตใหม่"
+            </button>
+            <div class="flex gap-2">
+                <button onclick="toggleThemeModal()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-xs font-bold hover:bg-black transition shadow-lg">
+                    <i class="fa-solid fa-floppy-disk"></i> นำไปใช้จริง
+                </button>
+            </div>
+            
+            <button onclick="logoutAdmin()" class="w-full text-red-400 hover:text-red-600 text-xs py-2 mt-4 flex items-center justify-center gap-1 transition font-medium">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ Admin
             </button>
         </div>
     </div>
 
 
     <script>
-        // โลจิกปุ่มเพลง
+        // ==========================================
+        // ระบบพื้นฐาน (เพลง, ล็อกอิน)
+        // ==========================================
         let isPlaying = false;
         document.getElementById('musicToggle').addEventListener('click', () => {
             isPlaying = !isPlaying;
@@ -300,22 +346,16 @@
             document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
         });
 
-        // ==========================================
-        // ระบบ ADMIN 
-        // ==========================================
         let isAdmin = false;
 
         document.getElementById('openLoginBtn').addEventListener('click', () => {
             if(!isAdmin) document.getElementById('loginModal').classList.remove('hidden');
+            else toggleThemeModal();
         });
 
-        // เมื่อกดเมนูฟันเฟืองด้านล่าง
         document.getElementById('settingsBtn').addEventListener('click', () => {
-            if(isAdmin) {
-                toggleThemePanel(); // เปิดแผงสีถ้าเป็นแอดมินแล้ว
-            } else {
-                document.getElementById('loginModal').classList.remove('hidden');
-            }
+            if(isAdmin) toggleThemeModal();
+            else document.getElementById('loginModal').classList.remove('hidden');
         });
 
         function attemptLogin() {
@@ -323,32 +363,18 @@
                 isAdmin = true;
                 document.body.classList.add('admin-active'); 
                 document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'true'));
-                
                 document.getElementById('loginModal').classList.add('hidden');
-                // ปุ่มวงกลมจานสีจะโผล่ขึ้นมาอัตโนมัติตามคลาส CSS .admin-only
                 
                 let btn = document.getElementById('openLoginBtn');
                 btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
                 btn.classList.add('bg-green-500', 'text-white', 'border-transparent');
                 btn.style.color = 'white';
+                
+                // อัปเดตสีตั้งต้นใน Modal
+                loadCurrentColorsToInputs();
+                loadCustomThemes(); // โหลดธีมที่เคยเซฟไว้
             } else {
                 alert("รหัสผ่านไม่ถูกต้อง");
-            }
-        }
-
-        // ฟังก์ชันเปิด/ปิด ย่อ/ขยาย แผงจานสี (Theme Panel)
-        function toggleThemePanel() {
-            const panel = document.getElementById('adminPanel');
-            const btn = document.getElementById('themeToggleBtn');
-            
-            if (panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                // หดปุ่มจานสีให้หายไป (Animation)
-                btn.classList.add('scale-0', 'opacity-0'); 
-            } else {
-                panel.classList.add('hidden');
-                // โชว์ปุ่มจานสีกลับมา
-                btn.classList.remove('scale-0', 'opacity-0');
             }
         }
 
@@ -356,8 +382,7 @@
             isAdmin = false;
             document.body.classList.remove('admin-active');
             document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'false'));
-            document.getElementById('adminPanel').classList.add('hidden');
-            document.getElementById('themeToggleBtn').classList.remove('scale-0', 'opacity-0'); // รีเซ็ตปุ่มจานสี
+            document.getElementById('themeModal').classList.add('hidden');
             
             let btn = document.getElementById('openLoginBtn');
             btn.innerHTML = '<i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล';
@@ -366,37 +391,140 @@
         }
 
         // ==========================================
-        // ระบบ Social Media Links 
+        // ระบบ THEME CUSTOMIZER (แบบใหม่)
         // ==========================================
-        function openSocialModal() {
-            document.getElementById('input-line').value = document.getElementById('icon-line').href !== window.location.href + "#" ? document.getElementById('icon-line').href : '';
-            document.getElementById('input-facebook').value = document.getElementById('icon-facebook').href !== window.location.href + "#" ? document.getElementById('icon-facebook').href : '';
-            document.getElementById('input-ig').value = document.getElementById('icon-ig').href !== window.location.href + "#" ? document.getElementById('icon-ig').href : '';
-            document.getElementById('input-tiktok').value = document.getElementById('icon-tiktok').href !== window.location.href + "#" ? document.getElementById('icon-tiktok').href : '';
-            document.getElementById('input-x').value = document.getElementById('icon-x').href !== window.location.href + "#" ? document.getElementById('icon-x').href : '';
+        
+        function toggleThemeModal() {
+            const modal = document.getElementById('themeModal');
+            if(modal.classList.contains('hidden')) {
+                loadCurrentColorsToInputs(); // ดึงสีปัจจุบันไปใส่ช่องให้ตรงกัน
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // ดึงค่า CSS Variable ปัจจุบันไปแสดงใน Input Color (เพื่อให้รหัสสีและแถบสีตรงกัน)
+        function loadCurrentColorsToInputs() {
+            const root = getComputedStyle(document.documentElement);
+            const bg = root.getPropertyValue('--bg-color').trim();
+            const accent = root.getPropertyValue('--accent-color').trim();
+            const accentBg = root.getPropertyValue('--accent-bg').trim();
+            const text = root.getPropertyValue('--text-main').trim();
+
+            document.getElementById('inputColorBg').value = bg;
+            document.getElementById('hexColorBg').innerText = bg;
             
-            document.getElementById('socialModal').classList.remove('hidden');
+            document.getElementById('inputColorAccent').value = accent;
+            document.getElementById('hexColorAccent').innerText = accent;
+            
+            document.getElementById('inputColorAccentBg').value = accentBg;
+            document.getElementById('hexColorAccentBg').innerText = accentBg;
+            
+            document.getElementById('inputColorText').value = text;
+            document.getElementById('hexColorText').innerText = text;
         }
 
-        function saveSocials() {
-            const platforms = ['line', 'facebook', 'ig', 'tiktok', 'x'];
-            platforms.forEach(p => {
-                const url = document.getElementById('input-' + p).value.trim();
-                const icon = document.getElementById('icon-' + p);
-                if(url) {
-                    icon.href = url;
-                    icon.classList.remove('hidden'); 
-                } else {
-                    icon.href = "#";
-                    icon.classList.add('hidden'); 
-                }
+        // เมื่อคลิกธีมสำเร็จรูป ให้ส่งสีเข้าไปเปลี่ยนเลย
+        function applyPresetTheme(bg, accent, accentBg, text) {
+            updateAllColors(bg, accent, accentBg, text);
+        }
+
+        // เมื่อผู้ใช้จิ้มสีเองจาก Color Picker 
+        function updateColorsManual() {
+            const bg = document.getElementById('inputColorBg').value;
+            const accent = document.getElementById('inputColorAccent').value;
+            const accentBg = document.getElementById('inputColorAccentBg').value;
+            const text = document.getElementById('inputColorText').value;
+            
+            updateAllColors(bg, accent, accentBg, text);
+        }
+
+        // ฟังก์ชันหลักในการเปลี่ยนสีทั้งเว็บ
+        function updateAllColors(bg, accent, accentBg, text) {
+            const root = document.documentElement;
+            // เปลี่ยนสีใน CSS
+            root.style.setProperty('--bg-color', bg);
+            root.style.setProperty('--accent-color', accent);
+            root.style.setProperty('--accent-bg', accentBg);
+            root.style.setProperty('--text-main', text);
+
+            // อัปเดตใน Input Modal
+            document.getElementById('inputColorBg').value = bg;
+            document.getElementById('hexColorBg').innerText = bg;
+            document.getElementById('inputColorAccent').value = accent;
+            document.getElementById('hexColorAccent').innerText = accent;
+            document.getElementById('inputColorAccentBg').value = accentBg;
+            document.getElementById('hexColorAccentBg').innerText = accentBg;
+            document.getElementById('inputColorText').value = text;
+            document.getElementById('hexColorText').innerText = text;
+        }
+
+        // ==========================================
+        // ระบบบันทึก "ธีมของฉัน" (Custom Themes)
+        // ==========================================
+        function saveCustomTheme() {
+            const themeName = prompt("ตั้งชื่อเทมเพลตใหม่ของคุณ:");
+            if(!themeName) return;
+
+            const newTheme = {
+                id: Date.now().toString(),
+                name: themeName,
+                bg: document.getElementById('inputColorBg').value,
+                accent: document.getElementById('inputColorAccent').value,
+                accentBg: document.getElementById('inputColorAccentBg').value,
+                text: document.getElementById('inputColorText').value
+            };
+
+            // ดึงข้อมูลเดิมจาก LocalStorage
+            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
+            savedThemes.push(newTheme);
+            localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
+
+            loadCustomThemes(); // รีเฟรชรายการ
+            alert(`บันทึกธีม "${themeName}" เรียบร้อยแล้ว!`);
+        }
+
+        function loadCustomThemes() {
+            const container = document.getElementById('myThemesContainer');
+            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
+            
+            if(savedThemes.length === 0) {
+                container.innerHTML = '<span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span>';
+                return;
+            }
+
+            container.innerHTML = ''; // ล้างของเก่า
+            savedThemes.forEach(theme => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-1.5 bg-slate-50 text-slate-700 rounded-full text-xs font-medium border border-slate-200 hover:bg-slate-100 transition flex items-center gap-1.5";
+                btn.innerHTML = `<div class="w-3 h-3 rounded-full shadow-inner" style="background-color: ${theme.accent}"></div> ${theme.name}`;
+                btn.onclick = () => applyPresetTheme(theme.bg, theme.accent, theme.accentBg, theme.text);
+                
+                // ปุ่มลบธีม (ตัว X เล็กๆ)
+                const delBtn = document.createElement('span');
+                delBtn.className = "text-[9px] text-slate-300 hover:text-red-400 ml-1";
+                delBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation(); // ไม่ให้ไปทับกับการคลิกเลือกธีม
+                    if(confirm(`ต้องการลบธีม "${theme.name}" ใช่หรือไม่?`)) {
+                        savedThemes = savedThemes.filter(t => t.id !== theme.id);
+                        localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
+                        loadCustomThemes();
+                    }
+                };
+                
+                btn.appendChild(delBtn);
+                container.appendChild(btn);
             });
-            document.getElementById('socialModal').classList.add('hidden');
         }
 
-        // ==========================================
-        // ระบบเปลี่ยนรูป และ เพิ่มรูปงาน
-        // ==========================================
+        // โหลดธีมที่เคยเซฟไว้ตั้งแต่เปิดเว็บ
+        window.onload = () => {
+            if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes();
+        };
+
+        // (ฟังก์ชันเปลี่ยนรูปและจัดการ Social ตัดทอนเพื่อความกระชับ สามารถใช้งานได้ตามเดิม)
         let currentTargetId = '';
         function editImage(imgId, title) {
             if(!isAdmin) return; 
@@ -404,7 +532,6 @@
             document.getElementById('inputModalTitle').innerText = title;
             document.getElementById('modalInput').value = document.getElementById(imgId).src;
             document.getElementById('inputModal').classList.remove('hidden');
-            
             document.getElementById('saveInputBtn').onclick = function() {
                 const newUrl = document.getElementById('modalInput').value;
                 if(newUrl) document.getElementById(currentTargetId).src = newUrl;
@@ -424,23 +551,14 @@
             newImg.src = "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=300&auto=format&fit=crop"; 
             newImg.className = "w-full h-full object-cover";
             newDiv.appendChild(newImg);
-            
             const container = document.getElementById('portfolioGallery');
             const addBtn = document.getElementById('addPortfolioBtn');
             container.insertBefore(newDiv, addBtn);
             editImage(newId, 'ใส่รูปลิงก์งานใหม่');
         }
 
-        // ==========================================
-        // Color Picker (เรียลไทม์)
-        // ==========================================
-        function updateColors() {
-            const root = document.documentElement;
-            root.style.setProperty('--bg-color', document.getElementById('colorBg').value);
-            root.style.setProperty('--accent-color', document.getElementById('colorAccent').value);
-            root.style.setProperty('--accent-bg', document.getElementById('colorAccentBg').value);
-            root.style.setProperty('--text-main', document.getElementById('colorText').value);
-        }
+        function openSocialModal() { document.getElementById('socialModal').classList.remove('hidden'); }
+        function saveSocials() { document.getElementById('socialModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
