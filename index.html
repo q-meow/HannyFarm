@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบสินค้า & แต่งสีสมบูรณ์</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบสมบูรณ์ 100%</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
+    <!-- นำเข้าไลบรารีวงกลมสี (Pickr) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+
     <!-- นำเข้าไลบรารี Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -41,6 +45,12 @@
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: flex !important; }
 
+        /* สไตล์ให้วงกลมสี Pickr กลมดิ๊กสวยงาม */
+        .pickr { display: flex; align-items: center; justify-content: center; }
+        .pickr .pcr-button { width: 24px !important; height: 24px !important; border-radius: 50% !important; border: 1px solid #cbd5e1 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
+        .pickr .pcr-button::before, .pickr .pcr-button::after { border-radius: 50% !important; }
+        .pcr-app { font-family: 'Prompt', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; border-radius: 12px !important; }
+        
         .tag-active { background-color: var(--accent-color) !important; color: white !important; }
         .dragging { opacity: 0.5; transform: scale(0.95); }
         .drag-over { border: 2px dashed var(--accent-color) !important; }
@@ -48,7 +58,6 @@
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto bg-white shadow-xl min-h-screen relative overflow-x-hidden">
 
-    <!-- ปุ่มเปิดระบบ Admin -->
     <button id="openLoginBtn" onclick="openLoginWindow()" class="absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5" style="color: var(--text-main)">
         <i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล
     </button>
@@ -132,9 +141,7 @@
             <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="ค้นหาสินค้า..." class="w-full bg-white border border-slate-200 rounded-full py-3 pl-11 pr-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" style="color: var(--text-main)">
         </div>
 
-        <div id="tagContainer" class="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-2">
-            <!-- แท็กอัตโนมัติ -->
-        </div>
+        <div id="tagContainer" class="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-2"></div>
 
         <div class="flex justify-between items-end mb-4">
             <p class="text-sm font-medium" style="color: var(--text-main); opacity: 0.8;">สินค้าทั้งหมด (<span id="totalProductCount">0</span>)</p>
@@ -175,7 +182,7 @@
     </nav>
 
     <!-- ========================================== -->
-    <!-- MODALS -->
+    <!-- MODALS (หน้าต่างป็อปอัพต่างๆ) -->
     <!-- ========================================== -->
 
     <!-- Modal เพิ่ม/แก้ไขสินค้า -->
@@ -251,7 +258,7 @@
         </div>
     </div>
 
-    <!-- 🌟🌟 แผงตกแต่งธีมสี (ใช้แบบเดิมที่เสถียร 100% พร้อมแถบปรับความโปร่งใส) 🌟🌟 -->
+    <!-- 🌟🌟 แผงตกแต่งธีมสี Pickr ฉบับสมบูรณ์ (Theme Modal) 🌟🌟 -->
     <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
         <div class="bg-white rounded-2xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
             <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 transition bg-slate-50 hover:bg-slate-100 rounded-full">
@@ -286,86 +293,44 @@
 
             <hr class="border-slate-100 my-5">
 
-            <!-- 🎨 ปรับแต่งสีเอง (Native HTML5) -->
+            <!-- 🎨 ปรับแต่งสีด้วย Pickr -->
             <div class="mb-5">
                 <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่วงกลมสี)
                 </h4>
                 
-                <div class="space-y-3">
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerAccent"></div>
+                            <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
+                        </div>
+                        <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerBg"></div>
+                            <span class="text-xs text-slate-600">พื้นหลังเว็บ</span>
+                        </div>
+                        <span id="hexColorBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    </div>
                     
-                    <!-- สีหลัก -->
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-2">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccent">
-                                    <input type="color" id="inputColorAccent" oninput="updateColorsManual()" class="opacity-0 absolute w-[200%] h-[200%] top-[-50%] left-[-50%] cursor-pointer">
-                                </div>
-                                <span class="text-xs font-medium text-slate-700">สีหลัก (ปุ่ม, ไอคอน)</span>
-                            </div>
-                            <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerAccentBg"></div>
+                            <span class="text-xs text-slate-600">สีพื้นหลังป้ายเล็กๆ</span>
                         </div>
-                        <div class="flex items-center gap-2 pl-10 pr-1">
-                            <span class="text-[9px] text-slate-400"><i class="fa-solid fa-droplet"></i> โปร่งใส</span>
-                            <input type="range" id="opacityAccent" min="0" max="100" value="100" oninput="updateColorsManual()" class="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                            <span id="textOpacityAccent" class="text-[9px] text-slate-500 font-mono w-7 text-right">100%</span>
-                        </div>
+                        <span id="hexColorAccentBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
                     </div>
-
-                    <!-- พื้นหลังเว็บ -->
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-2">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorBg">
-                                    <input type="color" id="inputColorBg" oninput="updateColorsManual()" class="opacity-0 absolute w-[200%] h-[200%] top-[-50%] left-[-50%] cursor-pointer">
-                                </div>
-                                <span class="text-xs font-medium text-slate-700">พื้นหลังเว็บ</span>
-                            </div>
-                            <span id="hexColorBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                    
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="pickerText"></div>
+                            <span class="text-xs text-slate-600">สีตัวอักษรหลัก</span>
                         </div>
-                        <div class="flex items-center gap-2 pl-10 pr-1">
-                            <span class="text-[9px] text-slate-400"><i class="fa-solid fa-droplet"></i> โปร่งใส</span>
-                            <input type="range" id="opacityBg" min="0" max="100" value="100" oninput="updateColorsManual()" class="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                            <span id="textOpacityBg" class="text-[9px] text-slate-500 font-mono w-7 text-right">100%</span>
-                        </div>
+                        <span id="hexColorText" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
                     </div>
-
-                    <!-- สีพื้นหลังป้ายเล็กๆ -->
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-2">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorAccentBg">
-                                    <input type="color" id="inputColorAccentBg" oninput="updateColorsManual()" class="opacity-0 absolute w-[200%] h-[200%] top-[-50%] left-[-50%] cursor-pointer">
-                                </div>
-                                <span class="text-xs font-medium text-slate-700">สีพื้นหลังป้ายเล็กๆ</span>
-                            </div>
-                            <span id="hexColorAccentBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
-                        </div>
-                        <div class="flex items-center gap-2 pl-10 pr-1">
-                            <span class="text-[9px] text-slate-400"><i class="fa-solid fa-droplet"></i> โปร่งใส</span>
-                            <input type="range" id="opacityAccentBg" min="0" max="100" value="100" oninput="updateColorsManual()" class="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                            <span id="textOpacityAccentBg" class="text-[9px] text-slate-500 font-mono w-7 text-right">100%</span>
-                        </div>
-                    </div>
-
-                    <!-- สีตัวอักษร -->
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-2">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 rounded-full border border-slate-200 shadow-inner relative overflow-hidden" id="boxColorText">
-                                    <input type="color" id="inputColorText" oninput="updateColorsManual()" class="opacity-0 absolute w-[200%] h-[200%] top-[-50%] left-[-50%] cursor-pointer">
-                                </div>
-                                <span class="text-xs font-medium text-slate-700">สีตัวอักษรหลัก</span>
-                            </div>
-                            <span id="hexColorText" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
-                        </div>
-                        <div class="flex items-center gap-2 pl-10 pr-1">
-                            <span class="text-[9px] text-slate-400"><i class="fa-solid fa-droplet"></i> โปร่งใส</span>
-                            <input type="range" id="opacityText" min="0" max="100" value="100" oninput="updateColorsManual()" class="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                            <span id="textOpacityText" class="text-[9px] text-slate-500 font-mono w-7 text-right">100%</span>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -395,14 +360,8 @@
         </div>
     </div>
 
-
     <!-- ⚡️ JAVASCRIPT: โลจิกทั้งหมด ⚡️ -->
     <script>
-        // --- ฟังก์ชันเสริมที่ขาดไป (แก้ปัญหาจอไม่เด้ง) ---
-        function rgbToHex(r, g, b) {
-            return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
-        }
-
         // --- 1. ตั้งค่า Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyBCJ--ekt4btJYce_6MsXC3iDHt5X6b9ag",
@@ -442,13 +401,10 @@
         // --- ระบบจัดการสินค้า ---
         db.ref('products').orderByChild('order').on('value', (snapshot) => {
             productsList = [];
-            snapshot.forEach(child => {
-                productsList.push({ id: child.key, ...child.val() });
-            });
+            snapshot.forEach(child => { productsList.push({ id: child.key, ...child.val() }); });
             document.getElementById('totalProductCount').innerText = productsList.length;
             document.getElementById('homeProductCount').innerText = productsList.length;
-            renderTags();
-            filterProducts(); 
+            renderTags(); filterProducts(); 
         });
 
         function renderTags() {
@@ -458,7 +414,6 @@
                 const tags = p.tags.split(',').map(t => t.trim()).filter(t => t);
                 tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
             });
-
             tagContainer.innerHTML = '';
             Object.keys(tagCounts).forEach(tag => {
                 const btn = document.createElement('button');
@@ -474,31 +429,22 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-
             let filtered = productsList.filter(p => {
                 const matchSearch = p.name.toLowerCase().includes(query);
                 const matchTag = (activeTag === 'All') || p.tags.split(',').map(t=>t.trim()).includes(activeTag);
                 return matchSearch && matchTag;
             });
 
-            if(filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-10 text-slate-400 text-sm">ไม่พบสินค้าที่ค้นหา</div>`;
-                return;
-            }
+            if(filtered.length === 0) { grid.innerHTML = `<div class="col-span-2 text-center py-10 text-slate-400 text-sm">ไม่พบสินค้าที่ค้นหา</div>`; return; }
 
             filtered.forEach(p => {
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl p-2 shadow-sm border border-slate-100 flex flex-col relative transition-all duration-300";
-                
                 if(isAdmin) {
-                    card.setAttribute('draggable', 'true');
-                    card.dataset.id = p.id;
-                    card.addEventListener('dragstart', handleDragStart);
-                    card.addEventListener('dragover', handleDragOver);
-                    card.addEventListener('drop', handleDrop);
-                    card.addEventListener('dragend', handleDragEnd);
+                    card.setAttribute('draggable', 'true'); card.dataset.id = p.id;
+                    card.addEventListener('dragstart', handleDragStart); card.addEventListener('dragover', handleDragOver);
+                    card.addEventListener('drop', handleDrop); card.addEventListener('dragend', handleDragEnd);
                 }
-
                 let badgesHTML = '';
                 if(p.isFeatured) badgesHTML += `<div class="absolute top-0 left-0 bg-yellow-300 text-yellow-800 text-[9px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-xl z-10 shadow-sm">ยอดฮิต (Featured)</div>`;
                 if(p.isPromo) badgesHTML += `<div class="absolute top-0 right-0 bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg rounded-tr-xl z-10 shadow-sm">ราคาโปร!</div>`;
@@ -506,15 +452,9 @@
                 let adminControls = '';
                 if(isAdmin) {
                     adminControls = `
-                        <div class="absolute top-1.5 left-1.5 w-6 h-6 bg-slate-800/60 backdrop-blur text-white rounded-md flex items-center justify-center cursor-move z-20 hover:bg-slate-800 drag-handle" title="ลากเพื่อเลื่อนลำดับ">
-                            <i class="fa-solid fa-grip-vertical text-[10px]"></i>
-                        </div>
-                        <button onclick="deleteProduct('${p.id}')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center z-20 shadow-md hover:scale-110 transition">
-                            <i class="fa-solid fa-xmark text-[10px]"></i>
-                        </button>
-                        <button onclick="editProduct('${p.id}')" class="absolute top-1.5 right-9 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center z-20 shadow-md hover:scale-110 transition">
-                            <i class="fa-solid fa-pen text-[9px]"></i>
-                        </button>
+                        <div class="absolute top-1.5 left-1.5 w-6 h-6 bg-slate-800/60 backdrop-blur text-white rounded-md flex items-center justify-center cursor-move z-20 hover:bg-slate-800 drag-handle" title="ลากเพื่อเลื่อนลำดับ"><i class="fa-solid fa-grip-vertical text-[10px]"></i></div>
+                        <button onclick="deleteProduct('${p.id}')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center z-20 shadow-md hover:scale-110 transition"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+                        <button onclick="editProduct('${p.id}')" class="absolute top-1.5 right-9 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center z-20 shadow-md hover:scale-110 transition"><i class="fa-solid fa-pen text-[9px]"></i></button>
                     `;
                 }
 
@@ -522,28 +462,17 @@
                 if(p.type === 'group') {
                     priceHTML = `<p class="text-sm font-bold text-center mt-1" style="color: var(--accent-color)">฿${p.priceSingle}</p>`;
                 } else {
-                    priceHTML = `
-                        <div class="flex justify-between mt-1 px-1">
-                            <div class="text-center"><span class="text-[8px] text-slate-400 block leading-tight">ใช้เอง</span><span class="text-xs font-bold" style="color: var(--accent-color)">฿${p.pricePersonal}</span></div>
-                            <div class="text-center"><span class="text-[8px] text-slate-400 block leading-tight">ลงกลุ่ม</span><span class="text-xs font-bold text-rose-400">฿${p.priceCommercial}</span></div>
-                        </div>
-                    `;
+                    priceHTML = `<div class="flex justify-between mt-1 px-1"><div class="text-center"><span class="text-[8px] text-slate-400 block leading-tight">ใช้เอง</span><span class="text-xs font-bold" style="color: var(--accent-color)">฿${p.pricePersonal}</span></div><div class="text-center"><span class="text-[8px] text-slate-400 block leading-tight">ลงกลุ่ม</span><span class="text-xs font-bold text-rose-400">฿${p.priceCommercial}</span></div></div>`;
                 }
 
                 const tagChips = p.tags.split(',').slice(0,2).map(t => `<span class="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md text-[8px] truncate whitespace-nowrap max-w-[60px] inline-block">${t.trim()}</span>`).join('');
-
                 card.innerHTML = `
                     ${adminControls}
-                    <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-50 mb-2 border border-slate-100">
-                        ${badgesHTML}
-                        <img src="${p.image}" class="w-full h-full object-cover">
-                    </div>
+                    <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-50 mb-2 border border-slate-100">${badgesHTML}<img src="${p.image}" class="w-full h-full object-cover"></div>
                     <div class="flex flex-wrap gap-1 justify-center mb-1.5 h-[14px] overflow-hidden">${tagChips}</div>
                     <h4 class="text-[11px] font-medium text-slate-700 text-center line-clamp-1 px-1">${p.name}</h4>
                     ${priceHTML}
-                    <div class="mt-auto pt-2 flex justify-center gap-1">
-                        ${p.link ? `<a href="${p.link}" target="_blank" class="w-full text-center bg-blue-50 text-blue-500 text-[9px] font-bold py-1.5 rounded-lg border border-blue-100 hover:bg-blue-100">ดูตัวอย่าง</a>` : ''}
-                    </div>
+                    <div class="mt-auto pt-2 flex justify-center gap-1">${p.link ? `<a href="${p.link}" target="_blank" class="w-full text-center bg-blue-50 text-blue-500 text-[9px] font-bold py-1.5 rounded-lg border border-blue-100 hover:bg-blue-100">ดูตัวอย่าง</a>` : ''}</div>
                 `;
                 grid.appendChild(card);
             });
@@ -551,52 +480,30 @@
 
         function togglePriceFields() {
             const isGroup = document.querySelector('input[name="prodType"]:checked').value === 'group';
-            if(isGroup) {
-                document.getElementById('priceGroupMode').classList.remove('hidden');
-                document.getElementById('priceAdoptMode').classList.add('hidden');
-            } else {
-                document.getElementById('priceGroupMode').classList.add('hidden');
-                document.getElementById('priceAdoptMode').classList.remove('hidden');
-            }
+            if(isGroup) { document.getElementById('priceGroupMode').classList.remove('hidden'); document.getElementById('priceAdoptMode').classList.add('hidden'); } 
+            else { document.getElementById('priceGroupMode').classList.add('hidden'); document.getElementById('priceAdoptMode').classList.remove('hidden'); }
         }
 
         function openProductModal() {
-            document.getElementById('prodId').value = '';
-            document.getElementById('prodImage').value = '';
-            document.getElementById('prodName').value = '';
-            document.getElementById('prodLink').value = '';
-            document.getElementById('prodTags').value = '';
-            document.getElementById('prodPriceSingle').value = '';
-            document.getElementById('prodPricePersonal').value = '';
-            document.getElementById('prodPriceCommercial').value = '';
-            document.getElementById('prodFeatured').checked = false;
-            document.getElementById('prodPromo').checked = false;
-            document.querySelector('input[value="group"]').checked = true;
-            togglePriceFields();
+            document.getElementById('prodId').value = ''; document.getElementById('prodImage').value = '';
+            document.getElementById('prodName').value = ''; document.getElementById('prodLink').value = '';
+            document.getElementById('prodTags').value = ''; document.getElementById('prodPriceSingle').value = '';
+            document.getElementById('prodPricePersonal').value = ''; document.getElementById('prodPriceCommercial').value = '';
+            document.getElementById('prodFeatured').checked = false; document.getElementById('prodPromo').checked = false;
+            document.querySelector('input[value="group"]').checked = true; togglePriceFields();
             document.getElementById('productModalTitle').innerHTML = '<i class="fa-solid fa-box text-blue-500"></i> เพิ่มสินค้าใหม่';
             document.getElementById('productModal').classList.remove('hidden');
         }
 
         function editProduct(id) {
-            const p = productsList.find(x => x.id === id);
-            if(!p) return;
-            document.getElementById('prodId').value = p.id;
-            document.getElementById('prodImage').value = p.image;
-            document.getElementById('prodName').value = p.name;
-            document.getElementById('prodLink').value = p.link || '';
-            document.getElementById('prodTags').value = p.tags;
-            document.getElementById('prodFeatured').checked = p.isFeatured || false;
+            const p = productsList.find(x => x.id === id); if(!p) return;
+            document.getElementById('prodId').value = p.id; document.getElementById('prodImage').value = p.image;
+            document.getElementById('prodName').value = p.name; document.getElementById('prodLink').value = p.link || '';
+            document.getElementById('prodTags').value = p.tags; document.getElementById('prodFeatured').checked = p.isFeatured || false;
             document.getElementById('prodPromo').checked = p.isPromo || false;
-            
-            document.querySelector(`input[value="${p.type}"]`).checked = true;
-            togglePriceFields();
-            
+            document.querySelector(`input[value="${p.type}"]`).checked = true; togglePriceFields();
             if(p.type === 'group') document.getElementById('prodPriceSingle').value = p.priceSingle;
-            else {
-                document.getElementById('prodPricePersonal').value = p.pricePersonal;
-                document.getElementById('prodPriceCommercial').value = p.priceCommercial;
-            }
-            
+            else { document.getElementById('prodPricePersonal').value = p.pricePersonal; document.getElementById('prodPriceCommercial').value = p.priceCommercial; }
             document.getElementById('productModalTitle').innerHTML = '<i class="fa-solid fa-pen text-blue-500"></i> แก้ไขสินค้า';
             document.getElementById('productModal').classList.remove('hidden');
         }
@@ -604,7 +511,6 @@
         function saveProduct() {
             const id = document.getElementById('prodId').value;
             const type = document.querySelector('input[name="prodType"]:checked').value;
-            
             const productData = {
                 image: document.getElementById('prodImage').value || 'https://via.placeholder.com/300',
                 name: document.getElementById('prodName').value || 'สินค้าใหม่',
@@ -614,49 +520,31 @@
                 isFeatured: document.getElementById('prodFeatured').checked,
                 isPromo: document.getElementById('prodPromo').checked,
             };
-
             if(type === 'group') productData.priceSingle = document.getElementById('prodPriceSingle').value || 0;
-            else {
-                productData.pricePersonal = document.getElementById('prodPricePersonal').value || 0;
-                productData.priceCommercial = document.getElementById('prodPriceCommercial').value || 0;
-            }
-
-            if(id) {
-                db.ref('products/' + id).update(productData); 
-            } else {
-                productData.order = Date.now(); 
-                db.ref('products').push(productData); 
-            }
+            else { productData.pricePersonal = document.getElementById('prodPricePersonal').value || 0; productData.priceCommercial = document.getElementById('prodPriceCommercial').value || 0; }
+            if(id) db.ref('products/' + id).update(productData); 
+            else { productData.order = Date.now(); db.ref('products').push(productData); }
             document.getElementById('productModal').classList.add('hidden');
         }
 
-        function deleteProduct(id) {
-            if(confirm("แน่ใจหรือไม่ว่าต้องการลบสินค้านี้?")) {
-                db.ref('products/' + id).remove();
-            }
-        }
+        function deleteProduct(id) { if(confirm("แน่ใจหรือไม่ว่าต้องการลบสินค้านี้?")) db.ref('products/' + id).remove(); }
 
         // --- ระบบลากวาง (Drag & Drop) ---
         let dragSrcId = null;
         function handleDragStart(e) { dragSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
         function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
         function handleDrop(e) {
-            e.stopPropagation();
-            const targetId = this.dataset.id;
+            e.stopPropagation(); const targetId = this.dataset.id;
             if (dragSrcId !== targetId) {
-                const srcItem = productsList.find(p => p.id === dragSrcId);
-                const targetItem = productsList.find(p => p.id === targetId);
-                const tempOrder = srcItem.order;
-                db.ref('products/' + dragSrcId).update({ order: targetItem.order });
-                db.ref('products/' + targetId).update({ order: tempOrder });
+                const srcItem = productsList.find(p => p.id === dragSrcId); const targetItem = productsList.find(p => p.id === targetId);
+                const tempOrder = srcItem.order; db.ref('products/' + dragSrcId).update({ order: targetItem.order }); db.ref('products/' + targetId).update({ order: tempOrder });
             }
             return false;
         }
         function handleDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
 
-
         // ==========================================
-        // 🎨 ระบบแต่งสี (โค้ดทำมือ 100% เลิกใช้ Pickr)
+        // 🎨 ระบบแต่งสี (ใช้ Pickr ตัวเดิม 100% ป้องกัน Firebase กวนการลากสี)
         // ==========================================
         function loadLocalTheme() {
             const saved = localStorage.getItem('myCuteSignActiveTheme');
@@ -673,25 +561,20 @@
         }
         loadLocalTheme(); 
 
+        // ดึงสีจากคลาวด์แค่ตอนเปิดเว็บหรือหน้าต่างสีโดนปิดอยู่ จะได้ไม่รบกวนตอนกำลังลากสี
         db.ref('theme/active').on('value', (snapshot) => {
             const theme = snapshot.val();
-            if (theme) {
+            if (theme && document.getElementById('themeModal').classList.contains('hidden')) {
                 const root = document.documentElement;
                 root.style.setProperty('--bg-color', theme.bg);
                 root.style.setProperty('--accent-color', theme.accent);
                 root.style.setProperty('--accent-bg', theme.accentBg);
                 root.style.setProperty('--text-main', theme.text);
                 localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(theme));
-                
-                if(!document.getElementById('themeModal').classList.contains('hidden')) {
-                    syncThemeInputs();
-                }
             }
         });
 
-        db.ref('theme/active').once('value', (snapshot) => {
-            if (!snapshot.exists()) saveCurrentTheme();
-        });
+        db.ref('theme/active').once('value', (snapshot) => { if (!snapshot.exists()) saveCurrentTheme(); });
 
         let saveTimeout;
         function saveCurrentTheme() {
@@ -705,18 +588,9 @@
                     text: root.getPropertyValue('--text-main').trim()
                 };
                 localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(currentTheme));
-                if(typeof db !== 'undefined') {
-                    db.ref('theme/active').set(currentTheme).catch(err => console.log(err));
-                }
+                if(typeof db !== 'undefined') db.ref('theme/active').set(currentTheme).catch(err => console.log(err));
             }, 150);
         }
-
-        let isPlaying = false;
-        document.getElementById('musicToggle').addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            document.getElementById('musicIcon').className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
-            document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
-        });
 
         function settingsClicked() {
             if(isAdmin) toggleThemeModal();
@@ -734,12 +608,8 @@
                 btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
                 btn.classList.add('bg-green-500', 'text-white', 'border-transparent');
                 
-                syncThemeInputs();
-                loadCustomThemes(); 
-                filterProducts();
-            } else {
-                alert("รหัสผ่านไม่ถูกต้อง");
-            }
+                loadCustomThemes(); filterProducts();
+            } else alert("รหัสผ่านไม่ถูกต้อง");
         }
 
         function logoutAdmin() {
@@ -755,92 +625,69 @@
             filterProducts();
         }
 
+        // 🌟 ตั้งค่าวงกลม Pickr ให้สมบูรณ์
+        const pickrConfig = {
+            theme: 'nano', swatches: null,
+            components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: true, input: true } }
+        };
+
+        const pickrAccent = Pickr.create({ el: '#pickerAccent', default: '#3b82f6', ...pickrConfig });
+        const pickrBg = Pickr.create({ el: '#pickerBg', default: '#f4f9ff', ...pickrConfig });
+        const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
+        const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
+
+        // ฟังก์ชันสั่งเปลี่ยนสีเว็บตอนลากสี
+        function updateRootColor(varName, pickrInstance, hexSpanId, runSmartPalette = false) {
+            const hexColor = pickrInstance.getColor().toHEXA().toString();
+            document.documentElement.style.setProperty(varName, hexColor);
+            if(document.getElementById(hexSpanId)) document.getElementById(hexSpanId).innerText = hexColor;
+            if(runSmartPalette) generateSmartPalette(hexColor);
+            saveCurrentTheme();
+        }
+
+        // ผูก Pickr กับเว็บไซต์
+        pickrAccent.on('change', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true)).on('changestop', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true));
+        pickrBg.on('change', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg')).on('changestop', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg'));
+        pickrAccentBg.on('change', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg')).on('changestop', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg'));
+        pickrText.on('change', () => updateRootColor('--text-main', pickrText, 'hexColorText')).on('changestop', () => updateRootColor('--text-main', pickrText, 'hexColorText'));
+
         function toggleThemeModal() {
             const modal = document.getElementById('themeModal');
             if(modal.classList.contains('hidden')) {
-                syncThemeInputs(); 
+                syncPickersWithRoot(); 
                 modal.classList.remove('hidden');
             } else {
                 modal.classList.add('hidden');
             }
         }
 
-        // --- ระบบอัปเดตสีแบบกำหนดเอง (ใหม่ ไม่ต้องง้อ Pickr!) ---
-        function updateColorsManual() {
-            const bgHex = document.getElementById('inputColorBg').value;
-            const accentHex = document.getElementById('inputColorAccent').value;
-            const accentBgHex = document.getElementById('inputColorAccentBg').value;
-            const textHex = document.getElementById('inputColorText').value;
-
-            const bgOp = document.getElementById('opacityBg').value;
-            const accentOp = document.getElementById('opacityAccent').value;
-            const accentBgOp = document.getElementById('opacityAccentBg').value;
-            const textOp = document.getElementById('opacityText').value;
-
-            document.getElementById('textOpacityBg').innerText = bgOp + '%';
-            document.getElementById('textOpacityAccent').innerText = accentOp + '%';
-            document.getElementById('textOpacityAccentBg').innerText = accentBgOp + '%';
-            document.getElementById('textOpacityText').innerText = textOp + '%';
-
-            const bgRgba = hexToRgba(bgHex, bgOp);
-            const accentRgba = hexToRgba(accentHex, accentOp);
-            const accentBgRgba = hexToRgba(accentBgHex, accentBgOp);
-            const textRgba = hexToRgba(textHex, textOp);
-
-            const root = document.documentElement;
-            root.style.setProperty('--bg-color', bgRgba);
-            root.style.setProperty('--accent-color', accentRgba);
-            root.style.setProperty('--accent-bg', accentBgRgba);
-            root.style.setProperty('--text-main', textRgba);
-
-            document.getElementById('boxColorBg').style.backgroundColor = bgRgba;
-            document.getElementById('hexColorBg').innerText = bgHex.toUpperCase();
-            document.getElementById('boxColorAccent').style.backgroundColor = accentRgba;
-            document.getElementById('hexColorAccent').innerText = accentHex.toUpperCase();
-            document.getElementById('boxColorAccentBg').style.backgroundColor = accentBgRgba;
-            document.getElementById('hexColorAccentBg').innerText = accentBgHex.toUpperCase();
-            document.getElementById('boxColorText').style.backgroundColor = textRgba;
-            document.getElementById('hexColorText').innerText = textHex.toUpperCase();
-
-            generateSmartPalette(accentHex);
-            saveCurrentTheme();
-        }
-
-        function hexToRgba(hex, opacity) {
-            let r = parseInt(hex.slice(1, 3), 16),
-                g = parseInt(hex.slice(3, 5), 16),
-                b = parseInt(hex.slice(5, 7), 16);
-            return `rgba(${r}, ${g}, ${b}, ${opacity / 100})`;
-        }
-
-        function syncThemeInputs() {
+        // ซิงค์สีปัจจุบันลงในวงกลม Pickr
+        function syncPickersWithRoot() {
             const root = getComputedStyle(document.documentElement);
-            setPickerValues('Bg', root.getPropertyValue('--bg-color').trim());
-            setPickerValues('Accent', root.getPropertyValue('--accent-color').trim());
-            setPickerValues('AccentBg', root.getPropertyValue('--accent-bg').trim());
-            setPickerValues('Text', root.getPropertyValue('--text-main').trim());
+            const bg = root.getPropertyValue('--bg-color').trim();
+            const accent = root.getPropertyValue('--accent-color').trim();
+            const accentBg = root.getPropertyValue('--accent-bg').trim();
+            const text = root.getPropertyValue('--text-main').trim();
+
+            pickrBg.setColor(bg); pickrAccent.setColor(accent); pickrAccentBg.setColor(accentBg); pickrText.setColor(text);
             
-            generateSmartPalette(document.getElementById('inputColorAccent').value); 
+            document.getElementById('hexColorBg').innerText = bg;
+            document.getElementById('hexColorAccent').innerText = accent;
+            document.getElementById('hexColorAccentBg').innerText = accentBg;
+            document.getElementById('hexColorText').innerText = text;
+            
+            generateSmartPalette(accent); 
         }
 
-        function setPickerValues(idSuffix, rgbaString) {
-            const parsed = parseRGB(rgbaString); 
-            const hex = rgbToHex(parsed.r, parsed.g, parsed.b);
-            const op = Math.round(parsed.a * 100);
-
-            document.getElementById('inputColor' + idSuffix).value = hex;
-            document.getElementById('opacity' + idSuffix).value = op;
-            document.getElementById('textOpacity' + idSuffix).innerText = op + '%';
-            document.getElementById('hexColor' + idSuffix).innerText = hex.toUpperCase();
-            document.getElementById('boxColor' + idSuffix).style.backgroundColor = rgbaString;
-        }
-
+        // เวลากดปุ่มธีมสำเร็จรูป ให้เปลี่ยนสีเว็บทันที
         function applyPresetTheme(bg, accent, accentBg, text) {
-            setPickerValues('Bg', bg);
-            setPickerValues('Accent', accent);
-            setPickerValues('AccentBg', accentBg);
-            setPickerValues('Text', text);
-            updateColorsManual(); 
+            const root = document.documentElement;
+            root.style.setProperty('--bg-color', bg);
+            root.style.setProperty('--accent-color', accent);
+            root.style.setProperty('--accent-bg', accentBg);
+            root.style.setProperty('--text-main', text);
+            syncPickersWithRoot(); 
+            setTimeout(saveCurrentTheme, 100); 
         }
 
         let currentSuggested = {};
@@ -948,6 +795,13 @@
         }
         window.onload = () => { if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); };
 
+        let isPlaying = false;
+        document.getElementById('musicToggle').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            document.getElementById('musicIcon').className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
+            document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
+        });
+
         let currentTargetId = '';
         function editImage(imgId, title) {
             if(!isAdmin) return; 
@@ -960,24 +814,6 @@
                 if(newUrl) document.getElementById(currentTargetId).src = newUrl;
                 document.getElementById('inputModal').classList.add('hidden');
             };
-        }
-
-        let portCount = 2; 
-        function addPortfolioImage() {
-            portCount++;
-            const newId = 'port' + portCount;
-            const newDiv = document.createElement('div');
-            newDiv.className = "flex-none w-32 h-32 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden editable-img";
-            newDiv.onclick = () => editImage(newId, 'เปลี่ยนตัวอย่างงาน ' + portCount);
-            const newImg = document.createElement('img');
-            newImg.id = newId;
-            newImg.src = "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=300&auto=format&fit=crop"; 
-            newImg.className = "w-full h-full object-cover";
-            newDiv.appendChild(newImg);
-            const container = document.getElementById('portfolioGallery');
-            const addBtn = document.getElementById('addPortfolioBtn');
-            container.insertBefore(newDiv, addBtn);
-            editImage(newId, 'ใส่รูปลิงก์งานใหม่');
         }
         function openSocialModal() { document.getElementById('socialModal').classList.remove('hidden'); }
         function saveSocials() { document.getElementById('socialModal').classList.add('hidden'); }
