@@ -398,6 +398,11 @@
 
     <!-- ⚡️ JAVASCRIPT: โลจิกทั้งหมด ⚡️ -->
     <script>
+        // --- ฟังก์ชันเสริมที่ขาดไป (แก้ปัญหาจอไม่เด้ง) ---
+        function rgbToHex(r, g, b) {
+            return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
+        }
+
         // --- 1. ตั้งค่า Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyBCJ--ekt4btJYce_6MsXC3iDHt5X6b9ag",
@@ -678,7 +683,6 @@
                 root.style.setProperty('--text-main', theme.text);
                 localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(theme));
                 
-                // ถ้าเปิดหน้าต่างสีอยู่ ให้อัปเดตค่าตามด้วย
                 if(!document.getElementById('themeModal').classList.contains('hidden')) {
                     syncThemeInputs();
                 }
