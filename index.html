@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบสมบูรณ์ 100%</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบธีมขั้นสุดยอด</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -54,6 +54,18 @@
         .tag-active { background-color: var(--accent-color) !important; color: white !important; }
         .dragging { opacity: 0.5; transform: scale(0.95); }
         .drag-over { border: 2px dashed var(--accent-color) !important; }
+
+        /* 🌟 คลาสสำหรับผูกสีหน้าต่าง Popup เข้ากับธีมแบบอัตโนมัติ 🌟 */
+        .theme-card { background-color: var(--bg-color); color: var(--text-main); border: 2px solid var(--accent-bg); }
+        .theme-box { background-color: var(--bg-color); border: 1px solid var(--accent-bg); }
+        .theme-text { color: var(--text-main); }
+        .theme-text-muted { color: var(--text-main); opacity: 0.7; }
+        .theme-accent { color: var(--accent-color); }
+        .theme-btn-primary { background-color: var(--accent-color); color: #ffffff; }
+        .theme-btn-secondary { background-color: var(--accent-bg); color: var(--accent-color); border: 1px solid var(--accent-bg); }
+        .theme-btn-outline { background-color: var(--bg-color); color: var(--accent-color); border: 1px solid var(--accent-color); }
+        .theme-input { background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--accent-bg); outline: none; transition: border 0.3s; }
+        .theme-input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-bg); }
     </style>
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto bg-white shadow-xl min-h-screen relative overflow-x-hidden">
@@ -182,33 +194,33 @@
     </nav>
 
     <!-- ========================================== -->
-    <!-- MODALS (หน้าต่างป็อปอัพต่างๆ) -->
+    <!-- MODALS (หน้าต่างป็อปอัพทั้งหมดเปลี่ยนสีตามธีมอัตโนมัติ) -->
     <!-- ========================================== -->
 
     <!-- Modal เพิ่ม/แก้ไขสินค้า -->
     <div id="productModal" class="hidden fixed inset-0 bg-slate-900/60 z-[90] flex justify-center items-center backdrop-blur-sm p-4">
-        <div class="bg-white rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
-            <button onclick="document.getElementById('productModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:bg-slate-100 rounded-full">
+        <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('productModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="font-bold text-lg text-slate-800 mb-4" id="productModalTitle"><i class="fa-solid fa-box text-blue-500"></i> เพิ่มสินค้าใหม่</h3>
+            <h3 class="font-bold text-lg mb-4 theme-text" id="productModalTitle"><i class="fa-solid fa-box theme-accent"></i> เพิ่มสินค้าใหม่</h3>
             <input type="hidden" id="prodId">
             <div class="space-y-3">
-                <div><label class="text-[11px] font-bold text-slate-600 mb-1 block">ลิงก์รูปภาพสินค้า *</label><input type="text" id="prodImage" placeholder="https://..." class="w-full border rounded-xl px-3 py-2 text-xs"></div>
-                <div><label class="text-[11px] font-bold text-slate-600 mb-1 block">ชื่อสินค้า *</label><input type="text" id="prodName" placeholder="เช่น Mochi Cookie Group" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
-                <div><label class="text-[11px] font-bold text-slate-600 mb-1 block">ลิงก์ดูตัวอย่าง</label><input type="text" id="prodLink" placeholder="https://..." class="w-full border rounded-xl px-3 py-2 text-xs"></div>
-                <div><label class="text-[11px] font-bold text-slate-600 mb-1 block">แท็กหมวดหมู่ (คั่นด้วยลูกน้ำ ,)</label><input type="text" id="prodTags" placeholder="เช่น กลุ่มบอท, กลุ่มตกแต่ง" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
+                <div><label class="text-[11px] font-bold mb-1 block theme-text">ลิงก์รูปภาพสินค้า *</label><input type="text" id="prodImage" placeholder="https://..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-bold mb-1 block theme-text">ชื่อสินค้า *</label><input type="text" id="prodName" placeholder="เช่น Mochi Cookie Group" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-bold mb-1 block theme-text">ลิงก์ดูตัวอย่าง</label><input type="text" id="prodLink" placeholder="https://..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-bold mb-1 block theme-text">แท็กหมวดหมู่ (คั่นด้วยลูกน้ำ ,)</label><input type="text" id="prodTags" placeholder="เช่น กลุ่มบอท, กลุ่มตกแต่ง" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
                 
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <label class="text-[11px] font-bold text-slate-600 mb-2 block">ประเภทสินค้า</label>
+                <div class="p-3 rounded-xl theme-box">
+                    <label class="text-[11px] font-bold mb-2 block theme-text">ประเภทสินค้า</label>
                     <div class="flex gap-4 mb-3">
-                        <label class="text-xs flex items-center gap-1 cursor-pointer"><input type="radio" name="prodType" value="group" checked onchange="togglePriceFields()"> กลุ่ม (1 ราคา)</label>
-                        <label class="text-xs flex items-center gap-1 cursor-pointer"><input type="radio" name="prodType" value="adopt" onchange="togglePriceFields()"> ปล่อยเอฟ (2 ราคา)</label>
+                        <label class="text-xs flex items-center gap-1 cursor-pointer theme-text"><input type="radio" name="prodType" value="group" checked onchange="togglePriceFields()"> กลุ่ม (1 ราคา)</label>
+                        <label class="text-xs flex items-center gap-1 cursor-pointer theme-text"><input type="radio" name="prodType" value="adopt" onchange="togglePriceFields()"> ปล่อยเอฟ (2 ราคา)</label>
                     </div>
-                    <div id="priceGroupMode"><label class="text-[10px] text-slate-500 block">ราคาเข้ากลุ่ม (บาท)</label><input type="number" id="prodPriceSingle" class="w-full border rounded-lg px-3 py-2 text-xs mt-1"></div>
+                    <div id="priceGroupMode"><label class="text-[10px] block theme-text-muted">ราคาเข้ากลุ่ม (บาท)</label><input type="number" id="prodPriceSingle" class="w-full rounded-lg px-3 py-2 text-xs mt-1 theme-input"></div>
                     <div id="priceAdoptMode" class="hidden flex gap-2">
-                        <div class="flex-1"><label class="text-[10px] text-slate-500 block">ราคาใช้เอง</label><input type="number" id="prodPricePersonal" class="w-full border rounded-lg px-3 py-2 text-xs mt-1"></div>
-                        <div class="flex-1"><label class="text-[10px] text-slate-500 block">ราคาลงกลุ่ม</label><input type="number" id="prodPriceCommercial" class="w-full border rounded-lg px-3 py-2 text-xs mt-1"></div>
+                        <div class="flex-1"><label class="text-[10px] block theme-text-muted">ราคาใช้เอง</label><input type="number" id="prodPricePersonal" class="w-full rounded-lg px-3 py-2 text-xs mt-1 theme-input"></div>
+                        <div class="flex-1"><label class="text-[10px] block theme-text-muted">ราคาลงกลุ่ม</label><input type="number" id="prodPriceCommercial" class="w-full rounded-lg px-3 py-2 text-xs mt-1 theme-input"></div>
                     </div>
                 </div>
                 
@@ -217,65 +229,65 @@
                     <label class="text-xs font-bold text-rose-500 flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="prodPromo"> ราคาโปร</label>
                 </div>
             </div>
-            <button onclick="saveProduct()" class="w-full bg-blue-500 text-white rounded-xl py-3 text-sm font-bold hover:bg-blue-600 transition shadow-lg shadow-blue-200 mt-5">บันทึกสินค้า</button>
+            <button onclick="saveProduct()" class="w-full rounded-xl py-3 text-sm font-bold transition shadow-lg mt-5 theme-btn-primary hover:opacity-90">บันทึกสินค้า</button>
         </div>
     </div>
 
     <!-- Login Modal -->
-    <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 z-[60] flex justify-center items-center backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
-            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
+    <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/60 z-[60] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="rounded-3xl w-[85%] max-w-[320px] p-6 shadow-2xl relative theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80"><i class="fa-solid fa-xmark"></i></button>
             <div class="text-center mb-5 mt-2">
-                <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fa-solid fa-shield-halved"></i></div>
-                <h3 class="font-bold text-lg text-slate-800">เข้าสู่ระบบผู้ดูแล</h3>
+                <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl theme-btn-secondary"><i class="fa-solid fa-shield-halved theme-accent"></i></div>
+                <h3 class="font-bold text-lg theme-text">เข้าสู่ระบบผู้ดูแล</h3>
             </div>
-            <input type="password" id="adminPassword" placeholder="รหัส: 1234" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm mb-4 text-center tracking-widest outline-none focus:border-blue-400">
-            <button onclick="attemptLogin()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium hover:bg-black transition">เข้าสู่ระบบ</button>
+            <input type="password" id="adminPassword" placeholder="รหัส: 1234" class="w-full rounded-xl px-4 py-3 text-sm mb-4 text-center tracking-widest theme-input">
+            <button onclick="attemptLogin()" class="w-full rounded-xl py-3 text-sm font-medium transition theme-btn-primary hover:opacity-90">เข้าสู่ระบบ</button>
         </div>
     </div>
 
     <!-- Input Modal -->
-    <div id="inputModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-3xl w-[85%] max-w-[320px] shadow-2xl relative">
-            <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
-            <h3 id="inputModalTitle" class="font-bold text-lg text-slate-800 mb-4">เปลี่ยนรูปภาพ</h3>
-            <input type="text" id="modalInput" placeholder="https://..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm mb-4 outline-none">
-            <button id="saveInputBtn" class="w-full bg-blue-500 text-white rounded-xl py-3 text-sm font-medium">บันทึกรูปภาพ</button>
+    <div id="inputModal" class="hidden fixed inset-0 bg-slate-900/60 z-[70] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="rounded-3xl w-[85%] max-w-[320px] p-6 shadow-2xl relative theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="inputModalTitle" class="font-bold text-lg mb-4 theme-text">เปลี่ยนรูปภาพ</h3>
+            <input type="text" id="modalInput" placeholder="https://..." class="w-full rounded-xl px-4 py-3 text-sm mb-4 theme-input">
+            <button id="saveInputBtn" class="w-full rounded-xl py-3 text-sm font-medium transition theme-btn-primary hover:opacity-90">บันทึกรูปภาพ</button>
         </div>
     </div>
 
     <!-- Social Modal -->
-    <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/40 z-[70] flex justify-center items-center backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-3xl w-[90%] max-w-[340px] max-h-[85vh] overflow-y-auto shadow-2xl relative hide-scrollbar border border-slate-100">
-            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="font-bold text-slate-800 mb-1 text-sm"><i class="fa-solid fa-link text-blue-500"></i> SOCIAL LINKS</h3>
+    <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/60 z-[70] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="rounded-3xl w-[90%] max-w-[340px] max-h-[85vh] overflow-y-auto p-6 shadow-2xl relative hide-scrollbar theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="font-bold mb-1 text-sm theme-text"><i class="fa-solid fa-link theme-accent"></i> SOCIAL LINKS</h3>
             <div class="space-y-4 mt-4">
-                <div><label class="text-[11px] font-medium text-green-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-line"></i> LINE</label><input type="text" id="input-line" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
-                <div><label class="text-[11px] font-medium text-blue-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-facebook"></i> Facebook</label><input type="text" id="input-facebook" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
-                <div><label class="text-[11px] font-medium text-pink-600 flex items-center gap-1.5 mb-1"><i class="fa-brands fa-instagram"></i> Instagram</label><input type="text" id="input-ig" class="w-full border rounded-xl px-3 py-2 text-xs"></div>
+                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-line text-green-500"></i> LINE</label><input type="text" id="input-line" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-facebook text-blue-500"></i> Facebook</label><input type="text" id="input-facebook" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-instagram text-pink-500"></i> Instagram</label><input type="text" id="input-ig" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
             </div>
-            <button onclick="saveSocials()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-sm font-medium mt-6">บันทึก</button>
+            <button onclick="saveSocials()" class="w-full rounded-xl py-3 text-sm font-medium mt-6 transition theme-btn-primary hover:opacity-90">บันทึก</button>
         </div>
     </div>
 
-    <!-- 🌟🌟 แผงตกแต่งธีมสี Pickr ฉบับสมบูรณ์ (Theme Modal) 🌟🌟 -->
-    <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/40 z-[80] flex justify-center items-center backdrop-blur-sm">
-        <div class="bg-white rounded-2xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl">
-            <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 transition bg-slate-50 hover:bg-slate-100 rounded-full">
+    <!-- 🌟🌟 แผงตกแต่งธีมสี Pickr ปรับสีตามธีมอัตโนมัติ (Theme Modal) 🌟🌟 -->
+    <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/60 z-[80] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="rounded-3xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar shadow-2xl theme-card transition-colors duration-300">
+            <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all theme-btn-secondary hover:opacity-80">
                 <i class="fa-solid fa-chevron-down text-sm"></i>
             </button>
             
             <div class="text-center mb-6 mt-1">
-                <div class="w-10 h-10 mx-auto bg-pink-100 rounded-full flex items-center justify-center text-lg mb-3">
-                    <i class="fa-solid fa-palette text-pink-500"></i>
+                <div class="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl mb-3 theme-btn-secondary">
+                    <i class="fa-solid fa-palette theme-accent"></i>
                 </div>
-                <h2 class="font-bold text-lg text-slate-800">ตกแต่งธีมสี</h2>
-                <p class="text-[11px] text-slate-500 mt-1">ปรับแต่งสีเว็บไซต์ตามต้องการ</p>
+                <h2 class="font-bold text-xl theme-text">ตกแต่งธีมสี</h2>
+                <p class="text-xs theme-text-muted mt-1">ปรับแต่งสีเว็บไซต์และหน้าต่างนี้ตามต้องการ</p>
             </div>
             
             <!-- ⚡ ธีมสำเร็จรูป -->
             <div class="mb-5">
-                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-bolt text-yellow-400"></i> ธีมสำเร็จรูป</h4>
+                <h4 class="text-xs font-bold mb-3 flex items-center gap-1.5 theme-text"><i class="fa-solid fa-bolt theme-accent"></i> ธีมสำเร็จรูป</h4>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="applyPresetTheme('#f0f7ff', '#3b82f6', '#dbeafe', '#1e3a8a')" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-blue-400"></div> Bubble Blue</button>
                     <button onclick="applyPresetTheme('#fdf2f8', '#f43f5e', '#ffe4e6', '#881337')" class="px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-xs font-medium border border-pink-100 hover:bg-pink-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-pink-400"></div> Rose Gold</button>
@@ -287,81 +299,84 @@
 
             <!-- 🌟 ธีมของฉัน -->
             <div class="mb-5">
-                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-star text-yellow-400"></i> ธีมของฉัน</h4>
-                <div id="myThemesContainer" class="flex flex-wrap gap-2 text-xs text-slate-400"><span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span></div>
+                <h4 class="text-xs font-bold mb-3 flex items-center gap-1.5 theme-text"><i class="fa-solid fa-star theme-accent"></i> ธีมของฉัน</h4>
+                <div id="myThemesContainer" class="flex flex-wrap gap-2 text-xs theme-text-muted"><span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span></div>
             </div>
 
-            <hr class="border-slate-100 my-5">
+            <div class="w-full h-[1px] my-5" style="background-color: var(--accent-bg);"></div>
 
             <!-- 🎨 ปรับแต่งสีด้วย Pickr -->
             <div class="mb-5">
-                <h4 class="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-fill-drip text-blue-400"></i> ปรับแต่งสีเอง (คลิกที่วงกลมสี)
+                <h4 class="text-xs font-bold mb-3 flex items-center gap-1.5 theme-text">
+                    <i class="fa-solid fa-fill-drip theme-accent"></i> ปรับแต่งสีเอง (คลิกที่วงกลมสี)
                 </h4>
                 
                 <div class="space-y-2">
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center p-2.5 rounded-xl shadow-sm transition-colors duration-300 theme-box">
                         <div class="flex items-center gap-3">
                             <div id="pickerAccent"></div>
-                            <span class="text-xs text-slate-600">สีหลัก (ปุ่ม, ไอคอน)</span>
+                            <span class="text-xs font-medium theme-text">สีหลัก (ปุ่ม, ไอคอน)</span>
                         </div>
-                        <span id="hexColorAccent" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                        <span id="hexColorAccent" class="text-[10px] font-mono px-2 py-1 rounded uppercase theme-btn-secondary"></span>
                     </div>
 
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center p-2.5 rounded-xl shadow-sm transition-colors duration-300 theme-box">
                         <div class="flex items-center gap-3">
                             <div id="pickerBg"></div>
-                            <span class="text-xs text-slate-600">พื้นหลังเว็บ</span>
+                            <span class="text-xs font-medium theme-text">พื้นหลังเว็บ</span>
                         </div>
-                        <span id="hexColorBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                        <span id="hexColorBg" class="text-[10px] font-mono px-2 py-1 rounded uppercase theme-btn-secondary"></span>
                     </div>
                     
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center p-2.5 rounded-xl shadow-sm transition-colors duration-300 theme-box">
                         <div class="flex items-center gap-3">
                             <div id="pickerAccentBg"></div>
-                            <span class="text-xs text-slate-600">สีพื้นหลังป้ายเล็กๆ</span>
+                            <span class="text-xs font-medium theme-text">สีพื้นหลังป้ายเล็กๆ</span>
                         </div>
-                        <span id="hexColorAccentBg" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                        <span id="hexColorAccentBg" class="text-[10px] font-mono px-2 py-1 rounded uppercase theme-btn-secondary"></span>
                     </div>
                     
-                    <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center p-2.5 rounded-xl shadow-sm transition-colors duration-300 theme-box">
                         <div class="flex items-center gap-3">
                             <div id="pickerText"></div>
-                            <span class="text-xs text-slate-600">สีตัวอักษรหลัก</span>
+                            <span class="text-xs font-medium theme-text">สีตัวอักษรหลัก</span>
                         </div>
-                        <span id="hexColorText" class="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 uppercase"></span>
+                        <span id="hexColorText" class="text-[10px] font-mono px-2 py-1 rounded uppercase theme-btn-secondary"></span>
                     </div>
                 </div>
             </div>
 
             <!-- Smart Palette Guide -->
-            <div class="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100 relative mt-8">
-                <div class="absolute -top-3 left-4 bg-white px-2 py-0.5 text-[10px] font-bold text-amber-500 border border-slate-100 rounded-full flex items-center gap-1 shadow-sm">
+            <div class="mb-6 p-4 rounded-2xl relative mt-8 transition-colors duration-300 theme-btn-secondary border-none">
+                <div class="absolute -top-3 left-4 px-2 py-0.5 text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm theme-btn-outline">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> แนะนำเฉดสีที่เข้ากัน
                 </div>
-                <p class="text-[10px] text-slate-500 mb-2 mt-1 leading-relaxed">
+                <p class="text-[10px] mb-2 mt-1 leading-relaxed theme-accent" style="opacity: 0.8;">
                     ปรับโทนสีอัตโนมัติตาม <b>"สีหลัก"</b> ด้านบน หากถูกใจสามารถคลิกที่แถบสีเพื่อนำไปใช้ได้เลย
                 </p>
-                <div id="suggestedPaletteContainer" onclick="applySuggestedPalette()" class="h-10 w-full rounded-xl overflow-hidden flex shadow-inner cursor-pointer hover:ring-2 ring-blue-300 transition-all">
+                <div id="suggestedPaletteContainer" onclick="applySuggestedPalette()" class="h-10 w-full rounded-xl overflow-hidden flex shadow-inner cursor-pointer transition-all border" style="border-color: var(--accent-color);">
                 </div>
             </div>
 
-            <button onclick="saveCustomTheme()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 rounded-xl py-3 text-[11px] font-bold hover:bg-blue-100 transition mb-3 flex items-center justify-center gap-1.5">
+            <button onclick="saveCustomTheme()" class="w-full rounded-xl py-3 text-xs font-bold transition mb-3 flex items-center justify-center gap-1.5 theme-btn-outline hover:opacity-80">
                 <i class="fa-solid fa-plus text-[10px]"></i> บันทึกการตั้งค่าสีปัจจุบันเป็นธีมใหม่
             </button>
-            <button onclick="toggleThemeModal()" class="w-full bg-slate-800 text-white rounded-xl py-3 text-[11px] font-bold hover:bg-black transition flex items-center justify-center gap-1.5 shadow-lg">
+            <button onclick="toggleThemeModal()" class="w-full rounded-xl py-3 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-lg theme-btn-primary hover:opacity-90">
                 นำไปใช้
             </button>
             <div class="text-center mt-4">
-                <button onclick="logoutAdmin()" class="text-[11px] text-red-400 hover:text-red-600 transition flex items-center justify-center gap-1.5 mx-auto font-medium">
+                <button onclick="logoutAdmin()" class="text-xs transition flex items-center justify-center gap-1.5 mx-auto font-medium theme-text-muted hover:opacity-100">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ Admin
                 </button>
             </div>
         </div>
     </div>
 
+
     <!-- ⚡️ JAVASCRIPT: โลจิกทั้งหมด ⚡️ -->
     <script>
+        function rgbToHex(r, g, b) { return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase(); }
+
         // --- 1. ตั้งค่า Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyBCJ--ekt4btJYce_6MsXC3iDHt5X6b9ag",
@@ -392,7 +407,6 @@
         function switchTab(tab) {
             document.getElementById('homeSection').classList.add('hidden');
             document.getElementById('productsSection').classList.add('hidden');
-            
             if(tab === 'home') document.getElementById('homeSection').classList.remove('hidden');
             if(tab === 'products') document.getElementById('productsSection').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -457,14 +471,12 @@
                         <button onclick="editProduct('${p.id}')" class="absolute top-1.5 right-9 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center z-20 shadow-md hover:scale-110 transition"><i class="fa-solid fa-pen text-[9px]"></i></button>
                     `;
                 }
-
                 let priceHTML = '';
                 if(p.type === 'group') {
                     priceHTML = `<p class="text-sm font-bold text-center mt-1" style="color: var(--accent-color)">฿${p.priceSingle}</p>`;
                 } else {
                     priceHTML = `<div class="flex justify-between mt-1 px-1"><div class="text-center"><span class="text-[8px] text-slate-400 block leading-tight">ใช้เอง</span><span class="text-xs font-bold" style="color: var(--accent-color)">฿${p.pricePersonal}</span></div><div class="text-center"><span class="text-[8px] text-slate-400 block leading-tight">ลงกลุ่ม</span><span class="text-xs font-bold text-rose-400">฿${p.priceCommercial}</span></div></div>`;
                 }
-
                 const tagChips = p.tags.split(',').slice(0,2).map(t => `<span class="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md text-[8px] truncate whitespace-nowrap max-w-[60px] inline-block">${t.trim()}</span>`).join('');
                 card.innerHTML = `
                     ${adminControls}
@@ -491,7 +503,7 @@
             document.getElementById('prodPricePersonal').value = ''; document.getElementById('prodPriceCommercial').value = '';
             document.getElementById('prodFeatured').checked = false; document.getElementById('prodPromo').checked = false;
             document.querySelector('input[value="group"]').checked = true; togglePriceFields();
-            document.getElementById('productModalTitle').innerHTML = '<i class="fa-solid fa-box text-blue-500"></i> เพิ่มสินค้าใหม่';
+            document.getElementById('productModalTitle').innerHTML = '<i class="fa-solid fa-box theme-accent"></i> เพิ่มสินค้าใหม่';
             document.getElementById('productModal').classList.remove('hidden');
         }
 
@@ -504,7 +516,7 @@
             document.querySelector(`input[value="${p.type}"]`).checked = true; togglePriceFields();
             if(p.type === 'group') document.getElementById('prodPriceSingle').value = p.priceSingle;
             else { document.getElementById('prodPricePersonal').value = p.pricePersonal; document.getElementById('prodPriceCommercial').value = p.priceCommercial; }
-            document.getElementById('productModalTitle').innerHTML = '<i class="fa-solid fa-pen text-blue-500"></i> แก้ไขสินค้า';
+            document.getElementById('productModalTitle').innerHTML = '<i class="fa-solid fa-pen theme-accent"></i> แก้ไขสินค้า';
             document.getElementById('productModal').classList.remove('hidden');
         }
 
@@ -561,7 +573,6 @@
         }
         loadLocalTheme(); 
 
-        // ดึงสีจากคลาวด์แค่ตอนเปิดเว็บหรือหน้าต่างสีโดนปิดอยู่ จะได้ไม่รบกวนตอนกำลังลากสี
         db.ref('theme/active').on('value', (snapshot) => {
             const theme = snapshot.val();
             if (theme && document.getElementById('themeModal').classList.contains('hidden')) {
@@ -636,7 +647,6 @@
         const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
         const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
 
-        // ฟังก์ชันสั่งเปลี่ยนสีเว็บตอนลากสี
         function updateRootColor(varName, pickrInstance, hexSpanId, runSmartPalette = false) {
             const hexColor = pickrInstance.getColor().toHEXA().toString();
             document.documentElement.style.setProperty(varName, hexColor);
@@ -645,7 +655,6 @@
             saveCurrentTheme();
         }
 
-        // ผูก Pickr กับเว็บไซต์
         pickrAccent.on('change', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true)).on('changestop', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true));
         pickrBg.on('change', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg')).on('changestop', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg'));
         pickrAccentBg.on('change', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg')).on('changestop', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg'));
@@ -661,7 +670,6 @@
             }
         }
 
-        // ซิงค์สีปัจจุบันลงในวงกลม Pickr
         function syncPickersWithRoot() {
             const root = getComputedStyle(document.documentElement);
             const bg = root.getPropertyValue('--bg-color').trim();
@@ -679,7 +687,6 @@
             generateSmartPalette(accent); 
         }
 
-        // เวลากดปุ่มธีมสำเร็จรูป ให้เปลี่ยนสีเว็บทันที
         function applyPresetTheme(bg, accent, accentBg, text) {
             const root = document.documentElement;
             root.style.setProperty('--bg-color', bg);
@@ -774,12 +781,12 @@
             container.innerHTML = ''; 
             savedThemes.forEach(theme => {
                 const btn = document.createElement('button');
-                btn.className = "px-3 py-1.5 bg-slate-50 text-slate-700 rounded-full text-xs font-medium border border-slate-200 hover:bg-slate-100 transition flex items-center gap-1.5";
+                btn.className = "px-3 py-1.5 rounded-full text-xs font-medium border shadow-sm transition flex items-center gap-1.5 theme-btn-secondary hover:opacity-80";
                 btn.innerHTML = `<div class="w-2 h-2 rounded-full shadow-inner" style="background-color: ${theme.accent}"></div> ${theme.name}`;
                 btn.onclick = () => applyPresetTheme(theme.bg, theme.accent, theme.accentBg, theme.text);
                 
                 const delBtn = document.createElement('span');
-                delBtn.className = "text-[9px] text-slate-300 hover:text-red-400 ml-1";
+                delBtn.className = "text-[9px] theme-accent hover:text-red-500 ml-1";
                 delBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
                 delBtn.onclick = (e) => {
                     e.stopPropagation();
