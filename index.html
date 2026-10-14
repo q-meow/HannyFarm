@@ -18,7 +18,7 @@
     
     <style>
         :root {
-            --bg-color: #f4f9ff;
+            --bg-color: #ffffff;
             --text-main: #334155;
             --accent-color: rgba(59, 130, 246, 1);
             --accent-bg: #dbeafe;
@@ -55,21 +55,21 @@
         .dragging { opacity: 0.5; transform: scale(0.95); }
         .drag-over { border: 2px dashed var(--accent-color) !important; }
 
-        /* 🌟 คลาสสำหรับผูกสีหน้าต่าง Popup และการแสดงผลโหมดสว่าง (ค่าเริ่มต้น) 🌟 */
+        /* 🌟 สไตล์การแสดงผลโหมดสว่าง (พื้นหลังขาวสะอาดตา) 🌟 */
         #mainBody { background-color: var(--bg-color); transition: background-color 0.4s ease; }
-        .surface-card { background-color: #ffffff; border: 1px solid var(--accent-bg); transition: all 0.3s ease; }
+        .surface-card { background-color: #ffffff; border: 1px solid #f1f5f9; transition: all 0.3s ease; }
         
         .theme-card { 
-            background-color: rgba(255, 255, 255, 0.96); 
+            background-color: rgba(255, 255, 255, 0.98); 
             backdrop-filter: blur(12px);
             color: var(--text-main); 
-            border: 1px solid rgba(255,255,255,0.6); 
+            border: 1px solid #f1f5f9; 
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18);
         }
         .theme-box { 
             background-color: #ffffff; 
-            border: 1px solid var(--accent-bg); 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
         .theme-text { color: var(--text-main); }
         .theme-text-muted { color: var(--text-main); opacity: 0.65; }
@@ -353,15 +353,15 @@
                 </button>
             </div>
             
-            <!-- ⚡ ธีมสำเร็จรูป -->
+            <!-- ⚡ ธีมสำเร็จรูป (โหมดสว่างใช้พื้นหลังสีขาวคลีน #ffffff) -->
             <div class="mb-5">
                 <h4 class="text-xs font-bold mb-3 flex items-center gap-1.5 theme-text"><i class="fa-solid fa-bolt theme-accent"></i> ธีมสำเร็จรูป</h4>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="applyPresetWithMode('#f0f7ff', '#3b82f6', '#dbeafe', '#1e3a8a')" class="keep-white px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-blue-400"></div> Bubble Blue</button>
-                    <button onclick="applyPresetWithMode('#fdf2f8', '#f43f5e', '#ffe4e6', '#881337')" class="keep-white px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-xs font-medium border border-pink-100 hover:bg-pink-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-pink-400"></div> Rose Gold</button>
-                    <button onclick="applyPresetWithMode('#f0fdf4', '#22c55e', '#dcfce7', '#14532d')" class="keep-white px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-medium border border-green-100 hover:bg-green-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-green-400"></div> Matcha</button>
-                    <button onclick="applyPresetWithMode('#fef3c7', '#d97706', '#fde68a', '#78350f')" class="keep-white px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-medium border border-amber-100 hover:bg-amber-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-amber-400"></div> Chestnut</button>
-                    <button onclick="applyPresetWithMode('#f8fafc', '#475569', '#e2e8f0', '#0f172a')" class="keep-white px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-xs font-medium border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-slate-400"></div> Minimal</button>
+                    <button onclick="applyPresetWithMode('#ffffff', '#3b82f6', '#dbeafe', '#1e3a8a')" class="keep-white px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-blue-400"></div> Bubble Blue</button>
+                    <button onclick="applyPresetWithMode('#ffffff', '#f43f5e', '#ffe4e6', '#881337')" class="keep-white px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-xs font-medium border border-pink-100 hover:bg-pink-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-pink-400"></div> Rose Gold</button>
+                    <button onclick="applyPresetWithMode('#ffffff', '#22c55e', '#dcfce7', '#14532d')" class="keep-white px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-medium border border-green-100 hover:bg-green-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-green-400"></div> Matcha</button>
+                    <button onclick="applyPresetWithMode('#ffffff', '#d97706', '#fef3c7', '#78350f')" class="keep-white px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-medium border border-amber-100 hover:bg-amber-100 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-amber-400"></div> Chestnut</button>
+                    <button onclick="applyPresetWithMode('#ffffff', '#475569', '#f1f5f9', '#0f172a')" class="keep-white px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-xs font-medium border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-slate-400"></div> Minimal</button>
                 </div>
             </div>
 
@@ -422,7 +422,7 @@
                 <p class="text-[10px] mb-2 mt-1 leading-relaxed theme-text" style="opacity: 0.9;">
                     ปรับโทนสีอัตโนมัติตาม <b>"สีหลัก"</b> และโหมดสว่าง/มืด หากถูกใจสามารถคลิกที่แถบสีเพื่อนำไปใช้ได้เลย
                 </p>
-                <div id="suggestedPaletteContainer" onclick="applySuggestedPalette()" class="h-10 w-full rounded-xl overflow-hidden flex shadow-inner cursor-pointer transition-all border border-white/50 hover:scale-[1.02]">
+                <div id="suggestedPaletteContainer" onclick="applySuggestedPalette()" class="h-10 w-full rounded-xl overflow-hidden flex shadow-inner cursor-pointer transition-all border border-slate-200/80 hover:scale-[1.02]">
                 </div>
             </div>
 
@@ -459,7 +459,7 @@
         const db = firebase.database();
 
         let isAdmin = false;
-        let isDarkMode = false; // สถานะโหมดสว่าง-มืด
+        let isDarkMode = false; 
         let productsList = []; 
         let activeTag = 'All'; 
 
@@ -549,7 +549,7 @@
                 const tagChips = p.tags.split(',').slice(0,2).map(t => `<span class="theme-btn-secondary px-1.5 py-0.5 rounded-md text-[8px] truncate whitespace-nowrap max-w-[60px] inline-block">${t.trim()}</span>`).join('');
                 card.innerHTML = `
                     ${adminControls}
-                    <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100/20 mb-2 border" style="border-color: var(--accent-bg)">${badgesHTML}<img src="${p.image}" class="w-full h-full object-cover"></div>
+                    <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100/20 mb-2 border border-slate-100">${badgesHTML}<img src="${p.image}" class="w-full h-full object-cover"></div>
                     <div class="flex flex-wrap gap-1 justify-center mb-1.5 h-[16px] overflow-hidden">${tagChips}</div>
                     <h4 class="text-[11px] font-medium theme-text text-center line-clamp-1 px-1">${p.name}</h4>
                     ${priceHTML}
@@ -652,7 +652,6 @@
             isDarkMode = dark;
             updateModeSwitchUI();
             
-            // คำนวณโทนสีใหม่จากสีหลักปัจจุบัน แล้วปรับใช้ทันที
             const root = getComputedStyle(document.documentElement);
             const currentAccent = root.getPropertyValue('--accent-color').trim();
             generateSmartPalette(currentAccent);
@@ -664,12 +663,14 @@
             if (saved) {
                 try {
                     const theme = JSON.parse(saved);
+                    isDarkMode = !!theme.isDark;
+                    // หากอยู่ในโหมดสว่างแต่ติดสีพื้นหลัง #ECB7BA เดิม ให้ปรับเป็นสีขาวอัตโนมัติ
+                    const bgToUse = (!isDarkMode && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
                     const root = document.documentElement;
-                    root.style.setProperty('--bg-color', theme.bg);
+                    root.style.setProperty('--bg-color', bgToUse);
                     root.style.setProperty('--accent-color', theme.accent);
                     root.style.setProperty('--accent-bg', theme.accentBg);
                     root.style.setProperty('--text-main', theme.text);
-                    isDarkMode = !!theme.isDark;
                     updateModeSwitchUI();
                 } catch(e) {}
             }
@@ -679,14 +680,15 @@
         db.ref('theme/active').on('value', (snapshot) => {
             const theme = snapshot.val();
             if (theme && document.getElementById('themeModal').classList.contains('hidden')) {
+                isDarkMode = !!theme.isDark;
+                const bgToUse = (!isDarkMode && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
                 const root = document.documentElement;
-                root.style.setProperty('--bg-color', theme.bg);
+                root.style.setProperty('--bg-color', bgToUse);
                 root.style.setProperty('--accent-color', theme.accent);
                 root.style.setProperty('--accent-bg', theme.accentBg);
                 root.style.setProperty('--text-main', theme.text);
-                isDarkMode = !!theme.isDark;
                 updateModeSwitchUI();
-                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(theme));
+                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify({ ...theme, bg: bgToUse }));
             }
         });
 
@@ -751,7 +753,7 @@
         };
 
         const pickrAccent = Pickr.create({ el: '#pickerAccent', default: '#3b82f6', ...pickrConfig });
-        const pickrBg = Pickr.create({ el: '#pickerBg', default: '#f4f9ff', ...pickrConfig });
+        const pickrBg = Pickr.create({ el: '#pickerBg', default: '#ffffff', ...pickrConfig });
         const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
         const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
 
@@ -796,13 +798,12 @@
             generateSmartPalette(accent); 
         }
 
-        // เวลากดธีมสำเร็จรูป ถ้าอยู่โหมดมืดจะแปลงธีมนั้นเป็นโทนมืดให้อัตโนมัติ
         function applyPresetWithMode(bg, accent, accentBg, text) {
             if(isDarkMode) {
                 generateSmartPalette(accent);
                 applySuggestedPalette();
             } else {
-                applyPresetTheme(bg, accent, accentBg, text);
+                applyPresetTheme(bg, accent, accentBg, text, false);
             }
         }
 
@@ -859,18 +860,15 @@
             let textCol, accentBgCol, bgCol, accentCol = baseHex;
 
             if (!isDarkMode) {
-                // โทนสว่าง (Light Mode)
-                let textL = Math.max(15, hsl.l - 35);
-                textCol = HSLToHex(hsl.h, hsl.s, textL);
-                let accentBgL = Math.min(94, hsl.l + 35);
-                accentBgCol = HSLToHex(hsl.h, hsl.s, accentBgL);
-                let bgL = Math.min(98, hsl.l + 45);
-                bgCol = HSLToHex(hsl.h, Math.max(10, hsl.s - 20), bgL);
+                // ☀️ โทนสว่าง: ล็อกพื้นหลังเว็บเป็นสีขาว #FFFFFF และสีป้ายเป็นพาสเทลอ่อนๆ
+                textCol = HSLToHex(hsl.h, hsl.s, Math.max(15, hsl.l - 30));
+                accentBgCol = HSLToHex(hsl.h, Math.min(75, hsl.s), 92);
+                bgCol = "#FFFFFF";
             } else {
-                // โทนมืด (Dark Mode)
-                bgCol = HSLToHex(hsl.h, Math.min(35, hsl.s), 11); // พื้นหลังมืดอมสีหลัก
-                accentBgCol = HSLToHex(hsl.h, Math.min(45, hsl.s), 22); // สีพื้นหลังป้ายโทนเข้ม
-                textCol = HSLToHex(hsl.h, Math.min(25, hsl.s), 93); // ตัวอักษรสว่างอ่านง่าย
+                // 🌙 โทนมืด: พื้นหลังมืดอมสีหลัก และตัวอักษรสว่างอ่านง่าย
+                bgCol = HSLToHex(hsl.h, Math.min(35, hsl.s), 11);
+                accentBgCol = HSLToHex(hsl.h, Math.min(45, hsl.s), 22);
+                textCol = HSLToHex(hsl.h, Math.min(25, hsl.s), 93);
             }
             
             currentSuggested = { text: textCol, accent: accentCol, accentBg: accentBgCol, bg: bgCol };
@@ -919,7 +917,10 @@
                 btn.className = "px-3 py-1.5 rounded-full text-xs font-medium border shadow-sm transition flex items-center gap-1.5 theme-btn-secondary hover:opacity-80";
                 const modeIcon = theme.isDark ? '<i class="fa-solid fa-moon text-[9px] opacity-70"></i>' : '';
                 btn.innerHTML = `<div class="w-2 h-2 rounded-full shadow-inner" style="background-color: ${theme.accent}"></div> ${modeIcon} ${theme.name}`;
-                btn.onclick = () => applyPresetTheme(theme.bg, theme.accent, theme.accentBg, theme.text, !!theme.isDark);
+                btn.onclick = () => {
+                    const bgToApply = (!theme.isDark && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
+                    applyPresetTheme(bgToApply, theme.accent, theme.accentBg, theme.text, !!theme.isDark);
+                };
                 
                 const delBtn = document.createElement('span');
                 delBtn.className = "text-[9px] theme-accent hover:text-red-500 ml-1";
