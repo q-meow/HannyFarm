@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบธีม สินค้า & คิวงาน</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบธีม สินค้า คิวงาน & ปฏิทิน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -115,6 +115,7 @@
             background-color: rgba(0, 0, 0, 0.25) !important;
             color: var(--text-main) !important;
             border-color: var(--accent-bg) !important;
+            color-scheme: dark;
         }
         body.dark-mode nav {
             background-color: var(--bg-color) !important;
@@ -174,21 +175,42 @@
             </div>
         </header>
 
-        <section class="px-6 mt-6 flex gap-4">
-            <div class="flex-1 flex flex-col gap-3">
-                <div onclick="switchTab('products')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition">
+        <section class="px-6 mt-6 flex gap-3.5 items-stretch">
+            <!-- ฝั่งซ้าย: จำนวนสินค้า & จำนวนคิวงาน -->
+            <div class="w-[44%] flex flex-col gap-3 justify-between">
+                <div onclick="switchTab('products')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition flex-1 flex flex-col justify-center">
                     <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนสินค้าทั้งหมด</p>
                     <p class="text-xl font-semibold mt-1" style="color: var(--accent-color)"><span id="homeProductCount">0</span> <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">รายการ</span></p>
                 </div>
-                <div onclick="switchTab('queue')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition">
+                <div onclick="switchTab('queue')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition flex-1 flex flex-col justify-center">
                     <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนคิวงานทั้งหมด</p>
                     <p class="text-xl font-semibold mt-1" style="color: var(--accent-color)"><span id="homeQueueCount">0</span> <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">งาน</span></p>
                 </div>
             </div>
-            <div class="flex-1 surface-card rounded-2xl p-4 shadow-sm flex flex-col justify-center relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10 text-5xl" style="color: var(--accent-color)"><i class="fa-regular fa-calendar-check"></i></div>
-                <h3 class="font-medium mb-2 relative z-10" style="color: var(--accent-color)">ปฏิทินงาน</h3>
-                <p class="text-xs relative z-10 leading-relaxed editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">เอาไว้บอกว่าวันไหนทำกี่งาน<br>เปิด-ปิดวันไหนบ้าง<br>เช็คคิวได้เลย</p>
+
+            <!-- 🌟 ฝั่งขวา: การ์ดรูปปฏิทินงาน (แตะเพื่อเปิดป๊อปอัพเช็คคิวรายวัน) 🌟 -->
+            <div onclick="openCalendarModal()" class="flex-1 surface-card rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden cursor-pointer hover:scale-[1.02] transition group">
+                <div class="flex items-center justify-between mb-1">
+                    <h3 class="font-semibold text-xs flex items-center gap-1.5" style="color: var(--accent-color)">
+                        <i class="fa-regular fa-calendar-check"></i> ปฏิทินงาน
+                    </h3>
+                    <span id="miniCalMonthLabel" class="text-[9px] font-bold px-2 py-0.5 rounded-full theme-btn-secondary"></span>
+                </div>
+
+                <!-- ตารางรูปปฏิทินมินิ -->
+                <div class="my-1">
+                    <div class="grid grid-cols-7 text-[8px] text-center opacity-50 font-medium mb-1">
+                        <span class="text-rose-400">อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span class="text-blue-400">ส</span>
+                    </div>
+                    <div id="miniCalendarGrid" class="grid grid-cols-7 gap-0.5 text-[9px] text-center"></div>
+                </div>
+
+                <div class="mt-1.5 pt-1.5 border-t border-dashed border-slate-200/60 flex items-center justify-between text-[9px]" style="color: var(--text-main); opacity: 0.75;">
+                    <span id="miniCalQueueSummary">กำลังโหลด...</span>
+                    <span class="font-semibold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform" style="color: var(--accent-color)">
+                        ดูคิว <i class="fa-solid fa-chevron-right text-[7px]"></i>
+                    </span>
+                </div>
             </div>
         </section>
         
@@ -231,13 +253,18 @@
     <!-- 📋 หน้าที่ 3: หน้าเช็คคิวงาน (QUEUE) -->
     <!-- ========================================== -->
     <div id="queueSection" class="hidden px-5 pt-8 min-h-screen">
-        <div class="mb-4">
-            <h2 class="text-2xl font-bold flex items-center gap-2" style="color: var(--text-main)">
-                <i class="fa-solid fa-list-check" style="color: var(--accent-color)"></i> เช็คคิวงานทั้งหมด
-            </h2>
-            <p class="text-xs mt-1" style="color: var(--text-main); opacity: 0.7;">
-                คิวของงานจะอยู่ที่ตรงนี้ ทยอยทำตามลำดับและเดดไลน์นะคะ
-            </p>
+        <div class="mb-4 flex justify-between items-start">
+            <div>
+                <h2 class="text-2xl font-bold flex items-center gap-2" style="color: var(--text-main)">
+                    <i class="fa-solid fa-list-check" style="color: var(--accent-color)"></i> เช็คคิวงานทั้งหมด
+                </h2>
+                <p class="text-xs mt-1" style="color: var(--text-main); opacity: 0.7;">
+                    คิวของงานจะอยู่ที่ตรงนี้ ทยอยทำตามลำดับและเดดไลน์นะคะ
+                </p>
+            </div>
+            <button onclick="openCalendarModal()" class="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm theme-btn-secondary hover:opacity-80 shrink-0">
+                <i class="fa-regular fa-calendar-days"></i> ปฏิทิน
+            </button>
         </div>
 
         <!-- กล่องสรุปสถานะคิวงาน -->
@@ -308,7 +335,69 @@
     <!-- MODALS -->
     <!-- ========================================== -->
 
-    <!-- Modal เพิ่ม/แก้ไขคิวงาน -->
+    <!-- 🌟📅 Modal ป๊อปอัพปฏิทินงานรายเดือน (แสดงคิวตามวันที่ส่งงาน) 📅🌟 -->
+    <div id="calendarModal" class="hidden fixed inset-0 bg-slate-900/60 z-[85] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="rounded-3xl w-full max-w-[380px] max-h-[90vh] overflow-y-auto p-5 relative hide-scrollbar theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('calendarModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-2.5 mb-4">
+                <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg theme-btn-secondary">
+                    <i class="fa-regular fa-calendar-check theme-accent"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base theme-text leading-tight">ปฏิทินตารางส่งงาน</h3>
+                    <p class="text-[10px] theme-text-muted">แตะที่วันที่เพื่อดูรายการคิวส่งงานในแต่ละวัน</p>
+                </div>
+            </div>
+
+            <!-- แถบเลื่อนเดือน ซ้าย-ขวา -->
+            <div class="flex items-center justify-between p-2 rounded-2xl mb-3 theme-box">
+                <button onclick="changeCalendarMonth(-1)" class="w-8 h-8 rounded-xl flex items-center justify-center theme-btn-secondary hover:opacity-80 transition">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <div class="text-center">
+                    <span id="calModalMonthTitle" class="font-bold text-sm theme-text"></span>
+                </div>
+                <button onclick="changeCalendarMonth(1)" class="w-8 h-8 rounded-xl flex items-center justify-center theme-btn-secondary hover:opacity-80 transition">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- ตารางปฏิทิน 7 วัน -->
+            <div class="p-3 rounded-2xl theme-box mb-3">
+                <div class="grid grid-cols-7 text-[10px] font-bold text-center mb-2 opacity-70">
+                    <span class="text-rose-500">อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span class="text-blue-500">ส</span>
+                </div>
+                <div id="fullCalendarGrid" class="grid grid-cols-7 gap-1 text-xs"></div>
+
+                <!-- คำอธิบายสัญลักษณ์ -->
+                <div class="flex flex-wrap items-center justify-center gap-3 mt-3 pt-2.5 border-t border-dashed border-slate-200/60 text-[9px] theme-text-muted">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full" style="background-color: var(--accent-color)"></span> มีคิวนัดส่งงาน</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> คิวด่วน 🔥</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> ส่งงานครบแล้ว</span>
+                </div>
+            </div>
+
+            <!-- ส่วนแสดงรายการคิวของวันที่เลือก -->
+            <div class="flex items-center justify-between mb-2 px-1">
+                <h4 id="selectedDateHeader" class="text-xs font-bold theme-text flex items-center gap-1.5"></h4>
+                <div class="flex items-center gap-1.5">
+                    <button id="adminAddQueueOnDateBtn" onclick="openQueueModalWithDate()" class="admin-only keep-white bg-green-50 text-green-600 border border-green-200 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-green-100 transition">
+                        <i class="fa-solid fa-plus"></i> เพิ่มคิววันนี้
+                    </button>
+                    <button onclick="selectCalendarDate(null)" class="text-[10px] font-medium px-2.5 py-1 rounded-full theme-btn-secondary hover:opacity-80 transition">
+                        ดูทั้งเดือน
+                    </button>
+                </div>
+            </div>
+
+            <div id="calendarDayQueuesList" class="space-y-2 max-h-52 overflow-y-auto pr-1 hide-scrollbar"></div>
+        </div>
+    </div>
+
+    <!-- Modal เพิ่ม/แก้ไขคิวงาน (ปฏิทินวันที่จ้าง/ส่งงาน + สถานะการชำระเงิน) -->
     <div id="queueModal" class="hidden fixed inset-0 bg-slate-900/60 z-[90] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('queueModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
@@ -320,25 +409,50 @@
             <div class="space-y-3">
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">ชื่อลูกค้า / รหัสคิว *</label>
-                    <input type="text" id="queueCustomer" placeholder="เช่น คุณมินนี่ / Q-01" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
+                    <input type="text" id="queueCustomer" placeholder="เช่น คุณมินนี่ / 01" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
                 </div>
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">รายละเอียดงานที่สั่ง *</label>
-                    <input type="text" id="queueDetail" placeholder="เช่น ป้ายบัญชี 1 ช่อง + โลโก้ร้าน" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
+                    <input type="text" id="queueDetail" placeholder="เช่น ป้ายบช. + โลโก้ร้าน" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
                 </div>
+
+                <!-- สถานะคิวงาน & สถานะการชำระเงิน -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">สถานะคิวงาน</label>
+                        <select id="queueStatus" class="w-full rounded-xl px-2.5 py-2 text-xs theme-input">
+                            <option value="รอคิว">⏳ รอคิว</option>
+                            <option value="กำลังทำ">🎨 กำลังทำ</option>
+                            <option value="รอเช็คงาน">💬 รอเช็คงาน</option>
+                            <option value="เสร็จสิ้น">✅ เสร็จสิ้น</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">สถานะการชำระ</label>
+                        <select id="queuePayment" class="w-full rounded-xl px-2.5 py-2 text-xs theme-input">
+                            <option value="มัดจำ 50%">🪙 มัดจำ 50%</option>
+                            <option value="ชำระครบ">💸 ชำระครบ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- วันที่จ้าง & กำหนดส่งงาน (เลือกจากปฏิทิน) -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text"><i class="fa-regular fa-calendar-plus mr-1 opacity-70"></i>วันที่จ้าง</label>
+                        <input type="date" id="queueStartDate" class="w-full rounded-xl px-2.5 py-2 text-xs theme-input cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text"><i class="fa-regular fa-calendar-check mr-1 opacity-70"></i>กำหนดส่งงาน</label>
+                        <input type="date" id="queueDueDate" class="w-full rounded-xl px-2.5 py-2 text-xs theme-input cursor-pointer">
+                    </div>
+                </div>
+
                 <div>
-                    <label class="text-[11px] font-bold mb-1 block theme-text">สถานะคิวงาน</label>
-                    <select id="queueStatus" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
-                        <option value="รอคิว">⏳ รอคิว (Waiting)</option>
-                        <option value="กำลังทำ">🎨 กำลังทำ (In Progress)</option>
-                        <option value="รอเช็คงาน">💬 รอเช็คงาน/แก้ไข (Review)</option>
-                        <option value="เสร็จสิ้น">✅ เสร็จสิ้น (Completed)</option>
-                    </select>
+                    <label class="text-[11px] font-bold mb-1 block theme-text">หมายเหตุเพิ่มเติม (ถ้ามี)</label>
+                    <input type="text" id="queueNote" placeholder="เช่น รอคอนเฟิร์มบรีฟ / แก้ไขรอบที่ 1" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
                 </div>
-                <div>
-                    <label class="text-[11px] font-bold mb-1 block theme-text">วันนัดส่งงาน / หมายเหตุ</label>
-                    <input type="text" id="queueNote" placeholder="เช่น นัดส่ง 25 ต.ค. / รอคอนเฟิร์มบรีฟ" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
-                </div>
+
                 <div class="pt-1">
                     <label class="text-xs font-bold text-rose-500 flex items-center gap-1.5 cursor-pointer">
                         <input type="checkbox" id="queueUrgent"> 🔥 คิวด่วนพิเศษ (Urgent / VIP)
@@ -359,7 +473,7 @@
             <input type="hidden" id="prodId">
             <div class="space-y-3">
                 
-                <!-- 🌟 ช่องใส่รูปภาพสินค้า (วางลิงก์ หรือ เลือกรูปจากเครื่อง) 🌟 -->
+                <!-- ช่องใส่รูปภาพสินค้า (วางลิงก์ หรือ เลือกรูปจากเครื่อง) -->
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">รูปภาพสินค้า (วางลิงก์ หรือ เลือกจากเครื่อง) *</label>
                     <div class="flex gap-2">
@@ -558,6 +672,20 @@
     <script>
         function rgbToHex(r, g, b) { return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase(); }
 
+        const thaiMonthsShort = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        const thaiMonthsFull = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+
+        // ฟังก์ชันแปลงวันที่ YYYY-MM-DD เป็นรูปแบบไทยย่อ (เช่น 31 ต.ค. 69)
+        function formatThaiDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const year = parseInt(parts[0], 10) + 543;
+            const month = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            return `${day} ${thaiMonthsShort[month] || ''} ${String(year).slice(-2)}`;
+        }
+
         // --- 1. ตั้งค่า Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyBCJ--ekt4btJYce_6MsXC3iDHt5X6b9ag",
@@ -580,6 +708,12 @@
         let queuesList = [];
         let activeQueueStatus = 'ทั้งหมด';
 
+        // ตัวแปรสำหรับระบบปฏิทิน
+        const nowDate = new Date();
+        let calViewYear = nowDate.getFullYear();
+        let calViewMonth = nowDate.getMonth();
+        let selectedCalendarDateStr = null; // รูปแบบ YYYY-MM-DD หรือ null (ดูทั้งเดือน)
+
         function openLoginWindow() {
             if(!isAdmin) {
                 document.getElementById('loginModal').classList.remove('hidden');
@@ -601,7 +735,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- ระบบจัดการรูปภาพสินค้า (รองรับทั้งวางลิงก์และอัปโหลดไฟล์จากเครื่อง) ---
+        // --- ระบบจัดการรูปภาพสินค้า ---
         function onProdUrlInput() {
             const url = document.getElementById('prodImage').value.trim();
             uploadedProdBase64 = '';
@@ -837,7 +971,7 @@
         function handleDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
 
         // ==========================================
-        // 📋 ระบบจัดการคิวงาน (Queue Manager)
+        // 📋 ระบบจัดการคิวงาน (Queue Manager) & ซิงค์ปฏิทิน
         // ==========================================
         db.ref('queues').orderByChild('order').on('value', (snapshot) => {
             queuesList = [];
@@ -856,7 +990,227 @@
 
             renderQueueStatusTabs();
             filterQueues();
+            renderMiniCalendar();
+            if (!document.getElementById('calendarModal').classList.contains('hidden')) {
+                renderFullCalendar();
+            }
         });
+
+        // ==========================================
+        // 📅 ระบบปฏิทินงานหน้าโฮม & ป๊อปอัพปฏิทินรายเดือน
+        // ==========================================
+        function toDateKey(year, monthIndex, day) {
+            const m = String(monthIndex + 1).padStart(2, '0');
+            const d = String(day).padStart(2, '0');
+            return `${year}-${m}-${d}`;
+        }
+
+        function renderMiniCalendar() {
+            const grid = document.getElementById('miniCalendarGrid');
+            const monthLabel = document.getElementById('miniCalMonthLabel');
+            const summaryEl = document.getElementById('miniCalQueueSummary');
+            if (!grid) return;
+
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const todayKey = toDateKey(year, month, today.getDate());
+
+            monthLabel.innerText = `${thaiMonthsShort[month]} ${String(year + 543).slice(-2)}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // นับคิวที่มีกำหนดส่งในเดือนปัจจุบัน
+            const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}-`;
+            const monthQueues = queuesList.filter(q => q.dueDate && q.dueDate.startsWith(monthPrefix));
+            summaryEl.innerText = monthQueues.length > 0 ? `เดือนนี้มี ${monthQueues.length} คิวส่งงาน` : `แตะเพื่อดูตารางคิว`;
+
+            grid.innerHTML = '';
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = toDateKey(year, month, d);
+                const dayQueues = queuesList.filter(q => q.dueDate === dateKey);
+                const hasUrgent = dayQueues.some(q => q.isUrgent && q.status !== 'เสร็จสิ้น');
+                const isToday = (dateKey === todayKey);
+
+                let cellStyle = 'opacity-75';
+                let inlineStyle = '';
+                if (dayQueues.length > 0) {
+                    if (hasUrgent) {
+                        cellStyle = 'keep-white bg-rose-500 text-white font-bold rounded-full shadow-sm';
+                    } else {
+                        cellStyle = 'text-white font-bold rounded-full shadow-sm';
+                        inlineStyle = 'background-color: var(--accent-color);';
+                    }
+                } else if (isToday) {
+                    cellStyle = 'font-bold rounded-full border';
+                    inlineStyle = 'border-color: var(--accent-color); color: var(--accent-color);';
+                }
+
+                grid.innerHTML += `<div class="h-4 flex items-center justify-center ${cellStyle}" style="${inlineStyle}">${d}</div>`;
+            }
+        }
+
+        function openCalendarModal() {
+            const today = new Date();
+            calViewYear = today.getFullYear();
+            calViewMonth = today.getMonth();
+            selectedCalendarDateStr = null; // เริ่มต้นแสดงคิวทั้งเดือน
+            renderFullCalendar();
+            document.getElementById('calendarModal').classList.remove('hidden');
+        }
+
+        function changeCalendarMonth(delta) {
+            calViewMonth += delta;
+            if (calViewMonth < 0) {
+                calViewMonth = 11;
+                calViewYear--;
+            } else if (calViewMonth > 11) {
+                calViewMonth = 0;
+                calViewYear++;
+            }
+            selectedCalendarDateStr = null;
+            renderFullCalendar();
+        }
+
+        function selectCalendarDate(dateStr) {
+            selectedCalendarDateStr = dateStr;
+            renderFullCalendar();
+        }
+
+        function renderFullCalendar() {
+            const titleEl = document.getElementById('calModalMonthTitle');
+            const grid = document.getElementById('fullCalendarGrid');
+            titleEl.innerText = `${thaiMonthsFull[calViewMonth]} ${calViewYear + 543}`;
+
+            const firstDay = new Date(calViewYear, calViewMonth, 1).getDay();
+            const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+            const today = new Date();
+            const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+
+            grid.innerHTML = '';
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="h-11"></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = toDateKey(calViewYear, calViewMonth, d);
+                const dayQueues = queuesList.filter(q => q.dueDate === dateKey);
+                const isSelected = (selectedCalendarDateStr === dateKey);
+                const isToday = (dateKey === todayKey);
+
+                const hasUrgent = dayQueues.some(q => q.isUrgent && q.status !== 'เสร็จสิ้น');
+                const allDone = dayQueues.length > 0 && dayQueues.every(q => q.status === 'เสร็จสิ้น');
+
+                let dotHTML = '';
+                if (dayQueues.length > 0) {
+                    let badgeBg = 'background-color: var(--accent-color);';
+                    let badgeClass = 'text-white';
+                    if (hasUrgent) {
+                        badgeBg = '';
+                        badgeClass = 'keep-white bg-rose-500 text-white';
+                    } else if (allDone) {
+                        badgeBg = '';
+                        badgeClass = 'keep-white bg-emerald-500 text-white';
+                    }
+                    dotHTML = `<span class="${badgeClass} text-[8px] font-bold px-1.5 rounded-full leading-tight mt-0.5 shadow-sm" style="${badgeBg}">${dayQueues.length} งาน</span>`;
+                }
+
+                let boxClass = 'rounded-xl h-11 flex flex-col items-center justify-center cursor-pointer transition relative border ';
+                let boxStyle = '';
+
+                if (isSelected) {
+                    boxClass += 'theme-btn-secondary font-bold ring-2';
+                    boxStyle = 'border-color: var(--accent-color); --tw-ring-color: var(--accent-color);';
+                } else if (isToday) {
+                    boxClass += 'border-dashed font-bold';
+                    boxStyle = 'border-color: var(--accent-color);';
+                } else {
+                    boxClass += 'border-transparent hover:bg-slate-100/50';
+                }
+
+                grid.innerHTML += `
+                    <div onclick="selectCalendarDate('${dateKey}')" class="${boxClass}" style="${boxStyle}">
+                        <span class="text-[11px] leading-none">${d}</span>
+                        ${dotHTML}
+                    </div>
+                `;
+            }
+
+            renderSelectedDateQueues();
+        }
+
+        function renderSelectedDateQueues() {
+            const headerEl = document.getElementById('selectedDateHeader');
+            const listEl = document.getElementById('calendarDayQueuesList');
+            const addBtn = document.getElementById('adminAddQueueOnDateBtn');
+
+            let targetQueues = [];
+            if (selectedCalendarDateStr) {
+                targetQueues = queuesList.filter(q => q.dueDate === selectedCalendarDateStr);
+                headerEl.innerHTML = `<i class="fa-regular fa-calendar-check theme-accent"></i> กำหนดส่ง ${formatThaiDate(selectedCalendarDateStr)} (${targetQueues.length} คิว)`;
+                if (addBtn) addBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+            } else {
+                const monthPrefix = `${calViewYear}-${String(calViewMonth + 1).padStart(2, '0')}-`;
+                targetQueues = queuesList
+                    .filter(q => q.dueDate && q.dueDate.startsWith(monthPrefix))
+                    .sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
+                headerEl.innerHTML = `<i class="fa-solid fa-layer-group theme-accent"></i> คิวส่งงานเดือน${thaiMonthsFull[calViewMonth]} (${targetQueues.length} คิว)`;
+                if (addBtn) addBtn.style.display = 'none';
+            }
+
+            listEl.innerHTML = '';
+            if (targetQueues.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-6 rounded-2xl theme-box opacity-60 text-xs">
+                        ไม่มีคิวนัดส่งงานใน${selectedCalendarDateStr ? 'วันนี้' : 'เดือนนี้'}ค่ะ
+                    </div>
+                `;
+                return;
+            }
+
+            targetQueues.forEach(q => {
+                const stConfig = getStatusConfig(q.status);
+                const paymentStatus = q.payment || 'มัดจำ 50%';
+                const paymentBadgeClass = paymentStatus === 'ชำระครบ' 
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' 
+                    : 'bg-amber-50 text-amber-600 border border-amber-200';
+                const paymentIcon = paymentStatus === 'ชำระครบ' ? '💸' : '🪙';
+                const qIndex = queuesList.findIndex(item => item.id === q.id) + 1;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "p-3 rounded-2xl theme-box flex flex-col gap-1";
+                itemDiv.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold theme-btn-secondary">คิว #${qIndex}</span>
+                            <span class="font-bold text-xs theme-text">${q.customer}</span>
+                            ${q.isUrgent ? `<span class="keep-white bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full">🔥 ด่วน</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="keep-white ${paymentBadgeClass} text-[8px] font-bold px-1.5 py-0.5 rounded-full">${paymentIcon} ${paymentStatus}</span>
+                            <span class="keep-white ${stConfig.badge} text-[9px] font-bold px-2 py-0.5 rounded-full">${q.status}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px] mt-0.5">
+                        <span class="theme-text opacity-85">${q.detail}</span>
+                        <span class="text-[10px] font-semibold text-rose-500 shrink-0"><i class="fa-regular fa-clock mr-0.5"></i>ส่ง ${formatThaiDate(q.dueDate)}</span>
+                    </div>
+                `;
+                listEl.appendChild(itemDiv);
+            });
+        }
+
+        function openQueueModalWithDate() {
+            openQueueModal();
+            if (selectedCalendarDateStr) {
+                document.getElementById('queueDueDate').value = selectedCalendarDateStr;
+            }
+        }
 
         function renderQueueStatusTabs() {
             const container = document.getElementById('queueStatusContainer');
@@ -916,6 +1270,12 @@
 
             filtered.forEach((q, idx) => {
                 const stConfig = getStatusConfig(q.status);
+                const paymentStatus = q.payment || 'มัดจำ 50%';
+                const paymentBadgeClass = paymentStatus === 'ชำระครบ' 
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' 
+                    : 'bg-amber-50 text-amber-600 border border-amber-200';
+                const paymentIcon = paymentStatus === 'ชำระครบ' ? '💸' : '🪙';
+
                 const card = document.createElement('div');
                 card.className = "surface-card rounded-2xl p-4 shadow-sm relative transition-all duration-300";
 
@@ -930,12 +1290,23 @@
 
                 let urgentBadge = q.isUrgent ? `<span class="keep-white bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">🔥 คิวด่วน</span>` : '';
 
+                // แสดงผลวันที่จ้าง & กำหนดส่งงาน
+                let datesHTML = '';
+                if (q.startDate || q.dueDate) {
+                    datesHTML = `
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] theme-text-muted mb-2 pl-8">
+                            ${q.startDate ? `<span><i class="fa-regular fa-calendar-plus mr-1 opacity-75"></i>วันที่จ้าง: <b class="theme-text">${formatThaiDate(q.startDate)}</b></span>` : ''}
+                            ${q.dueDate ? `<span><i class="fa-regular fa-calendar-check mr-1 text-rose-400"></i>ส่งงาน: <b class="text-rose-500">${formatThaiDate(q.dueDate)}</b></span>` : ''}
+                        </div>
+                    `;
+                }
+
                 let adminToolbar = '';
                 if (isAdmin) {
                     adminToolbar = `
-                        <div class="flex items-center justify-between pt-3 mt-3 border-t border-dashed border-slate-200/70">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 bg-slate-800/70 text-white rounded-md flex items-center justify-center cursor-move" title="ลากเพื่อสลับคิว">
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-3 mt-3 border-t border-dashed border-slate-200/70">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <div class="w-6 h-6 bg-slate-800/70 text-white rounded-md flex items-center justify-center cursor-move shrink-0" title="ลากเพื่อสลับคิว">
                                     <i class="fa-solid fa-grip-vertical text-[10px]"></i>
                                 </div>
                                 <select onchange="quickChangeQueueStatus('${q.id}', this.value)" class="text-[10px] rounded-lg px-2 py-1 theme-input font-medium">
@@ -943,6 +1314,10 @@
                                     <option value="กำลังทำ" ${q.status === 'กำลังทำ' ? 'selected' : ''}>🎨 กำลังทำ</option>
                                     <option value="รอเช็คงาน" ${q.status === 'รอเช็คงาน' ? 'selected' : ''}>💬 รอเช็คงาน</option>
                                     <option value="เสร็จสิ้น" ${q.status === 'เสร็จสิ้น' ? 'selected' : ''}>✅ เสร็จสิ้น</option>
+                                </select>
+                                <select onchange="quickChangeQueuePayment('${q.id}', this.value)" class="text-[10px] rounded-lg px-2 py-1 theme-input font-medium">
+                                    <option value="มัดจำ 50%" ${paymentStatus === 'มัดจำ 50%' ? 'selected' : ''}>🪙 มัดจำ 50%</option>
+                                    <option value="ชำระครบ" ${paymentStatus === 'ชำระครบ' ? 'selected' : ''}>💸 ชำระครบ</option>
                                 </select>
                             </div>
                             <div class="flex items-center gap-1.5">
@@ -958,18 +1333,24 @@
                 }
 
                 card.innerHTML = `
-                    <div class="flex justify-between items-start gap-2 mb-2">
-                        <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex justify-between items-start gap-2 mb-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap">
                             <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold theme-btn-secondary shrink-0">#${idx + 1}</span>
                             <h4 class="font-bold text-sm theme-text">${q.customer}</h4>
                             ${urgentBadge}
                         </div>
-                        <span class="keep-white ${stConfig.badge} text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0">
-                            <i class="fa-solid ${stConfig.icon} text-[9px]"></i> ${q.status}
-                        </span>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="keep-white ${paymentBadgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full">
+                                ${paymentIcon} ${paymentStatus}
+                            </span>
+                            <span class="keep-white ${stConfig.badge} text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                <i class="fa-solid ${stConfig.icon} text-[9px]"></i> ${q.status}
+                            </span>
+                        </div>
                     </div>
                     <p class="text-xs theme-text opacity-85 mb-2 pl-8">${q.detail}</p>
-                    ${q.note ? `<p class="text-[10px] theme-text-muted mb-2.5 pl-8"><i class="fa-regular fa-calendar mr-1"></i> ${q.note}</p>` : ''}
+                    ${datesHTML}
+                    ${q.note ? `<p class="text-[10px] theme-text-muted mb-2.5 pl-8"><i class="fa-regular fa-comment-dots mr-1"></i> ${q.note}</p>` : ''}
                     <div class="pl-8">
                         <div class="w-full h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
                             <div class="h-full ${stConfig.barColor} transition-all duration-500 rounded-full" style="width: ${stConfig.progress}%"></div>
@@ -982,10 +1363,14 @@
         }
 
         function openQueueModal() {
+            const today = new Date().toISOString().split('T')[0];
             document.getElementById('queueId').value = '';
             document.getElementById('queueCustomer').value = '';
             document.getElementById('queueDetail').value = '';
             document.getElementById('queueStatus').value = 'รอคิว';
+            document.getElementById('queuePayment').value = 'มัดจำ 50%';
+            document.getElementById('queueStartDate').value = today;
+            document.getElementById('queueDueDate').value = '';
             document.getElementById('queueNote').value = '';
             document.getElementById('queueUrgent').checked = false;
             document.getElementById('queueModalTitle').innerHTML = '<i class="fa-solid fa-clipboard-list theme-accent"></i> เพิ่มคิวงานใหม่';
@@ -999,6 +1384,9 @@
             document.getElementById('queueCustomer').value = q.customer || '';
             document.getElementById('queueDetail').value = q.detail || '';
             document.getElementById('queueStatus').value = q.status || 'รอคิว';
+            document.getElementById('queuePayment').value = q.payment || 'มัดจำ 50%';
+            document.getElementById('queueStartDate').value = q.startDate || '';
+            document.getElementById('queueDueDate').value = q.dueDate || '';
             document.getElementById('queueNote').value = q.note || '';
             document.getElementById('queueUrgent').checked = !!q.isUrgent;
             document.getElementById('queueModalTitle').innerHTML = '<i class="fa-solid fa-pen theme-accent"></i> แก้ไขคิวงาน';
@@ -1011,6 +1399,9 @@
                 customer: document.getElementById('queueCustomer').value.trim() || 'ลูกค้าทั่วไป',
                 detail: document.getElementById('queueDetail').value.trim() || 'สั่งทำป้าย',
                 status: document.getElementById('queueStatus').value,
+                payment: document.getElementById('queuePayment').value,
+                startDate: document.getElementById('queueStartDate').value,
+                dueDate: document.getElementById('queueDueDate').value,
                 note: document.getElementById('queueNote').value.trim(),
                 isUrgent: document.getElementById('queueUrgent').checked
             };
@@ -1026,6 +1417,10 @@
 
         function quickChangeQueueStatus(id, newStatus) {
             db.ref('queues/' + id).update({ status: newStatus });
+        }
+
+        function quickChangeQueuePayment(id, newPayment) {
+            db.ref('queues/' + id).update({ payment: newPayment });
         }
 
         function deleteQueue(id) {
@@ -1365,7 +1760,10 @@
                 container.appendChild(btn);
             });
         }
-        window.onload = () => { if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); };
+        window.onload = () => { 
+            if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); 
+            renderMiniCalendar();
+        };
 
         let isPlaying = false;
         document.getElementById('musicToggle').addEventListener('click', () => {
