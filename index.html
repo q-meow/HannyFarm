@@ -216,7 +216,8 @@
         
         <section class="px-6 mt-8 mb-6">
             <h2 class="font-medium text-lg mb-4 text-center" style="color: var(--text-main)">รายละเอียดการสั่งงาน/เรทราคา</h2>
-            <div class="w-full rounded-2xl shadow-sm overflow-hidden surface-card flex items-center justify-center editable-img" onclick="editImage('priceImg', 'เปลี่ยนรูปเรทราคา')">
+            <!-- 🌟 เปลี่ยนหัวข้อจาก 'เปลี่ยนรูปเรทราคา' เป็น 'เปลี่ยนรูป' 🌟 -->
+            <div class="w-full rounded-2xl shadow-sm overflow-hidden surface-card flex items-center justify-center editable-img" onclick="editImage('priceImg', 'เปลี่ยนรูป')">
                 <img id="priceImg" src="https://images.unsplash.com/photo-1542204625-2dfb7e8cb3cc?q=80&w=800&auto=format&fit=crop" class="w-full h-auto object-contain">
             </div>
         </section>
@@ -387,7 +388,7 @@
     <!-- MODALS -->
     <!-- ========================================== -->
 
-    <!-- ⭐ Modal เขียน/แก้ไขรีวิว (รองรับทั้งลูกค้าเขียนรีวิวและแอดมินจัดการ) ⭐ -->
+    <!-- ⭐ Modal เขียน/แก้ไขรีวิว ⭐ -->
     <div id="reviewModal" class="hidden fixed inset-0 bg-slate-900/60 z-[90] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('reviewModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
@@ -397,7 +398,6 @@
             <input type="hidden" id="revId">
             
             <div class="space-y-3">
-                <!-- เลือกคะแนนดาว -->
                 <div class="p-3 rounded-2xl theme-box text-center">
                     <label class="text-[11px] font-bold mb-1.5 block theme-text">ให้คะแนนความพึงพอใจ *</label>
                     <div id="starSelector" class="flex justify-center gap-2 text-2xl text-amber-400 cursor-pointer">
@@ -424,7 +424,6 @@
                     <textarea id="revComment" rows="3" placeholder="เขียนความประทับใจต่อผลงานหรือบริการของทางร้าน..." class="w-full rounded-xl px-3 py-2 text-xs theme-input resize-none"></textarea>
                 </div>
 
-                <!-- แนบรูปภาพรีวิว (วางลิงก์ หรือ เลือกรูปจากเครื่อง) -->
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">แนบรูปผลงาน/สลิปรีวิว (วางลิงก์ หรือ เลือกจากเครื่อง)</label>
                     <div class="flex gap-2">
@@ -451,7 +450,7 @@
         <img id="lightboxImg" src="" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain">
     </div>
 
-    <!-- 📅 Modal ป๊อปอัพปฏิทินงานรายเดือน (แสดงคิวตามวันที่ส่งงาน) -->
+    <!-- 📅 Modal ป๊อปอัพปฏิทินงานรายเดือน -->
     <div id="calendarModal" class="hidden fixed inset-0 bg-slate-900/60 z-[85] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-full max-w-[380px] max-h-[90vh] overflow-y-auto p-5 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('calendarModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
@@ -468,7 +467,6 @@
                 </div>
             </div>
 
-            <!-- แถบเลื่อนเดือน ซ้าย-ขวา -->
             <div class="flex items-center justify-between p-2 rounded-2xl mb-3 theme-box">
                 <button onclick="changeCalendarMonth(-1)" class="w-8 h-8 rounded-xl flex items-center justify-center theme-btn-secondary hover:opacity-80 transition">
                     <i class="fa-solid fa-chevron-left text-xs"></i>
@@ -481,14 +479,12 @@
                 </button>
             </div>
 
-            <!-- ตารางปฏิทิน 7 วัน -->
             <div class="p-3 rounded-2xl theme-box mb-3">
                 <div class="grid grid-cols-7 text-[10px] font-bold text-center mb-2 opacity-70">
                     <span class="text-rose-500">อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span class="text-blue-500">ส</span>
                 </div>
                 <div id="fullCalendarGrid" class="grid grid-cols-7 gap-1 text-xs"></div>
 
-                <!-- คำอธิบายสัญลักษณ์ -->
                 <div class="flex flex-wrap items-center justify-center gap-3 mt-3 pt-2.5 border-t border-dashed border-slate-200/60 text-[9px] theme-text-muted">
                     <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full" style="background-color: var(--accent-color)"></span> มีคิวนัดส่งงาน</span>
                     <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> คิวด่วน 🔥</span>
@@ -496,7 +492,6 @@
                 </div>
             </div>
 
-            <!-- ส่วนแสดงรายการคิวของวันที่เลือก -->
             <div class="flex items-center justify-between mb-2 px-1">
                 <h4 id="selectedDateHeader" class="text-xs font-bold theme-text flex items-center gap-1.5"></h4>
                 <div class="flex items-center gap-1.5">
@@ -513,7 +508,7 @@
         </div>
     </div>
 
-    <!-- Modal เพิ่ม/แก้ไขคิวงาน (ปฏิทินวันที่จ้าง/ส่งงาน + สถานะการชำระเงิน) -->
+    <!-- Modal เพิ่ม/แก้ไขคิวงาน -->
     <div id="queueModal" class="hidden fixed inset-0 bg-slate-900/60 z-[90] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('queueModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
@@ -532,7 +527,6 @@
                     <input type="text" id="queueDetail" placeholder="เช่น ป้ายบช. + โลโก้ร้าน" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
                 </div>
 
-                <!-- สถานะคิวงาน & สถานะการชำระเงิน -->
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="text-[11px] font-bold mb-1 block theme-text">สถานะคิวงาน</label>
@@ -552,7 +546,6 @@
                     </div>
                 </div>
 
-                <!-- วันที่จ้าง & กำหนดส่งงาน (เลือกจากปฏิทิน) -->
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="text-[11px] font-bold mb-1 block theme-text"><i class="fa-regular fa-calendar-plus mr-1 opacity-70"></i>วันที่จ้าง</label>
@@ -579,7 +572,7 @@
         </div>
     </div>
 
-    <!-- Modal เพิ่ม/แก้ไขสินค้า (รองรับทั้งวางลิงก์และอัปโหลดจากเครื่อง) -->
+    <!-- Modal เพิ่ม/แก้ไขสินค้า -->
     <div id="productModal" class="hidden fixed inset-0 bg-slate-900/60 z-[90] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('productModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
@@ -589,7 +582,6 @@
             <input type="hidden" id="prodId">
             <div class="space-y-3">
                 
-                <!-- ช่องใส่รูปภาพสินค้า (วางลิงก์ หรือ เลือกรูปจากเครื่อง) -->
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">รูปภาพสินค้า (วางลิงก์ หรือ เลือกจากเครื่อง) *</label>
                     <div class="flex gap-2">
@@ -599,7 +591,6 @@
                             <input type="file" id="prodFile" accept="image/*" class="hidden" onchange="handleProdFileSelect(event)">
                         </label>
                     </div>
-                    <!-- กรอบแสดงตัวอย่างรูปภาพ -->
                     <div id="prodImagePreviewBox" class="hidden mt-2.5 relative w-24 h-24 rounded-xl overflow-hidden border mx-auto shadow-sm bg-slate-50" style="border-color: var(--accent-bg)">
                         <img id="prodImagePreview" src="" class="w-full h-full object-cover">
                         <button type="button" onclick="clearProdImage()" class="keep-white absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] shadow hover:scale-110 transition" title="ลบรูปภาพ">
@@ -647,13 +638,30 @@
         </div>
     </div>
 
-    <!-- Input Modal -->
+    <!-- 🌟 Input Modal (สำหรับเปลี่ยนภาพปก, ภาพโปรไฟล์, และเปลี่ยนรูปเรทราคา รองรับทั้งวางลิงก์และอัปโหลดจากเครื่อง) 🌟 -->
     <div id="inputModal" class="hidden fixed inset-0 bg-slate-900/60 z-[70] flex justify-center items-center backdrop-blur-sm p-4">
-        <div class="rounded-3xl w-[85%] max-w-[320px] p-6 relative theme-card transition-colors duration-300">
+        <div class="rounded-3xl w-[90%] max-w-[340px] p-6 relative theme-card transition-colors duration-300">
             <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80"><i class="fa-solid fa-xmark"></i></button>
-            <h3 id="inputModalTitle" class="font-bold text-lg mb-4 theme-text">เปลี่ยนรูปภาพ</h3>
-            <input type="text" id="modalInput" placeholder="https://..." class="w-full rounded-xl px-4 py-3 text-sm mb-4 theme-input">
-            <button id="saveInputBtn" class="w-full rounded-xl py-3 text-sm font-medium transition theme-btn-primary hover:opacity-90">บันทึกรูปภาพ</button>
+            <h3 id="inputModalTitle" class="font-bold text-lg mb-3 theme-text">เปลี่ยนรูป</h3>
+            
+            <label class="text-[11px] font-bold mb-1.5 block theme-text">วางลิงก์รูปภาพ หรือ เลือกรูปจากเครื่อง</label>
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="modalInput" oninput="onModalUrlInput()" placeholder="https://..." class="flex-1 rounded-xl px-3 py-2.5 text-xs theme-input">
+                <label class="cursor-pointer px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition shadow-sm theme-btn-secondary hover:opacity-80">
+                    <i class="fa-solid fa-image"></i> เลือกรูป
+                    <input type="file" id="modalFile" accept="image/*" class="hidden" onchange="handleModalFileSelect(event)">
+                </label>
+            </div>
+
+            <!-- กรอบพรีวิวรูปภาพก่อนบันทึก -->
+            <div id="modalImagePreviewBox" class="hidden mb-4 relative w-32 h-32 rounded-2xl overflow-hidden border mx-auto shadow-sm bg-slate-50" style="border-color: var(--accent-bg)">
+                <img id="modalImagePreview" src="" class="w-full h-full object-cover">
+                <button type="button" onclick="clearModalImage()" class="keep-white absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs shadow hover:scale-110 transition" title="ลบรูปภาพ">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <button id="saveInputBtn" class="w-full rounded-xl py-3 text-sm font-bold transition shadow-md theme-btn-primary hover:opacity-90">บันทึกรูปภาพ</button>
         </div>
     </div>
 
@@ -828,11 +836,25 @@
         let selectedReviewRating = 5;
         let uploadedRevBase64 = '';
 
+        // ตัวแปรสำหรับเปลี่ยนรูปหน้าโฮม (ปก, โปรไฟล์, รูปเรทราคา)
+        let currentTargetId = '';
+        let uploadedModalBase64 = '';
+
         // ตัวแปรสำหรับระบบปฏิทิน
         const nowDate = new Date();
         let calViewYear = nowDate.getFullYear();
         let calViewMonth = nowDate.getMonth();
         let selectedCalendarDateStr = null;
+
+        // ดึงรูปภาพหน้าโฮม (coverImg, profileImg, priceImg) จาก Firebase แบบ Real-time
+        db.ref('shopImages').on('value', (snapshot) => {
+            const imgs = snapshot.val();
+            if (imgs) {
+                if (imgs.coverImg && document.getElementById('coverImg')) document.getElementById('coverImg').src = imgs.coverImg;
+                if (imgs.profileImg && document.getElementById('profileImg')) document.getElementById('profileImg').src = imgs.profileImg;
+                if (imgs.priceImg && document.getElementById('priceImg')) document.getElementById('priceImg').src = imgs.priceImg;
+            }
+        });
 
         function openLoginWindow() {
             if(!isAdmin) {
@@ -2204,19 +2226,104 @@
             document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
         });
 
-        let currentTargetId = '';
+        // ==========================================
+        // 🖼️ ระบบเปลี่ยนรูปหน้าโฮม (ปก, โปรไฟล์, เรทราคา) รองรับทั้งลิงก์และอัปโหลดไฟล์
+        // ==========================================
+        function onModalUrlInput() {
+            const url = document.getElementById('modalInput').value.trim();
+            uploadedModalBase64 = '';
+            document.getElementById('modalFile').value = '';
+            document.getElementById('modalInput').placeholder = 'https://...';
+
+            const previewBox = document.getElementById('modalImagePreviewBox');
+            const previewImg = document.getElementById('modalImagePreview');
+            if (url) {
+                previewImg.src = url;
+                previewBox.classList.remove('hidden');
+            } else {
+                previewBox.classList.add('hidden');
+            }
+        }
+
+        function handleModalFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    // ความละเอียด 900px เพื่อให้ภาพปกและตัวหนังสือในเรทราคาคมชัด
+                    const maxDim = 900;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > h && w > maxDim) {
+                        h = Math.round(h * (maxDim / w));
+                        w = maxDim;
+                    } else if (h > maxDim) {
+                        w = Math.round(w * (maxDim / h));
+                        h = maxDim;
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    uploadedModalBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+                    const urlInput = document.getElementById('modalInput');
+                    urlInput.value = '';
+                    urlInput.placeholder = 'อัปโหลดรูปจากเครื่องแล้ว ✓';
+
+                    document.getElementById('modalImagePreview').src = uploadedModalBase64;
+                    document.getElementById('modalImagePreviewBox').classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearModalImage() {
+            uploadedModalBase64 = '';
+            document.getElementById('modalFile').value = '';
+            const urlInput = document.getElementById('modalInput');
+            urlInput.value = '';
+            urlInput.placeholder = 'https://...';
+            document.getElementById('modalImagePreview').src = '';
+            document.getElementById('modalImagePreviewBox').classList.add('hidden');
+        }
+
         function editImage(imgId, title) {
             if(!isAdmin) return; 
             currentTargetId = imgId;
             document.getElementById('inputModalTitle').innerText = title;
-            document.getElementById('modalInput').value = document.getElementById(imgId).src;
+            clearModalImage();
+
+            const currentSrc = document.getElementById(imgId).src;
+            if (currentSrc && currentSrc.startsWith('data:image')) {
+                uploadedModalBase64 = currentSrc;
+                document.getElementById('modalInput').placeholder = 'ใช้รูปที่อัปโหลดไว้ ✓';
+                document.getElementById('modalImagePreview').src = currentSrc;
+                document.getElementById('modalImagePreviewBox').classList.remove('hidden');
+            } else if (currentSrc) {
+                document.getElementById('modalInput').value = currentSrc;
+                document.getElementById('modalImagePreview').src = currentSrc;
+                document.getElementById('modalImagePreviewBox').classList.remove('hidden');
+            }
+
             document.getElementById('inputModal').classList.remove('hidden');
             document.getElementById('saveInputBtn').onclick = function() {
-                const newUrl = document.getElementById('modalInput').value;
-                if(newUrl) document.getElementById(currentTargetId).src = newUrl;
+                const finalImg = uploadedModalBase64 || document.getElementById('modalInput').value.trim();
+                if(finalImg) {
+                    document.getElementById(currentTargetId).src = finalImg;
+                    // บันทึกลง Firebase เพื่อให้ทุกคนเห็นรูปปก/โปรไฟล์/เรทราคาตรงกัน
+                    db.ref('shopImages/' + currentTargetId).set(finalImg);
+                }
                 document.getElementById('inputModal').classList.add('hidden');
             };
         }
+
         function openSocialModal() { document.getElementById('socialModal').classList.remove('hidden'); }
         function saveSocials() { document.getElementById('socialModal').classList.add('hidden'); }
     </script>
