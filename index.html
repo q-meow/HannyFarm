@@ -3,59 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบธีม สินค้า คิวงาน ปฏิทิน & รีวิว</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบครบวงจร</title>
+
+    <!-- นำเข้า Tailwind CSS สำหรับจัดหน้าเว็บ และ Font Awesome สำหรับไอคอน -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- นำเข้าไลบรารีวงกลมสี (Pickr) -->
+    <!-- นำเข้าไลบรารีวงกลมเลือกสี (Pickr) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 
-    <!-- นำเข้าไลบรารี Firebase -->
+    <!-- นำเข้าไลบรารีฐานข้อมูล Firebase Realtime Database -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     
+    <!-- ========================================== -->
+    <!-- 🎨 ส่วนที่ 1: CSS กำหนดสไตล์และธีมสีของเว็บไซต์ -->
+    <!-- ========================================== -->
     <style>
+        /* ตัวแปรสีหลักของเว็บไซต์ (จะถูกเปลี่ยนค่าเมื่อแอดมินปรับแต่งสี) */
         :root {
             --bg-color: #ffffff;
             --text-main: #334155;
             --accent-color: rgba(59, 130, 246, 1);
             --accent-bg: #dbeafe;
         }
+
         body {
             font-family: 'Prompt', sans-serif;
             background-color: var(--bg-color); 
             color: var(--text-main); 
             transition: background-color 0.4s ease, color 0.4s ease;
         }
+
+        /* ซ่อนแถบเลื่อน (Scrollbar) เพื่อความมินิมอล */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid var(--accent-bg); transition: all 0.4s ease; }
-
+        /* สไตล์เมื่อแอดมินเข้าสู่โหมดแก้ไข (แสดงกรอบประและปุ่มเปลี่ยนรูป) */
         body.admin-active .editable-img { cursor: pointer; position: relative; }
         body.admin-active .editable-img::after {
-            content: "\f030  เปลี่ยนรูป"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; inset: 0; background: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0; transition: opacity 0.2s; border-radius: inherit;
+            content: "\f030  เปลี่ยนรูป";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: inherit;
         }
         body.admin-active .editable-img:hover::after { opacity: 1; }
         body.admin-active .editable-text { border: 1px dashed #cbd5e1; padding: 2px 4px; border-radius: 4px; cursor: text; }
         body.admin-active .editable-text:hover { background: rgba(0,0,0,0.05); }
         
+        /* ซ่อนปุ่มสำหรับแอดมินไว้ และจะแสดงเมื่อมีคลาส admin-active ที่ body เท่านั้น */
         .admin-only { display: none !important; }
-        body.admin-active .admin-only { display: flex !important; }
+        body.admin-active .admin-only { display: inline-flex !important; }
 
-        /* สไตล์ให้วงกลมสี Pickr กลมดิ๊กสวยงาม */
+        /* ปรับแต่งปุ่มวงกลมเลือกสี Pickr */
         .pickr { display: flex; align-items: center; justify-content: center; }
         .pickr .pcr-button { width: 24px !important; height: 24px !important; border-radius: 50% !important; border: 1px solid #cbd5e1 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
         .pickr .pcr-button::before, .pickr .pcr-button::after { border-radius: 50% !important; }
         .pcr-app { font-family: 'Prompt', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; border-radius: 12px !important; }
         
-        .tag-active { background-color: var(--accent-color) !important; color: white !important; }
+        /* เอฟเฟกต์ตอนลากสลับตำแหน่งการ์ด (Drag & Drop) */
         .dragging { opacity: 0.5; transform: scale(0.95); }
         .drag-over { border: 2px dashed var(--accent-color) !important; }
 
-        /* 🌟 สไตล์การแสดงผลโหมดสว่าง (พื้นหลังขาวสะอาดตา) 🌟 */
+        /* 🌟 สไตล์ของการ์ดและหน้าต่างป๊อปอัพในโหมดสว่าง (Light Mode) 🌟 */
         #mainBody { background-color: var(--bg-color); transition: background-color 0.4s ease; }
         .surface-card { background-color: #ffffff; border: 1px solid #f1f5f9; transition: all 0.3s ease; }
         
@@ -125,11 +147,16 @@
 </head>
 <body id="mainBody" class="pb-28 max-w-md mx-auto shadow-xl min-h-screen relative overflow-x-hidden">
 
+    <!-- เครื่องเล่นเสียงเพลงแบบซ่อน (ควบคุมผ่านปุ่มเล่นเพลงโปรด) -->
+    <audio id="bgAudioPlayer" loop></audio>
+
+    <!-- ปุ่มเข้าสู่ระบบผู้ดูแล (มุมขวาบน) -->
     <button id="openLoginBtn" onclick="openLoginWindow()" class="keep-white absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5" style="color: #334155">
         <i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล
     </button>
 
-    <button id="themeToggleBtn" onclick="toggleThemeModal()" class="keep-white admin-only fixed bottom-[90px] right-5 z-40 w-14 h-14 bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.15)] flex items-center justify-center transition-all duration-300 hover:scale-110" style="border: 3px solid var(--accent-color); color: var(--accent-color);">
+    <!-- ปุ่มลอยสำหรับเปิดหน้าต่างตกแต่งธีมสี (แสดงเฉพาะตอนล็อกอินแอดมิน) -->
+    <button id="themeToggleBtn" onclick="toggleThemeModal()" class="keep-white admin-only fixed bottom-[90px] right-5 z-40 w-14 h-14 bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.15)] items-center justify-center transition-all duration-300 hover:scale-110" style="border: 3px solid var(--accent-color); color: var(--accent-color);">
         <i class="fa-solid fa-palette text-2xl"></i>
     </button>
 
@@ -138,11 +165,13 @@
     <!-- ========================================== -->
     <div id="homeSection" class="block">
         <header class="relative">
-            <!-- 🌟 เอาฟิลเตอร์สี (opacity-80 mix-blend-overlay) ออกเพื่อให้ภาพปกแสดงสีจริง 100% 🌟 -->
+            <!-- ส่วนภาพปก (แสดงสีจริง 100% ไม่มีฟิลเตอร์ทับ) -->
             <div class="h-48 w-full relative overflow-hidden editable-img bg-slate-100" onclick="editImage('coverImg', 'เปลี่ยนภาพปก')">
                 <img id="coverImg" src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
             </div>
+
             <div class="px-6 relative -mt-16">
+                <!-- ส่วนภาพโปรไฟล์ -->
                 <div class="flex items-end justify-between">
                     <div class="relative">
                         <div class="w-32 h-32 rounded-full border-[5px] border-white overflow-hidden shadow-sm bg-white keep-white editable-img" onclick="editImage('profileImg', 'เปลี่ยนภาพโปรไฟล์')">
@@ -150,32 +179,58 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ส่วนชื่อร้าน ป้ายสถานะ Open/Closed และคำอธิบายร้าน -->
                 <div class="mt-4">
-                    <h1 class="text-2xl font-semibold flex items-center gap-2" style="color: var(--text-main)">
-                        <span id="shopName" class="editable-text" contenteditable="false">ชื่อร้าน ป้ายน่ารัก</span>
-                        <span class="text-xs px-2 py-1 rounded-full font-normal editable-text" contenteditable="false" style="background-color: var(--accent-bg); color: var(--accent-color);">เปิดรับงาน (Op)</span>
-                    </h1>
-                    <p class="text-sm mt-2 editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 id="shopName" onblur="saveShopText()" class="text-2xl font-semibold editable-text" contenteditable="false" style="color: var(--text-main)">ชื่อร้าน ป้ายน่ารัก</h1>
+                        
+                        <!-- 🟢🔴 ป้ายแสดงสถานะ Open / Closed อัตโนมัติตามวันและเวลาที่ตั้งไว้ -->
+                        <span id="shopStatusBadge" onclick="onStatusBadgeClick()" class="keep-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm transition">
+                            <span id="shopStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="shopStatusText">Open</span>
+                        </span>
+
+                        <!-- ปุ่มตั้งค่าเวลาเปิด-ปิด (แสดงเฉพาะโหมดแก้ไข) -->
+                        <button onclick="openStatusModal()" class="admin-only keep-white px-2.5 py-1 bg-white border border-dashed border-slate-300 text-slate-500 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" title="ตั้งเวลาเปิด-ปิดร้าน">
+                            <i class="fa-regular fa-clock"></i> ตั้งเวลาเปิด-ปิด
+                        </button>
+                    </div>
+
+                    <!-- แสดงช่วงเวลาทำการย่อยให้ลูกค้าทราบ -->
+                    <p id="shopScheduleHint" class="text-[10px] mt-1 font-medium" style="color: var(--accent-color); opacity: 0.85;"></p>
+
+                    <p id="shopDesc" onblur="saveShopText()" class="text-sm mt-1.5 editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">
                         รับทำป้ายไวนิล โปสเตอร์ โลโก้ สไตล์มินิมอลและน่ารักๆ สามารถใส่รายละเอียดร้านเพิ่มเติมได้ตรงนี้เลยค่ะ
                     </p>
+
+                    <!-- ปุ่มโซเชียลมีเดีย -->
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         <div id="socialIcons" class="flex gap-2">
-                            <a href="#" id="icon-line" class="w-7 h-7 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-line"></i></a>
-                            <a href="#" id="icon-facebook" class="w-7 h-7 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-facebook-f"></i></a>
-                            <a href="#" id="icon-ig" class="w-7 h-7 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-sm transition hover:scale-110 hidden"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="#" id="icon-line" target="_blank" class="w-7 h-7 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-line"></i></a>
+                            <a href="#" id="icon-facebook" target="_blank" class="w-7 h-7 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" id="icon-ig" target="_blank" class="w-7 h-7 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-sm transition hover:scale-110 hidden"><i class="fa-brands fa-instagram"></i></a>
                         </div>
-                        <button id="editSocialBtn" class="admin-only px-3 py-1 bg-white border border-dashed border-slate-300 text-slate-400 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" onclick="openSocialModal()">
+                        <button id="editSocialBtn" class="admin-only keep-white px-3 py-1 bg-white border border-dashed border-slate-300 text-slate-500 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" onclick="openSocialModal()">
                             <i class="fa-solid fa-pen"></i> แก้ไขช่องทาง
                         </button>
                     </div>
-                    <button id="musicToggle" class="mt-3 flex items-center gap-2 text-xs surface-card px-3 py-1.5 rounded-full shadow-sm transition-colors" style="color: var(--accent-color); border: 1px solid var(--accent-bg)">
-                        <i id="musicIcon" class="fa-solid fa-play"></i>
-                        <span id="musicText">เล่นเพลงโปรด</span>
-                    </button>
+
+                    <!-- 🎵 ปุ่มเล่นเพลงโปรด + ปุ่มตั้งค่าเพลงสำหรับแอดมิน -->
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <button id="musicToggle" onclick="togglePlayMusic()" class="flex items-center gap-2 text-xs surface-card px-3.5 py-1.5 rounded-full shadow-sm transition-all hover:scale-105 max-w-[240px]" style="color: var(--accent-color); border: 1px solid var(--accent-bg)">
+                            <i id="musicIcon" class="fa-solid fa-play shrink-0"></i>
+                            <span id="musicText" class="truncate font-medium">เล่นเพลงโปรด</span>
+                        </button>
+                        <button onclick="openMusicModal()" class="admin-only keep-white px-3 py-1.5 bg-white border border-dashed border-slate-300 text-slate-500 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1">
+                            <i class="fa-solid fa-music"></i> ตั้งค่าเพลง
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
+        <!-- ส่วนสรุปจำนวนสินค้า จำนวนคิวงาน และปฏิทินงานมินิ -->
         <section class="px-6 mt-6 flex gap-3.5 items-stretch">
             <!-- ฝั่งซ้าย: จำนวนสินค้า & จำนวนคิวงาน -->
             <div class="w-[44%] flex flex-col gap-3 justify-between">
@@ -215,6 +270,7 @@
             </div>
         </section>
         
+        <!-- ส่วนรูปภาพรายละเอียดการสั่งงาน / เรทราคา -->
         <section class="px-6 mt-8 mb-6">
             <h2 class="font-medium text-lg mb-4 text-center" style="color: var(--text-main)">รายละเอียดการสั่งงาน/เรทราคา</h2>
             <div class="w-full rounded-2xl shadow-sm overflow-hidden surface-card flex items-center justify-center editable-img" onclick="editImage('priceImg', 'เปลี่ยนรูป')">
@@ -229,20 +285,23 @@
     <div id="productsSection" class="hidden px-5 pt-8 min-h-screen">
         <h2 class="text-2xl font-bold mb-4" style="color: var(--text-main)">หมวดหมู่สินค้า</h2>
         
+        <!-- ช่องค้นหาชื่อสินค้า -->
         <div class="relative mb-4">
             <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 opacity-50" style="color: var(--text-main)"></i>
             <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="ค้นหาสินค้า..." class="w-full rounded-full py-3 pl-11 pr-4 text-sm shadow-sm theme-input">
         </div>
 
+        <!-- แถบปุ่มกรองแท็กสินค้าพร้อมจำนวนในวงเล็บ -->
         <div id="tagContainer" class="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-2"></div>
 
         <div class="flex justify-between items-end mb-4">
             <p class="text-sm font-medium" style="color: var(--text-main); opacity: 0.8;">สินค้าทั้งหมด (<span id="totalProductCount">0</span>)</p>
-            <button class="admin-only bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-green-100 transition shadow-sm keep-white" onclick="openProductModal()">
+            <button class="admin-only bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-green-100 transition shadow-sm keep-white items-center gap-1" onclick="openProductModal()">
                 <i class="fa-solid fa-plus"></i> เพิ่มสินค้า
             </button>
         </div>
 
+        <!-- ตารางแสดงการ์ดสินค้า -->
         <div id="productGrid" class="grid grid-cols-2 gap-4 pb-10">
             <div class="col-span-2 text-center py-10 opacity-60 text-sm">
                 <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><br>กำลังโหลดสินค้า...
@@ -295,7 +354,7 @@
 
         <div class="flex justify-between items-end mb-4">
             <p class="text-sm font-medium" style="color: var(--text-main); opacity: 0.8;">รายการคิวทั้งหมด (<span id="totalQueueCount">0</span>)</p>
-            <button class="admin-only bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-green-100 transition shadow-sm keep-white" onclick="openQueueModal()">
+            <button class="admin-only bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-green-100 transition shadow-sm keep-white items-center gap-1" onclick="openQueueModal()">
                 <i class="fa-solid fa-plus"></i> เพิ่มคิวงาน
             </button>
         </div>
@@ -361,7 +420,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- แถบเมนูด้านล่าง (Navigation) -->
+    <!-- 🧭 แถบเมนูนำทางด้านล่าง (Bottom Navigation) -->
     <!-- ========================================== -->
     <nav class="fixed bottom-0 w-full max-w-md bg-white px-4 py-3 rounded-t-3xl flex justify-between items-end shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-30 border-t border-slate-50 transition-colors duration-300" style="color: var(--accent-color)">
         <button onclick="switchTab('products')" class="flex flex-col items-center gap-1 transition w-[18%] pb-1 hover:opacity-70">
@@ -385,8 +444,103 @@
     </nav>
 
     <!-- ========================================== -->
-    <!-- MODALS -->
+    <!-- 🪟 ส่วนที่ 2: หน้าต่างป๊อปอัพต่างๆ (MODALS) -->
     <!-- ========================================== -->
+
+    <!-- 🕒 Modal ตั้งค่าวัน-เวลาเปิดรับงาน (Open / Closed อัตโนมัติ) -->
+    <div id="statusModal" class="hidden fixed inset-0 bg-slate-900/60 z-[95] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('statusModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="font-bold text-lg mb-1 theme-text"><i class="fa-regular fa-clock theme-accent mr-1"></i> ตั้งค่าวัน-เวลาเปิดร้าน</h3>
+            <p class="text-[11px] theme-text-muted mb-4">ระบบจะแสดงป้าย <b>Open</b> หรือ <b>Closed</b> ตามเวลาที่กำหนดอัตโนมัติ</p>
+
+            <div class="space-y-3.5">
+                <!-- เลือกโหมดการทำงาน -->
+                <div>
+                    <label class="text-[11px] font-bold mb-1.5 block theme-text">โหมดการแสดงสถานะร้าน</label>
+                    <select id="statusModeSelect" onchange="toggleScheduleConfigFields()" class="w-full rounded-xl px-3 py-2.5 text-xs font-medium theme-input">
+                        <option value="auto">🕒 เปิด-ปิดอัตโนมัติตามวันและเวลา</option>
+                        <option value="open">🟢 บังคับแสดง Open (เปิดตลอด)</option>
+                        <option value="closed">🔴 บังคับแสดง Closed (ปิดชั่วคราว)</option>
+                    </select>
+                </div>
+
+                <!-- ส่วนตั้งค่าวันและเวลา (แสดงเมื่อเลือกโหมดอัตโนมัติ) -->
+                <div id="scheduleConfigFields" class="space-y-3.5 p-3.5 rounded-2xl theme-box">
+                    <div>
+                        <label class="text-[11px] font-bold mb-2 block theme-text">เลือกวันที่เปิดรับงาน</label>
+                        <div class="grid grid-cols-4 gap-1.5 text-xs">
+                            <label class="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-lg border border-slate-200/70"><input type="checkbox" class="day-checkbox" value="1"> จันทร์</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-lg border border-slate-200/70"><input type="checkbox" class="day-checkbox" value="2"> อังคาร</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-lg border border-slate-200/70"><input type="checkbox" class="day-checkbox" value="3"> พุธ</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-lg border border-slate-200/70"><input type="checkbox" class="day-checkbox" value="4"> พฤหัส</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-lg border border-slate-200/70"><input type="checkbox" class="day-checkbox" value="5"> ศุกร์</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-lg border border-slate-200/70"><input type="checkbox" class="day-checkbox" value="6"> เสาร์</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-lg border border-slate-200/70 col-span-2"><input type="checkbox" class="day-checkbox" value="0"> อาทิตย์</label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[11px] font-bold mb-1 block theme-text">เวลาเปิด (Open)</label>
+                            <input type="time" id="shopOpenTime" value="08:30" class="w-full rounded-xl px-3 py-2 text-xs theme-input cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold mb-1 block theme-text">เวลาปิด (Closed)</label>
+                            <input type="time" id="shopCloseTime" value="00:00" class="w-full rounded-xl px-3 py-2 text-xs theme-input cursor-pointer">
+                        </div>
+                    </div>
+                    <p class="text-[10px] theme-text-muted leading-relaxed">
+                        💡 รองรับเวลาข้ามคืน เช่น ตั้งเปิด <b>08:30</b> ปิด <b>00:00</b> (เที่ยงคืน) ระบบจะแสดง <b>Open</b> ในช่วงเวลาดังกล่าว และเปลี่ยนเป็น <b>Closed</b> นอกเวลาอัตโนมัติค่ะ
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="saveShopStatusConfig()" class="w-full rounded-xl py-3 text-sm font-bold transition shadow-lg mt-5 theme-btn-primary hover:opacity-90">บันทึกเวลาเปิด-ปิด</button>
+        </div>
+    </div>
+
+    <!-- 🎵 Modal ตั้งค่าเพลงโปรด (ใส่ลิงก์เพลง หรือ อัปโหลดไฟล์ MP3 จากเครื่อง) -->
+    <div id="musicModal" class="hidden fixed inset-0 bg-slate-900/60 z-[95] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('musicModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="font-bold text-lg mb-1 theme-text"><i class="fa-solid fa-music theme-accent mr-1"></i> ตั้งค่าเพลงประจำร้าน</h3>
+            <p class="text-[11px] theme-text-muted mb-4">ใส่ชื่อเพลง และเลือกวางลิงก์หรืออัปโหลดไฟล์ .mp3 จากเครื่อง</p>
+
+            <div class="space-y-3.5">
+                <div>
+                    <label class="text-[11px] font-bold mb-1 block theme-text">ชื่อเพลงที่จะแสดงบนปุ่ม *</label>
+                    <input type="text" id="musicTitleInput" placeholder="เช่น Cute BGM - เพลงประจำร้าน" class="w-full rounded-xl px-3 py-2.5 text-xs theme-input">
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-bold mb-1 block theme-text">ลิงก์เพลง (.mp3) หรือ อัปโหลดจากเครื่อง *</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="musicUrlInput" oninput="onMusicUrlInput()" placeholder="https://...ไฟล์.mp3" class="flex-1 rounded-xl px-3 py-2.5 text-xs theme-input">
+                        <label class="cursor-pointer px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition shadow-sm theme-btn-secondary hover:opacity-80">
+                            <i class="fa-solid fa-file-audio"></i> เลือก MP3
+                            <input type="file" id="musicFileInput" accept="audio/mp3,audio/*" class="hidden" onchange="handleMusicFileSelect(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- กรอบแสดงสถานะไฟล์เพลงและตัวทดลองฟัง -->
+                <div id="musicPreviewBox" class="hidden p-3 rounded-2xl theme-box space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span id="musicFileStatusText" class="text-[11px] font-medium theme-text truncate pr-2">พร้อมใช้งาน</span>
+                        <button type="button" onclick="clearMusicSource()" class="text-[10px] text-rose-500 font-bold hover:underline shrink-0">ล้างค่า</button>
+                    </div>
+                    <audio id="musicModalPreviewPlayer" controls class="w-full h-8"></audio>
+                </div>
+            </div>
+
+            <button id="saveMusicBtn" onclick="saveMusicConfig()" class="w-full rounded-xl py-3 text-sm font-bold transition shadow-lg mt-5 theme-btn-primary hover:opacity-90">บันทึกเพลงโปรด</button>
+        </div>
+    </div>
 
     <!-- ⭐ Modal เขียน/แก้ไขรีวิว ⭐ -->
     <div id="reviewModal" class="hidden fixed inset-0 bg-slate-900/60 z-[90] flex justify-center items-center backdrop-blur-sm p-4">
@@ -495,7 +649,7 @@
             <div class="flex items-center justify-between mb-2 px-1">
                 <h4 id="selectedDateHeader" class="text-xs font-bold theme-text flex items-center gap-1.5"></h4>
                 <div class="flex items-center gap-1.5">
-                    <button id="adminAddQueueOnDateBtn" onclick="openQueueModalWithDate()" class="admin-only keep-white bg-green-50 text-green-600 border border-green-200 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-green-100 transition">
+                    <button id="adminAddQueueOnDateBtn" onclick="openQueueModalWithDate()" class="admin-only keep-white bg-green-50 text-green-600 border border-green-200 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-green-100 transition items-center gap-1">
                         <i class="fa-solid fa-plus"></i> เพิ่มคิววันนี้
                     </button>
                     <button onclick="selectCalendarDate(null)" class="text-[10px] font-medium px-2.5 py-1 rounded-full theme-btn-secondary hover:opacity-80 transition">
@@ -669,11 +823,11 @@
     <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/60 z-[70] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-[90%] max-w-[340px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="font-bold mb-1 text-sm theme-text"><i class="fa-solid fa-link theme-accent"></i> SOCIAL LINKS</h3>
+            <h3 class="font-bold mb-1 text-sm theme-text"><i class="fa-solid fa-link theme-accent"></i> ตั้งค่าลิงก์ช่องทางติดต่อ</h3>
             <div class="space-y-4 mt-4">
-                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-line text-green-500"></i> LINE</label><input type="text" id="input-line" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
-                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-facebook text-blue-500"></i> Facebook</label><input type="text" id="input-facebook" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
-                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-instagram text-pink-500"></i> Instagram</label><input type="text" id="input-ig" class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-line text-green-500"></i> LINE URL</label><input type="text" id="input-line" placeholder="https://line.me/..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-facebook text-blue-500"></i> Facebook URL</label><input type="text" id="input-facebook" placeholder="https://facebook.com/..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-instagram text-pink-500"></i> Instagram URL</label><input type="text" id="input-ig" placeholder="https://instagram.com/..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
             </div>
             <button onclick="saveSocials()" class="w-full rounded-xl py-3 text-sm font-medium mt-6 transition theme-btn-primary hover:opacity-90">บันทึก</button>
         </div>
@@ -792,13 +946,19 @@
     </div>
 
 
-    <!-- ⚡️ JAVASCRIPT: โลจิกทั้งหมด ⚡️ -->
+    <!-- ========================================== -->
+    <!-- ⚡️ ส่วนที่ 3: JAVASCRIPT ควบคุมระบบทั้งหมดของเว็บไซต์ -->
+    <!-- ========================================== -->
     <script>
+        // ฟังก์ชันเสริมสำหรับแปลงค่าสี RGB เป็นรหัสสี HEX
         function rgbToHex(r, g, b) { return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase(); }
 
+        // รายชื่อเดือนภาษาไทยแบบย่อและแบบเต็มสำหรับระบบปฏิทินและคิวงาน
         const thaiMonthsShort = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
         const thaiMonthsFull = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+        const thaiDaysShort = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
 
+        // ฟังก์ชันแปลงวันที่จาก YYYY-MM-DD เป็นรูปแบบภาษาไทย (เช่น 31 ต.ค. 69)
         function formatThaiDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
@@ -809,7 +969,7 @@
             return `${day} ${thaiMonthsShort[month] || ''} ${String(year).slice(-2)}`;
         }
 
-        // --- 1. ตั้งค่า Firebase ---
+        // --- 1. ตั้งค่าการเชื่อมต่อฐานข้อมูล Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyBCJ--ekt4btJYce_6MsXC3iDHt5X6b9ag",
             authDomain: "cutesignshop.firebaseapp.com",
@@ -822,19 +982,20 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let isAdmin = false;
-        let isDarkMode = false; 
-        let productsList = []; 
-        let activeTag = 'All'; 
-        let uploadedProdBase64 = ''; 
+        // ตัวแปรสถานะหลักของโปรแกรม
+        let isAdmin = false;            // สถานะล็อกอินแอดมิน
+        let isDarkMode = false;         // สถานะโหมดมืด/สว่าง
+        let productsList = [];          // รายการสินค้าทั้งหมด
+        let activeTag = 'All';          // แท็กสินค้าที่กำลังเลือกดู
+        let uploadedProdBase64 = '';    // เก็บข้อมูลรูปสินค้าจากการอัปโหลด
 
-        let queuesList = [];
-        let activeQueueStatus = 'ทั้งหมด';
+        let queuesList = [];            // รายการคิวงานทั้งหมด
+        let activeQueueStatus = 'ทั้งหมด'; // สถานะคิวงานที่กำลังเลือกดู
 
-        let reviewsList = [];
-        let activeReviewFilter = 'ทั้งหมด';
-        let selectedReviewRating = 5;
-        let uploadedRevBase64 = '';
+        let reviewsList = [];           // รายการรีวิวทั้งหมด
+        let activeReviewFilter = 'ทั้งหมด'; // ตัวกรองรีวิวที่กำลังเลือกดู
+        let selectedReviewRating = 5;   // คะแนนดาวตอนเขียนรีวิว
+        let uploadedRevBase64 = '';     // เก็บข้อมูลรูปรีวิวจากการอัปโหลด
 
         // ตัวแปรสำหรับเปลี่ยนรูปหน้าโฮม (ปก, โปรไฟล์, รูปเรทราคา)
         let currentTargetId = '';
@@ -846,7 +1007,333 @@
         let calViewMonth = nowDate.getMonth();
         let selectedCalendarDateStr = null;
 
-        // ดึงรูปภาพหน้าโฮม (coverImg, profileImg, priceImg) จาก Firebase แบบ Real-time
+        // ==========================================
+        // 🕒 ระบบที่ 1: ระบบตั้งเวลาเปิด-ปิดร้านอัตโนมัติ (Open / Closed)
+        // ==========================================
+        let shopStatusConfig = {
+            mode: 'auto',               // 'auto' | 'open' | 'closed'
+            days: [0, 1, 2, 3, 4, 5, 6], // วันเปิดทำการ (0=อาทิตย์ ถึง 6=เสาร์)
+            openTime: '08:30',          // เวลาเปิด
+            closeTime: '00:00'          // เวลาปิด
+        };
+
+        // ดึงการตั้งค่าเวลาเปิด-ปิดจาก Firebase แบบ Real-time
+        db.ref('shopStatusConfig').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if (val) {
+                shopStatusConfig = {
+                    mode: val.mode || 'auto',
+                    days: Array.isArray(val.days) ? val.days.map(Number) : [0, 1, 2, 3, 4, 5, 6],
+                    openTime: val.openTime || '08:30',
+                    closeTime: val.closeTime || '00:00'
+                };
+            }
+            updateShopOpenStatusUI();
+        });
+
+        // ฟังก์ชันคำนวณว่าขณะนี้ร้านอยู่ในช่วงเวลา Open หรือ Closed
+        function checkIsShopOpenNow() {
+            if (shopStatusConfig.mode === 'open') return true;
+            if (shopStatusConfig.mode === 'closed') return false;
+
+            const now = new Date();
+            const currentDay = now.getDay(); // 0 (อาทิตย์) - 6 (เสาร์)
+            const yesterdayDay = (currentDay + 6) % 7;
+            const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+            const [openH, openM] = (shopStatusConfig.openTime || '08:30').split(':').map(Number);
+            const [closeH, closeM] = (shopStatusConfig.closeTime || '00:00').split(':').map(Number);
+            const openMinutes = openH * 60 + openM;
+            const closeMinutes = closeH * 60 + closeM;
+
+            const openDays = shopStatusConfig.days || [];
+
+            // กรณีเปิด-ปิดภายในวันเดียวกัน (เช่น 08:30 ถึง 22:00)
+            if (closeMinutes > openMinutes) {
+                return openDays.includes(currentDay) && nowMinutes >= openMinutes && nowMinutes < closeMinutes;
+            }
+            // กรณีปิดเที่ยงคืนตรง (00:00) นับตั้งแต่เวลาเปิดจนจบวันนั้น (24:00)
+            if (closeMinutes === 0) {
+                return openDays.includes(currentDay) && nowMinutes >= openMinutes;
+            }
+            // กรณีเปิดข้ามคืนไปถึงเช้ามืดของอีกวัน (เช่น 08:30 ถึง 02:00)
+            const isOpenFromToday = openDays.includes(currentDay) && nowMinutes >= openMinutes;
+            const isOpenFromYesterday = openDays.includes(yesterdayDay) && nowMinutes < closeMinutes;
+            return isOpenFromToday || isOpenFromYesterday;
+        }
+
+        // อัปเดตการแสดงผลป้าย Open / Closed บนหน้าเว็บ
+        function updateShopOpenStatusUI() {
+            const badge = document.getElementById('shopStatusBadge');
+            const dot = document.getElementById('shopStatusDot');
+            const text = document.getElementById('shopStatusText');
+            const hint = document.getElementById('shopScheduleHint');
+            if (!badge || !dot || !text) return;
+
+            const isOpen = checkIsShopOpenNow();
+
+            if (isOpen) {
+                text.innerText = 'Open';
+                badge.className = 'keep-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm transition bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-pointer';
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+            } else {
+                text.innerText = 'Closed';
+                badge.className = 'keep-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm transition bg-rose-50 text-rose-600 border border-rose-200 cursor-pointer';
+                dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+            }
+
+            // แสดงข้อความบอกเวลาเปิด-ปิดด้านล่างชื่อร้าน
+            if (hint) {
+                if (shopStatusConfig.mode === 'auto') {
+                    const daysCount = (shopStatusConfig.days || []).length;
+                    const daysLabel = daysCount === 7 ? 'ทุกวัน' : (shopStatusConfig.days || []).map(d => thaiDaysShort[d]).join(' ');
+                    hint.innerHTML = `<i class="fa-regular fa-clock mr-1"></i>เวลาทำการ: ${daysLabel} (${shopStatusConfig.openTime} - ${shopStatusConfig.closeTime} น.)`;
+                } else if (shopStatusConfig.mode === 'open') {
+                    hint.innerHTML = `<i class="fa-regular fa-circle-check mr-1"></i>เปิดรับงานตลอดเวลา`;
+                } else {
+                    hint.innerHTML = `<i class="fa-regular fa-circle-xmark mr-1"></i>ขณะนี้ปิดรับคิวชั่วคราว`;
+                }
+            }
+        }
+
+        // ตรวจสอบเวลาทุกๆ 30 วินาทีเพื่อสลับ Open / Closed อัตโนมัติโดยไม่ต้องรีเฟรชหน้า
+        setInterval(updateShopOpenStatusUI, 30000);
+
+        // เมื่อคลิกที่ป้าย Open/Closed (ถ้าเป็นแอดมินจะเปิดหน้าต่างตั้งค่าเวลา)
+        function onStatusBadgeClick() {
+            if (isAdmin) openStatusModal();
+        }
+
+        function toggleScheduleConfigFields() {
+            const mode = document.getElementById('statusModeSelect').value;
+            const fields = document.getElementById('scheduleConfigFields');
+            if (mode === 'auto') fields.classList.remove('hidden');
+            else fields.classList.add('hidden');
+        }
+
+        function openStatusModal() {
+            document.getElementById('statusModeSelect').value = shopStatusConfig.mode || 'auto';
+            document.getElementById('shopOpenTime').value = shopStatusConfig.openTime || '08:30';
+            document.getElementById('shopCloseTime').value = shopStatusConfig.closeTime || '00:00';
+
+            const openDays = shopStatusConfig.days || [];
+            document.querySelectorAll('.day-checkbox').forEach(cb => {
+                cb.checked = openDays.includes(parseInt(cb.value, 10));
+            });
+
+            toggleScheduleConfigFields();
+            document.getElementById('statusModal').classList.remove('hidden');
+        }
+
+        function saveShopStatusConfig() {
+            const mode = document.getElementById('statusModeSelect').value;
+            const openTime = document.getElementById('shopOpenTime').value || '08:30';
+            const closeTime = document.getElementById('shopCloseTime').value || '00:00';
+            const selectedDays = [];
+            document.querySelectorAll('.day-checkbox:checked').forEach(cb => {
+                selectedDays.push(parseInt(cb.value, 10));
+            });
+
+            const newConfig = {
+                mode: mode,
+                days: selectedDays,
+                openTime: openTime,
+                closeTime: closeTime
+            };
+
+            db.ref('shopStatusConfig').set(newConfig);
+            document.getElementById('statusModal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 🎵 ระบบที่ 2: ระบบเครื่องเล่นเพลงโปรด (รองรับไฟล์ MP3 & ลิงก์เพลง)
+        // ==========================================
+        let shopMusicConfig = {
+            title: 'เล่นเพลงโปรด',
+            src: ''
+        };
+        let uploadedMusicBase64 = '';
+        let isPlaying = false;
+
+        // ดึงข้อมูลเพลงจาก Firebase แบบ Real-time
+        db.ref('shopMusic').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                shopMusicConfig = {
+                    title: data.title || 'เล่นเพลงโปรด',
+                    src: data.src || ''
+                };
+                const audioEl = document.getElementById('bgAudioPlayer');
+                if (audioEl && shopMusicConfig.src && audioEl.src !== shopMusicConfig.src) {
+                    audioEl.src = shopMusicConfig.src;
+                }
+                updateMusicButtonUI();
+            }
+        });
+
+        // อัปเดตชื่อเพลงและไอคอนบนปุ่มเล่นเพลง
+        function updateMusicButtonUI() {
+            const iconEl = document.getElementById('musicIcon');
+            const textEl = document.getElementById('musicText');
+            if (!iconEl || !textEl) return;
+
+            iconEl.className = isPlaying ? 'fa-solid fa-pause shrink-0 animate-pulse' : 'fa-solid fa-play shrink-0';
+            textEl.innerText = shopMusicConfig.title || 'เล่นเพลงโปรด';
+        }
+
+        // กดปุ่มเล่น / หยุดเพลง
+        function togglePlayMusic() {
+            const audioEl = document.getElementById('bgAudioPlayer');
+            if (!shopMusicConfig.src) {
+                if (isAdmin) {
+                    openMusicModal();
+                } else {
+                    alert('ทางร้านยังไม่ได้ใส่เพลงประกอบค่ะ');
+                }
+                return;
+            }
+
+            if (isPlaying) {
+                audioEl.pause();
+                isPlaying = false;
+                updateMusicButtonUI();
+            } else {
+                audioEl.play().then(() => {
+                    isPlaying = true;
+                    updateMusicButtonUI();
+                }).catch(err => {
+                    console.log(err);
+                    alert('ไม่สามารถเล่นไฟล์เสียงนี้ได้ กรุณาตรวจสอบลิงก์หรือไฟล์ MP3 อีกครั้งค่ะ');
+                });
+            }
+        }
+
+        function openMusicModal() {
+            document.getElementById('musicTitleInput').value = shopMusicConfig.title === 'เล่นเพลงโปรด' ? '' : (shopMusicConfig.title || '');
+            uploadedMusicBase64 = '';
+            document.getElementById('musicFileInput').value = '';
+
+            const urlInput = document.getElementById('musicUrlInput');
+            const previewBox = document.getElementById('musicPreviewBox');
+            const previewPlayer = document.getElementById('musicModalPreviewPlayer');
+            const statusText = document.getElementById('musicFileStatusText');
+
+            if (shopMusicConfig.src && shopMusicConfig.src.startsWith('data:audio')) {
+                uploadedMusicBase64 = shopMusicConfig.src;
+                urlInput.value = '';
+                urlInput.placeholder = 'ใช้ไฟล์ MP3 ที่อัปโหลดไว้ ✓';
+                previewPlayer.src = shopMusicConfig.src;
+                statusText.innerText = 'ไฟล์ MP3 ที่บันทึกไว้ในระบบ';
+                previewBox.classList.remove('hidden');
+            } else if (shopMusicConfig.src) {
+                urlInput.value = shopMusicConfig.src;
+                urlInput.placeholder = 'https://...ไฟล์.mp3';
+                previewPlayer.src = shopMusicConfig.src;
+                statusText.innerText = 'ลิงก์เพลงที่ตั้งค่าไว้';
+                previewBox.classList.remove('hidden');
+            } else {
+                urlInput.value = '';
+                urlInput.placeholder = 'https://...ไฟล์.mp3';
+                previewPlayer.src = '';
+                previewBox.classList.add('hidden');
+            }
+
+            document.getElementById('musicModal').classList.remove('hidden');
+        }
+
+        function onMusicUrlInput() {
+            const url = document.getElementById('musicUrlInput').value.trim();
+            uploadedMusicBase64 = '';
+            document.getElementById('musicFileInput').value = '';
+            document.getElementById('musicUrlInput').placeholder = 'https://...ไฟล์.mp3';
+
+            const previewBox = document.getElementById('musicPreviewBox');
+            const previewPlayer = document.getElementById('musicModalPreviewPlayer');
+            if (url) {
+                previewPlayer.src = url;
+                document.getElementById('musicFileStatusText').innerText = 'ลิงก์เพลงพร้อมใช้งาน';
+                previewBox.classList.remove('hidden');
+            } else {
+                previewPlayer.src = '';
+                previewBox.classList.add('hidden');
+            }
+        }
+
+        // เมื่อเลือกไฟล์ MP3 จากเครื่อง (แปลงเป็น Base64 เพื่อเก็บลง Firebase)
+        function handleMusicFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // ตรวจสอบขนาดไฟล์ไม่ให้เกิน 7MB เพื่อความรวดเร็วในการซิงค์บน Firebase
+            if (file.size > 7 * 1024 * 1024) {
+                alert('ไฟล์ MP3 มีขนาดใหญ่เกิน 7MB กรุณาเลือกไฟล์ขนาดเล็กลง หรือใช้การวางลิงก์แทนนะคะ');
+                event.target.value = '';
+                return;
+            }
+
+            // หากยังไม่ได้ตั้งชื่อเพลง ให้นำชื่อไฟล์มาใส่เป็นชื่อเพลงให้อัตโนมัติ
+            const titleInput = document.getElementById('musicTitleInput');
+            if (!titleInput.value.trim()) {
+                titleInput.value = file.name.replace(/\.[^/.]+$/, '');
+            }
+
+            const saveBtn = document.getElementById('saveMusicBtn');
+            saveBtn.innerText = 'กำลังเตรียมไฟล์เพลง...';
+            saveBtn.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedMusicBase64 = e.target.result;
+                const urlInput = document.getElementById('musicUrlInput');
+                urlInput.value = '';
+                urlInput.placeholder = `อัปโหลด: ${file.name} ✓`;
+
+                document.getElementById('musicFileStatusText').innerText = `ไฟล์: ${file.name}`;
+                document.getElementById('musicModalPreviewPlayer').src = uploadedMusicBase64;
+                document.getElementById('musicPreviewBox').classList.remove('hidden');
+
+                saveBtn.innerText = 'บันทึกเพลงโปรด';
+                saveBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearMusicSource() {
+            uploadedMusicBase64 = '';
+            document.getElementById('musicFileInput').value = '';
+            const urlInput = document.getElementById('musicUrlInput');
+            urlInput.value = '';
+            urlInput.placeholder = 'https://...ไฟล์.mp3';
+            document.getElementById('musicModalPreviewPlayer').src = '';
+            document.getElementById('musicPreviewBox').classList.add('hidden');
+        }
+
+        function saveMusicConfig() {
+            const title = document.getElementById('musicTitleInput').value.trim() || 'เล่นเพลงโปรด';
+            const finalSrc = uploadedMusicBase64 || document.getElementById('musicUrlInput').value.trim();
+
+            const previewPlayer = document.getElementById('musicModalPreviewPlayer');
+            if (previewPlayer) previewPlayer.pause();
+
+            db.ref('shopMusic').set({
+                title: title,
+                src: finalSrc
+            }).then(() => {
+                // หากกำลังเล่นเพลงเก่าอยู่ ให้รีโหลดเพลงใหม่ทันที
+                const audioEl = document.getElementById('bgAudioPlayer');
+                if (audioEl) {
+                    audioEl.pause();
+                    isPlaying = false;
+                    audioEl.src = finalSrc;
+                }
+                updateMusicButtonUI();
+                document.getElementById('musicModal').classList.add('hidden');
+            });
+        }
+
+        // ==========================================
+        // 🏠 ระบบซิงค์ข้อมูลหน้าโฮม (รูปภาพ, ข้อความชื่อร้าน, โซเชียล)
+        // ==========================================
         db.ref('shopImages').on('value', (snapshot) => {
             const imgs = snapshot.val();
             if (imgs) {
@@ -856,6 +1343,62 @@
             }
         });
 
+        db.ref('shopText').on('value', (snapshot) => {
+            const txt = snapshot.val();
+            if (txt) {
+                if (txt.shopName && document.activeElement !== document.getElementById('shopName')) {
+                    document.getElementById('shopName').innerText = txt.shopName;
+                }
+                if (txt.shopDesc && document.activeElement !== document.getElementById('shopDesc')) {
+                    document.getElementById('shopDesc').innerText = txt.shopDesc;
+                }
+            }
+        });
+
+        function saveShopText() {
+            if (!isAdmin) return;
+            db.ref('shopText').set({
+                shopName: document.getElementById('shopName').innerText.trim(),
+                shopDesc: document.getElementById('shopDesc').innerText.trim()
+            });
+        }
+
+        db.ref('shopSocials').on('value', (snapshot) => {
+            const soc = snapshot.val();
+            if (soc) {
+                const lineIcon = document.getElementById('icon-line');
+                const fbIcon = document.getElementById('icon-facebook');
+                const igIcon = document.getElementById('icon-ig');
+
+                if (soc.line) { lineIcon.href = soc.line; lineIcon.classList.remove('hidden'); }
+                if (soc.facebook) { fbIcon.href = soc.facebook; fbIcon.classList.remove('hidden'); }
+                if (soc.ig) { igIcon.href = soc.ig; igIcon.classList.remove('hidden'); } else { igIcon.classList.add('hidden'); }
+            }
+        });
+
+        function openSocialModal() {
+            db.ref('shopSocials').once('value', (snapshot) => {
+                const soc = snapshot.val() || {};
+                document.getElementById('input-line').value = soc.line || '';
+                document.getElementById('input-facebook').value = soc.facebook || '';
+                document.getElementById('input-ig').value = soc.ig || '';
+                document.getElementById('socialModal').classList.remove('hidden');
+            });
+        }
+
+        function saveSocials() {
+            const socData = {
+                line: document.getElementById('input-line').value.trim(),
+                facebook: document.getElementById('input-facebook').value.trim(),
+                ig: document.getElementById('input-ig').value.trim()
+            };
+            db.ref('shopSocials').set(socData);
+            document.getElementById('socialModal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 🧭 ระบบสลับหน้า SPA (เปลี่ยนหน้าโดยไม่เปลี่ยนลิงก์)
+        // ==========================================
         function openLoginWindow() {
             if(!isAdmin) {
                 document.getElementById('loginModal').classList.remove('hidden');
@@ -885,7 +1428,9 @@
             document.getElementById('imageLightboxModal').classList.remove('hidden');
         }
 
-        // --- ระบบจัดการรูปภาพสินค้า ---
+        // ==========================================
+        // 📦 ระบบที่ 3: ระบบจัดการสินค้า (Products Manager)
+        // ==========================================
         function onProdUrlInput() {
             const url = document.getElementById('prodImage').value.trim();
             uploadedProdBase64 = '';
@@ -950,7 +1495,7 @@
             document.getElementById('prodImagePreviewBox').classList.add('hidden');
         }
 
-        // --- ระบบจัดการสินค้า ---
+        // ดึงข้อมูลสินค้าจาก Firebase แบบ Real-time
         db.ref('products').orderByChild('order').on('value', (snapshot) => {
             productsList = [];
             snapshot.forEach(child => { productsList.push({ id: child.key, ...child.val() }); });
@@ -959,6 +1504,7 @@
             renderTags(); filterProducts(); 
         });
 
+        // สร้างปุ่มแท็กหมวดหมู่สินค้าพร้อมตัวเลขจำนวนในวงเล็บ
         function renderTags() {
             const tagContainer = document.getElementById('tagContainer');
             let tagCounts = { 'All': productsList.length };
@@ -977,6 +1523,7 @@
             });
         }
 
+        // กรองและแสดงผลการ์ดสินค้า
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('productGrid');
@@ -1102,7 +1649,7 @@
 
         function deleteProduct(id) { if(confirm("แน่ใจหรือไม่ว่าต้องการลบสินค้านี้?")) db.ref('products/' + id).remove(); }
 
-        // --- ระบบลากวางสินค้า (Drag & Drop) ---
+        // ระบบลากวางสลับลำดับสินค้า (Drag & Drop)
         let dragSrcId = null;
         function handleDragStart(e) { dragSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
         function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
@@ -1121,7 +1668,7 @@
         function handleDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
 
         // ==========================================
-        // 📋 ระบบจัดการคิวงาน (Queue Manager) & ซิงค์ปฏิทิน
+        // 📋 ระบบที่ 4: ระบบจัดการคิวงาน (Queue Manager) & ปฏิทินส่งงาน
         // ==========================================
         db.ref('queues').orderByChild('order').on('value', (snapshot) => {
             queuesList = [];
@@ -1146,15 +1693,13 @@
             }
         });
 
-        // ==========================================
-        // 📅 ระบบปฏิทินงานหน้าโฮม & ป๊อปอัพปฏิทินรายเดือน
-        // ==========================================
         function toDateKey(year, monthIndex, day) {
             const m = String(monthIndex + 1).padStart(2, '0');
             const d = String(day).padStart(2, '0');
             return `${year}-${m}-${d}`;
         }
 
+        // วาดตารางปฏิทินมินิบนการ์ดหน้าโฮม
         function renderMiniCalendar() {
             const grid = document.getElementById('miniCalendarGrid');
             const monthLabel = document.getElementById('miniCalMonthLabel');
@@ -1231,6 +1776,7 @@
             renderFullCalendar();
         }
 
+        // วาดตารางปฏิทินเต็มในหน้าต่างป๊อปอัพ
         function renderFullCalendar() {
             const titleEl = document.getElementById('calModalMonthTitle');
             const grid = document.getElementById('fullCalendarGrid');
@@ -1577,7 +2123,7 @@
             }
         }
 
-        // --- ระบบลากวางคิวงาน (Drag & Drop) ---
+        // ระบบลากวางสลับลำดับคิวงาน (Drag & Drop)
         let dragQueueSrcId = null;
         function handleQueueDragStart(e) { dragQueueSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
         function handleQueueDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
@@ -1598,7 +2144,7 @@
         function handleQueueDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
 
         // ==========================================
-        // ⭐ ระบบจัดการหน้ารีวิว (Reviews Manager)
+        // ⭐ ระบบที่ 5: ระบบจัดการหน้ารีวิว (Reviews Manager)
         // ==========================================
         db.ref('reviews').orderByChild('order').on('value', (snapshot) => {
             reviewsList = [];
@@ -1846,484 +2392,3 @@
             document.getElementById('reviewModalTitle').innerHTML = '<i class="fa-solid fa-pen theme-accent"></i> แก้ไขรีวิว';
             document.getElementById('reviewModal').classList.remove('hidden');
         }
-
-        function saveReview() {
-            const id = document.getElementById('revId').value;
-            const comment = document.getElementById('revComment').value.trim();
-            if (!comment) {
-                alert('กรุณาพิมพ์ข้อความรีวิวก่อนกดบันทึกนะคะ');
-                return;
-            }
-            const finalImage = uploadedRevBase64 || document.getElementById('revImage').value.trim() || '';
-            const today = new Date().toISOString().split('T')[0];
-
-            const reviewData = {
-                author: document.getElementById('revAuthor').value.trim() || 'ลูกค้าที่น่ารัก',
-                service: document.getElementById('revService').value.trim(),
-                comment: comment,
-                rating: selectedReviewRating,
-                image: finalImage
-            };
-
-            if (id) {
-                db.ref('reviews/' + id).update(reviewData);
-            } else {
-                reviewData.date = today;
-                reviewData.order = Date.now();
-                db.ref('reviews').push(reviewData);
-            }
-            document.getElementById('reviewModal').classList.add('hidden');
-        }
-
-        function deleteReview(id) {
-            if (confirm('ต้องการลบรีวิวนี้ใช่หรือไม่?')) {
-                db.ref('reviews/' + id).remove();
-            }
-        }
-
-        // --- ระบบลากวางรีวิว (Drag & Drop) ---
-        let dragRevSrcId = null;
-        function handleReviewDragStart(e) { dragRevSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
-        function handleReviewDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
-        function handleReviewDrop(e) {
-            e.stopPropagation();
-            const targetId = this.dataset.id;
-            if (dragRevSrcId && dragRevSrcId !== targetId) {
-                const srcItem = reviewsList.find(r => r.id === dragRevSrcId);
-                const targetItem = reviewsList.find(r => r.id === targetId);
-                if (srcItem && targetItem) {
-                    const tempOrder = srcItem.order;
-                    db.ref('reviews/' + dragRevSrcId).update({ order: targetItem.order });
-                    db.ref('reviews/' + targetId).update({ order: tempOrder });
-                }
-            }
-            return false;
-        }
-        function handleReviewDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
-
-        // ==========================================
-        // 🎨 ระบบแต่งสี + สวิตช์โหมด สว่าง/มืด (Light/Dark Mode)
-        // ==========================================
-        function updateModeSwitchUI() {
-            const btnLight = document.getElementById('btnLightMode');
-            const btnDark = document.getElementById('btnDarkMode');
-            const paletteLabel = document.getElementById('paletteLabel');
-            
-            document.body.classList.toggle('dark-mode', isDarkMode);
-
-            if(btnLight && btnDark) {
-                if(isDarkMode) {
-                    btnDark.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-btn-primary shadow-sm";
-                    btnLight.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-text-muted hover:opacity-100";
-                    if(paletteLabel) paletteLabel.innerText = "แนะนำเฉดสีที่เข้ากัน (โทนมืด)";
-                } else {
-                    btnLight.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-btn-primary shadow-sm";
-                    btnDark.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-text-muted hover:opacity-100";
-                    if(paletteLabel) paletteLabel.innerText = "แนะนำเฉดสีที่เข้ากัน (โทนสว่าง)";
-                }
-            }
-        }
-
-        function setThemeMode(dark) {
-            isDarkMode = dark;
-            updateModeSwitchUI();
-            
-            const root = getComputedStyle(document.documentElement);
-            const currentAccent = root.getPropertyValue('--accent-color').trim();
-            generateSmartPalette(currentAccent);
-            applySuggestedPalette();
-        }
-
-        function loadLocalTheme() {
-            const saved = localStorage.getItem('myCuteSignActiveTheme');
-            if (saved) {
-                try {
-                    const theme = JSON.parse(saved);
-                    isDarkMode = !!theme.isDark;
-                    const bgToUse = (!isDarkMode && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
-                    const root = document.documentElement;
-                    root.style.setProperty('--bg-color', bgToUse);
-                    root.style.setProperty('--accent-color', theme.accent);
-                    root.style.setProperty('--accent-bg', theme.accentBg);
-                    root.style.setProperty('--text-main', theme.text);
-                    updateModeSwitchUI();
-                } catch(e) {}
-            }
-        }
-        loadLocalTheme(); 
-
-        db.ref('theme/active').on('value', (snapshot) => {
-            const theme = snapshot.val();
-            if (theme && document.getElementById('themeModal').classList.contains('hidden')) {
-                isDarkMode = !!theme.isDark;
-                const bgToUse = (!isDarkMode && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
-                const root = document.documentElement;
-                root.style.setProperty('--bg-color', bgToUse);
-                root.style.setProperty('--accent-color', theme.accent);
-                root.style.setProperty('--accent-bg', theme.accentBg);
-                root.style.setProperty('--text-main', theme.text);
-                updateModeSwitchUI();
-                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify({ ...theme, bg: bgToUse }));
-            }
-        });
-
-        db.ref('theme/active').once('value', (snapshot) => { if (!snapshot.exists()) saveCurrentTheme(); });
-
-        let saveTimeout;
-        function saveCurrentTheme() {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                const root = getComputedStyle(document.documentElement);
-                const currentTheme = {
-                    bg: root.getPropertyValue('--bg-color').trim(),
-                    accent: root.getPropertyValue('--accent-color').trim(),
-                    accentBg: root.getPropertyValue('--accent-bg').trim(),
-                    text: root.getPropertyValue('--text-main').trim(),
-                    isDark: isDarkMode
-                };
-                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(currentTheme));
-                if(typeof db !== 'undefined') db.ref('theme/active').set(currentTheme).catch(err => console.log(err));
-            }, 150);
-        }
-
-        function settingsClicked() {
-            if(isAdmin) toggleThemeModal();
-            else openLoginWindow();
-        }
-
-        function attemptLogin() {
-            if(document.getElementById('adminPassword').value === '1234') {
-                isAdmin = true;
-                document.body.classList.add('admin-active'); 
-                document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'true'));
-                document.getElementById('loginModal').classList.add('hidden');
-                
-                let btn = document.getElementById('openLoginBtn');
-                btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
-                btn.classList.remove('bg-white/80');
-                btn.classList.add('theme-btn-primary');
-                btn.style.color = "#ffffff";
-                
-                loadCustomThemes();
-                filterProducts();
-                filterQueues();
-                filterReviews();
-            } else alert("รหัสผ่านไม่ถูกต้อง");
-        }
-
-        function logoutAdmin() {
-            isAdmin = false;
-            document.body.classList.remove('admin-active');
-            document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'false'));
-            document.getElementById('themeModal').classList.add('hidden');
-            
-            let btn = document.getElementById('openLoginBtn');
-            btn.innerHTML = '<i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล';
-            btn.className = "keep-white absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5";
-            btn.style.color = "#334155";
-            filterProducts();
-            filterQueues();
-            filterReviews();
-        }
-
-        // 🌟 ตั้งค่าวงกลม Pickr
-        const pickrConfig = {
-            theme: 'nano', swatches: null,
-            components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: true, input: true } }
-        };
-
-        const pickrAccent = Pickr.create({ el: '#pickerAccent', default: '#3b82f6', ...pickrConfig });
-        const pickrBg = Pickr.create({ el: '#pickerBg', default: '#ffffff', ...pickrConfig });
-        const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
-        const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
-
-        function updateRootColor(varName, pickrInstance, hexSpanId, runSmartPalette = false) {
-            const hexColor = pickrInstance.getColor().toHEXA().toString();
-            document.documentElement.style.setProperty(varName, hexColor);
-            if(document.getElementById(hexSpanId)) document.getElementById(hexSpanId).innerText = hexColor;
-            if(runSmartPalette) generateSmartPalette(hexColor);
-            saveCurrentTheme();
-        }
-
-        pickrAccent.on('change', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true)).on('changestop', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true));
-        pickrBg.on('change', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg')).on('changestop', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg'));
-        pickrAccentBg.on('change', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg')).on('changestop', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg'));
-        pickrText.on('change', () => updateRootColor('--text-main', pickrText, 'hexColorText')).on('changestop', () => updateRootColor('--text-main', pickrText, 'hexColorText'));
-
-        function toggleThemeModal() {
-            const modal = document.getElementById('themeModal');
-            if(modal.classList.contains('hidden')) {
-                updateModeSwitchUI();
-                syncPickersWithRoot(); 
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        function syncPickersWithRoot() {
-            const root = getComputedStyle(document.documentElement);
-            const bg = root.getPropertyValue('--bg-color').trim();
-            const accent = root.getPropertyValue('--accent-color').trim();
-            const accentBg = root.getPropertyValue('--accent-bg').trim();
-            const text = root.getPropertyValue('--text-main').trim();
-
-            pickrBg.setColor(bg); pickrAccent.setColor(accent); pickrAccentBg.setColor(accentBg); pickrText.setColor(text);
-            
-            document.getElementById('hexColorBg').innerText = bg;
-            document.getElementById('hexColorAccent').innerText = accent;
-            document.getElementById('hexColorAccentBg').innerText = accentBg;
-            document.getElementById('hexColorText').innerText = text;
-            
-            generateSmartPalette(accent); 
-        }
-
-        function applyPresetWithMode(bg, accent, accentBg, text) {
-            if(isDarkMode) {
-                generateSmartPalette(accent);
-                applySuggestedPalette();
-            } else {
-                applyPresetTheme(bg, accent, accentBg, text, false);
-            }
-        }
-
-        function applyPresetTheme(bg, accent, accentBg, text, darkFlag = isDarkMode) {
-            isDarkMode = darkFlag;
-            updateModeSwitchUI();
-            const root = document.documentElement;
-            root.style.setProperty('--bg-color', bg);
-            root.style.setProperty('--accent-color', accent);
-            root.style.setProperty('--accent-bg', accentBg);
-            root.style.setProperty('--text-main', text);
-            syncPickersWithRoot(); 
-            setTimeout(saveCurrentTheme, 100); 
-        }
-
-        let currentSuggested = {};
-        function parseRGB(colorStr) {
-            let r=0, g=0, b=0, a=1;
-            if(colorStr.startsWith('rgba')) {
-                const parts = colorStr.match(/[\d.]+/g);
-                if(parts && parts.length >= 3) { r = parseInt(parts[0]); g = parseInt(parts[1]); b = parseInt(parts[2]); if(parts.length >= 4) a = parseFloat(parts[3]); }
-            } else if(colorStr.startsWith('rgb')) {
-                const parts = colorStr.match(/[\d.]+/g);
-                if(parts && parts.length >= 3) { r = parseInt(parts[0]); g = parseInt(parts[1]); b = parseInt(parts[2]); }
-            } else if(colorStr.startsWith('#')) {
-                let hex = colorStr.replace('#', '');
-                if(hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-                if(hex.length === 8) { r = parseInt(hex.substring(0,2), 16); g = parseInt(hex.substring(2,4), 16); b = parseInt(hex.substring(4,6), 16); a = parseInt(hex.substring(6,8), 16) / 255; }
-                else { r = parseInt(hex.substring(0,2), 16); g = parseInt(hex.substring(2,4), 16); b = parseInt(hex.substring(4,6), 16); }
-            }
-            return {r, g, b, a};
-        }
-
-        function RGBToHSL(r, g, b) {
-            r /= 255; g /= 255; b /= 255;
-            let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
-            if (delta == 0) h = 0; else if (cmax == r) h = ((g - b) / delta) % 6; else if (cmax == g) h = (b - r) / delta + 2; else h = (r - g) / delta + 4;
-            h = Math.round(h * 60); if (h < 0) h += 360; l = (cmax + cmin) / 2; s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-            return {h, s: +(s * 100).toFixed(1), l: +(l * 100).toFixed(1)};
-        }
-
-        function HSLToHex(h, s, l) {
-            s /= 100; l /= 100;
-            let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
-            if (0 <= h && h < 60) { r = c; g = x; b = 0; } else if (60 <= h && h < 120) { r = x; g = c; b = 0; } else if (120 <= h && h < 180) { r = 0; g = c; b = x; } else if (180 <= h && h < 240) { r = 0; g = x; b = c; } else if (240 <= h && h < 300) { r = x; g = 0; b = c; } else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
-            r = Math.round((r + m) * 255); g = Math.round((g + m) * 255); b = Math.round((b + m) * 255);
-            return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
-        }
-
-        function generateSmartPalette(baseHex) {
-            const rgb = parseRGB(baseHex);
-            const hsl = RGBToHSL(rgb.r, rgb.g, rgb.b);
-            let textCol, accentBgCol, bgCol, accentCol = baseHex;
-
-            if (!isDarkMode) {
-                textCol = HSLToHex(hsl.h, hsl.s, Math.max(15, hsl.l - 30));
-                accentBgCol = HSLToHex(hsl.h, Math.min(75, hsl.s), 92);
-                bgCol = "#FFFFFF";
-            } else {
-                bgCol = HSLToHex(hsl.h, Math.min(35, hsl.s), 11);
-                accentBgCol = HSLToHex(hsl.h, Math.min(45, hsl.s), 22);
-                textCol = HSLToHex(hsl.h, Math.min(25, hsl.s), 93);
-            }
-            
-            currentSuggested = { text: textCol, accent: accentCol, accentBg: accentBgCol, bg: bgCol };
-
-            document.getElementById('suggestedPaletteContainer').innerHTML = `
-                <div class="flex-1 transition-colors duration-300" style="background-color: ${textCol}" title="สีตัวอักษร"></div>
-                <div class="flex-1 transition-colors duration-300" style="background-color: ${accentCol}" title="สีหลัก"></div>
-                <div class="flex-1 transition-colors duration-300" style="background-color: ${accentBgCol}" title="สีพื้นหลังป้าย"></div>
-                <div class="flex-1 transition-colors duration-300" style="background-color: ${bgCol}" title="สีพื้นหลังเว็บ"></div>
-            `;
-        }
-
-        function applySuggestedPalette() { 
-            applyPresetTheme(currentSuggested.bg, currentSuggested.accent, currentSuggested.accentBg, currentSuggested.text, isDarkMode); 
-        }
-
-        function saveCustomTheme() {
-            const themeName = prompt("ตั้งชื่อธีมใหม่ของคุณ:");
-            if(!themeName) return;
-            const root = getComputedStyle(document.documentElement);
-            const newTheme = {
-                id: Date.now().toString(),
-                name: themeName,
-                bg: root.getPropertyValue('--bg-color').trim(),
-                accent: root.getPropertyValue('--accent-color').trim(),
-                accentBg: root.getPropertyValue('--accent-bg').trim(),
-                text: root.getPropertyValue('--text-main').trim(),
-                isDark: isDarkMode
-            };
-            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
-            savedThemes.push(newTheme);
-            localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
-            loadCustomThemes();
-        }
-
-        function loadCustomThemes() {
-            const container = document.getElementById('myThemesContainer');
-            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
-            if(savedThemes.length === 0) {
-                container.innerHTML = '<span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span>';
-                return;
-            }
-            container.innerHTML = ''; 
-            savedThemes.forEach(theme => {
-                const btn = document.createElement('button');
-                btn.className = "px-3 py-1.5 rounded-full text-xs font-medium border shadow-sm transition flex items-center gap-1.5 theme-btn-secondary hover:opacity-80";
-                const modeIcon = theme.isDark ? '<i class="fa-solid fa-moon text-[9px] opacity-70"></i>' : '';
-                btn.innerHTML = `<div class="w-2 h-2 rounded-full shadow-inner" style="background-color: ${theme.accent}"></div> ${modeIcon} ${theme.name}`;
-                btn.onclick = () => {
-                    const bgToApply = (!theme.isDark && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
-                    applyPresetTheme(bgToApply, theme.accent, theme.accentBg, theme.text, !!theme.isDark);
-                };
-                
-                const delBtn = document.createElement('span');
-                delBtn.className = "text-[9px] theme-accent hover:text-red-500 ml-1";
-                delBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-                delBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    if(confirm(`ต้องการลบธีม "${theme.name}" ใช่หรือไม่?`)) {
-                        savedThemes = savedThemes.filter(t => t.id !== theme.id);
-                        localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
-                        loadCustomThemes();
-                    }
-                };
-                btn.appendChild(delBtn);
-                container.appendChild(btn);
-            });
-        }
-        window.onload = () => { 
-            if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); 
-            renderMiniCalendar();
-        };
-
-        let isPlaying = false;
-        document.getElementById('musicToggle').addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            document.getElementById('musicIcon').className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
-            document.getElementById('musicText').innerText = isPlaying ? "กำลังเล่น..." : "เล่นเพลงโปรด";
-        });
-
-        // ==========================================
-        // 🖼️ ระบบเปลี่ยนรูปหน้าโฮม (ปก, โปรไฟล์, เรทราคา) รองรับทั้งลิงก์และอัปโหลดไฟล์
-        // ==========================================
-        function onModalUrlInput() {
-            const url = document.getElementById('modalInput').value.trim();
-            uploadedModalBase64 = '';
-            document.getElementById('modalFile').value = '';
-            document.getElementById('modalInput').placeholder = 'https://...';
-
-            const previewBox = document.getElementById('modalImagePreviewBox');
-            const previewImg = document.getElementById('modalImagePreview');
-            if (url) {
-                previewImg.src = url;
-                previewBox.classList.remove('hidden');
-            } else {
-                previewBox.classList.add('hidden');
-            }
-        }
-
-        function handleModalFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxDim = 900;
-                    let w = img.width;
-                    let h = img.height;
-                    if (w > h && w > maxDim) {
-                        h = Math.round(h * (maxDim / w));
-                        w = maxDim;
-                    } else if (h > maxDim) {
-                        w = Math.round(w * (maxDim / h));
-                        h = maxDim;
-                    }
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-
-                    uploadedModalBase64 = canvas.toDataURL('image/jpeg', 0.85);
-
-                    const urlInput = document.getElementById('modalInput');
-                    urlInput.value = '';
-                    urlInput.placeholder = 'อัปโหลดรูปจากเครื่องแล้ว ✓';
-
-                    document.getElementById('modalImagePreview').src = uploadedModalBase64;
-                    document.getElementById('modalImagePreviewBox').classList.remove('hidden');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearModalImage() {
-            uploadedModalBase64 = '';
-            document.getElementById('modalFile').value = '';
-            const urlInput = document.getElementById('modalInput');
-            urlInput.value = '';
-            urlInput.placeholder = 'https://...';
-            document.getElementById('modalImagePreview').src = '';
-            document.getElementById('modalImagePreviewBox').classList.add('hidden');
-        }
-
-        function editImage(imgId, title) {
-            if(!isAdmin) return; 
-            currentTargetId = imgId;
-            document.getElementById('inputModalTitle').innerText = title;
-            clearModalImage();
-
-            const currentSrc = document.getElementById(imgId).src;
-            if (currentSrc && currentSrc.startsWith('data:image')) {
-                uploadedModalBase64 = currentSrc;
-                document.getElementById('modalInput').placeholder = 'ใช้รูปที่อัปโหลดไว้ ✓';
-                document.getElementById('modalImagePreview').src = currentSrc;
-                document.getElementById('modalImagePreviewBox').classList.remove('hidden');
-            } else if (currentSrc) {
-                document.getElementById('modalInput').value = currentSrc;
-                document.getElementById('modalImagePreview').src = currentSrc;
-                document.getElementById('modalImagePreviewBox').classList.remove('hidden');
-            }
-
-            document.getElementById('inputModal').classList.remove('hidden');
-            document.getElementById('saveInputBtn').onclick = function() {
-                const finalImg = uploadedModalBase64 || document.getElementById('modalInput').value.trim();
-                if(finalImg) {
-                    document.getElementById(currentTargetId).src = finalImg;
-                    db.ref('shopImages/' + currentTargetId).set(finalImg);
-                }
-                document.getElementById('inputModal').classList.add('hidden');
-            };
-        }
-
-        function openSocialModal() { document.getElementById('socialModal').classList.remove('hidden'); }
-        function saveSocials() { document.getElementById('socialModal').classList.add('hidden'); }
-    </script>
-</body>
-</html>
