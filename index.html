@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ร้านป้ายสไตล์น่ารัก - ระบบครบวงจร & แต่งหน้าโฮมอิสระ</title>
+    <title>ร้านป้ายสไตล์น่ารัก - ระบบครบวงจร & ยกย้ายวางหน้าโฮมอิสระ</title>
 
-    <!-- นำเข้า Tailwind CSS สำหรับจัดหน้าเว็บ และ Font Awesome 6.5.1 สำหรับไอคอนโซเชียลและสัญลักษณ์ต่างๆ -->
+    <!-- นำเข้า Tailwind CSS สำหรับจัดหน้าเว็บ และ Font Awesome 6.5.1 สำหรับไอคอน -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -14,15 +14,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 
+    <!-- นำเข้าไลบรารี SortableJS สำหรับระบบ "ยกย้ายวาง (Drag & Drop)" ลื่นไหลทั้งเมาส์และหน้าจอสัมผัส -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
     <!-- นำเข้าไลบรารีฐานข้อมูล Firebase Realtime Database -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     
     <!-- ========================================== -->
-    <!-- 🎨 ส่วนที่ 1: CSS กำหนดสไตล์ ธีมสี และลูกเล่นแอนิเมชัน -->
+    <!-- 🎨 ส่วนที่ 1: CSS กำหนดสไตล์ ธีมสี และเอฟเฟกต์ยกย้ายวาง -->
     <!-- ========================================== -->
     <style>
-        /* ตัวแปรสีหลักของเว็บไซต์ (จะถูกเปลี่ยนค่าเมื่อแอดมินปรับแต่งสี) */
+        /* ตัวแปรสีหลักของเว็บไซต์ (เปลี่ยนค่าตามที่แอดมินตั้งค่า) */
         :root {
             --bg-color: #ffffff;
             --text-main: #334155;
@@ -41,7 +44,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* สไตล์การเลื่อนซ้าย-ขวาแบบสมูทและล็อกกึ่งกลางภาพ (Snap Scroll) */
+        /* สไตล์การเลื่อนซ้าย-ขวาแบบสมูท (Snap Scroll) */
         .snap-carousel {
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
@@ -59,7 +62,7 @@
         .marquee-track {
             display: inline-block;
             white-space: nowrap;
-            animation: marqueeScroll 16s linear infinite;
+            animation: marqueeScroll 15s linear infinite;
         }
         .marquee-track:hover {
             animation-play-state: paused;
@@ -87,11 +90,42 @@
         body.admin-active .editable-text { border: 1px dashed #cbd5e1; padding: 2px 4px; border-radius: 4px; cursor: text; }
         body.admin-active .editable-text:hover { background: rgba(0,0,0,0.05); }
         
-        /* ซ่อนปุ่มสำหรับแอดมินไว้ และจะแสดงเมื่อมีคลาส admin-active ที่ body เท่านั้น */
+        /* ซ่อนปุ่มและแถบควบคุมของแอดมินเมื่อไม่ได้อยู่ในโหมดแก้ไข */
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: inline-flex !important; }
         .admin-block-only { display: none !important; }
         body.admin-active .admin-block-only { display: block !important; }
+        .admin-flex-only { display: none !important; }
+        body.admin-active .admin-flex-only { display: flex !important; }
+
+        /* กรอบรอบแต่ละบล็อกในหน้าโฮมเมื่ออยู่ในโหมดแก้ไข เพื่อให้เห็นขอบเขตชัดเจนตอนลากวาง */
+        body.admin-active .home-draggable-section {
+            padding: 8px;
+            border-radius: 20px;
+            border: 1.5px dashed rgba(148, 163, 184, 0.45);
+            background-color: rgba(248, 250, 252, 0.4);
+            transition: all 0.2s ease;
+        }
+        body.dark-mode.admin-active .home-draggable-section {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* เอฟเฟกต์ของ SortableJS ขณะกำลังยกบล็อกลอยและวางลงตำแหน่งใหม่ */
+        .sortable-ghost {
+            opacity: 0.35 !important;
+            border: 2px dashed var(--accent-color) !important;
+            background-color: var(--accent-bg) !important;
+            border-radius: 20px;
+        }
+        .sortable-chosen {
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2) !important;
+        }
+        .sortable-drag {
+            opacity: 0.95 !important;
+            transform: scale(1.02) rotate(0.5deg);
+            cursor: grabbing !important;
+        }
 
         /* ปรับแต่งปุ่มวงกลมเลือกสี Pickr */
         .pickr { display: flex; align-items: center; justify-content: center; }
@@ -99,7 +133,7 @@
         .pickr .pcr-button::before, .pickr .pcr-button::after { border-radius: 50% !important; }
         .pcr-app { font-family: 'Prompt', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; border-radius: 12px !important; }
         
-        /* เอฟเฟกต์ตอนลากสลับตำแหน่งการ์ด (Drag & Drop) */
+        /* เอฟเฟกต์ตอนลากสลับตำแหน่งการ์ดทั่วไป */
         .dragging { opacity: 0.5; transform: scale(0.95); }
         .drag-over { border: 2px dashed var(--accent-color) !important; }
 
@@ -190,14 +224,13 @@
     <!-- 🏠 หน้าที่ 1: หน้าหลัก (HOME) -->
     <!-- ========================================== -->
     <div id="homeSection" class="block">
+        <!-- ส่วนหัวโปรไฟล์ร้าน (อยู่ด้านบนสุดเสมอ) -->
         <header class="relative">
-            <!-- ส่วนภาพปก (แสดงสีจริง 100% ไม่มีฟิลเตอร์ทับ) -->
             <div class="h-48 w-full relative overflow-hidden editable-img bg-slate-100" onclick="editImage('coverImg', 'เปลี่ยนภาพปก')">
                 <img id="coverImg" src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
             </div>
 
             <div class="px-6 relative -mt-16">
-                <!-- ส่วนภาพโปรไฟล์ -->
                 <div class="flex items-end justify-between">
                     <div class="relative">
                         <div class="w-32 h-32 rounded-full border-[5px] border-white overflow-hidden shadow-sm bg-white keep-white editable-img" onclick="editImage('profileImg', 'เปลี่ยนภาพโปรไฟล์')">
@@ -206,31 +239,29 @@
                     </div>
                 </div>
 
-                <!-- ส่วนชื่อร้าน ป้ายสถานะ Open/Closed และคำอธิบายร้าน -->
                 <div class="mt-4">
                     <div class="flex flex-wrap items-center gap-2">
                         <h1 id="shopName" onblur="saveShopText()" class="text-2xl font-semibold editable-text" contenteditable="false" style="color: var(--text-main)">ชื่อร้าน ป้ายน่ารัก</h1>
                         
-                        <!-- 🟢🔴 ป้ายแสดงสถานะ Open / Closed อัตโนมัติตามวันและเวลาที่ตั้งไว้ -->
+                        <!-- ป้ายแสดงสถานะ Open / Closed อัตโนมัติตามวันและเวลา -->
                         <span id="shopStatusBadge" onclick="onStatusBadgeClick()" class="keep-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm transition">
                             <span id="shopStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span id="shopStatusText">Open</span>
                         </span>
 
                         <!-- ปุ่มตั้งค่าเวลาเปิด-ปิด (แสดงเฉพาะโหมดแก้ไข) -->
-                        <button onclick="openStatusModal()" class="admin-only keep-white px-2.5 py-1 bg-white border border-dashed border-slate-300 text-slate-500 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" title="ตั้งเวลาเปิด-ปิดร้าน">
+                        <button onclick="openStatusModal()" class="admin-only keep-white px-2.5 py-1 bg-white border border-dashed border-slate-300 text-slate-500 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1">
                             <i class="fa-regular fa-clock"></i> ตั้งเวลาเปิด-ปิด
                         </button>
                     </div>
 
-                    <!-- แสดงช่วงเวลาทำการย่อยให้ลูกค้าทราบ -->
                     <p id="shopScheduleHint" class="text-[10px] mt-1 font-medium" style="color: var(--accent-color); opacity: 0.85;"></p>
 
                     <p id="shopDesc" onblur="saveShopText()" class="text-sm mt-1.5 editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.8;">
                         รับทำป้ายไวนิล โปสเตอร์ โลโก้ สไตล์มินิมอลและน่ารักๆ สามารถใส่รายละเอียดร้านเพิ่มเติมได้ตรงนี้เลยค่ะ
                     </p>
 
-                    <!-- 🌐 ปุ่มโซเชียลมีเดีย (รองรับหลายแพลตฟอร์ม) -->
+                    <!-- ปุ่มโซเชียลมีเดีย -->
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         <div id="socialIcons" class="flex flex-wrap gap-2"></div>
                         <button id="editSocialBtn" class="admin-only keep-white px-3 py-1 bg-white border border-dashed border-slate-300 text-slate-500 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" onclick="openSocialModal()">
@@ -238,7 +269,7 @@
                         </button>
                     </div>
 
-                    <!-- 🎵 ปุ่มเล่นเพลงโปรด + ปุ่มตั้งค่าเพลงสำหรับแอดมิน -->
+                    <!-- ปุ่มเล่นเพลงโปรด + ปุ่มตั้งค่าเพลง -->
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         <button id="musicToggle" onclick="togglePlayMusic()" class="flex items-center gap-2 text-xs surface-card px-3.5 py-1.5 rounded-full shadow-sm transition-all hover:scale-105 max-w-[240px]" style="color: var(--accent-color); border: 1px solid var(--accent-bg)">
                             <i id="musicIcon" class="fa-solid fa-play shrink-0"></i>
@@ -252,106 +283,156 @@
             </div>
         </header>
 
-        <!-- ส่วนสรุปจำนวนสินค้า จำนวนคิวงาน และปฏิทินงานมินิ -->
-        <section class="px-6 mt-6 flex gap-3.5 items-stretch">
-            <!-- ฝั่งซ้าย: จำนวนสินค้า & จำนวนคิวงาน -->
-            <div class="w-[44%] flex flex-col gap-3 justify-between">
-                <div onclick="switchTab('products')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition flex-1 flex flex-col justify-center">
-                    <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนสินค้าทั้งหมด</p>
-                    <p class="text-xl font-semibold mt-1" style="color: var(--accent-color)"><span id="homeProductCount">0</span> <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">รายการ</span></p>
-                </div>
-                <div onclick="switchTab('queue')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition flex-1 flex flex-col justify-center">
-                    <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนคิวงานทั้งหมด</p>
-                    <p class="text-xl font-semibold mt-1" style="color: var(--accent-color)"><span id="homeQueueCount">0</span> <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">งาน</span></p>
-                </div>
+        <!-- คำแนะนำการยกย้ายวางเมื่ออยู่ในโหมดแก้ไข -->
+        <div class="admin-block-only px-6 mt-5">
+            <div class="px-3.5 py-2 rounded-2xl bg-slate-800 text-white text-[11px] flex items-center justify-between shadow-sm">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-up-down-left-right text-amber-300"></i>
+                    <span><b>โหมดจัดวางอิสระ:</b> แตะค้างที่แถบหัวบล็อก <i class="fa-solid fa-grip-vertical mx-0.5"></i> เพื่อยกย้ายสลับตำแหน่งได้เลย</span>
+                </span>
             </div>
+        </div>
 
-            <!-- ฝั่งขวา: การ์ดรูปปฏิทินงาน (แตะเพื่อเปิดป๊อปอัพเช็คคิวรายวัน) -->
-            <div onclick="openCalendarModal()" class="flex-1 surface-card rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden cursor-pointer hover:scale-[1.02] transition group">
-                <div class="flex items-center justify-between mb-1">
-                    <h3 class="font-semibold text-xs flex items-center gap-1.5" style="color: var(--accent-color)">
-                        <i class="fa-regular fa-calendar-check"></i> ปฏิทินงาน
-                    </h3>
-                    <span id="miniCalMonthLabel" class="text-[9px] font-bold px-2 py-0.5 rounded-full theme-btn-secondary"></span>
-                </div>
+        <!-- ========================================== -->
+        <!-- 🖐️ พื้นที่รวมทุกโซนบนหน้าโฮมที่สามารถ "ยกย้ายวาง (Drag & Drop)" สลับตำแหน่งกันได้อิสระ -->
+        <!-- ========================================== -->
+        <div id="homeSortableContainer" class="px-6 mt-5 space-y-5">
 
-                <!-- ตารางรูปปฏิทินมินิ -->
-                <div class="my-1">
-                    <div class="grid grid-cols-7 text-[8px] text-center opacity-50 font-medium mb-1">
-                        <span class="text-rose-400">อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span class="text-blue-400">ส</span>
+            <!-- โซนหลักที่ 1: จำนวนสินค้า, จำนวนคิวงาน และปฏิทินงาน -->
+            <div id="section-core-stats" data-section-id="core-stats" class="home-draggable-section">
+                <!-- แถบจับย้ายสำหรับแอดมิน -->
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-800 text-white text-[10px]">
+                    <div class="section-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold">โซนหลัก: สถิติร้าน & ปฏิทินงาน (ลากย้ายได้)</span>
                     </div>
-                    <div id="miniCalendarGrid" class="grid grid-cols-7 gap-0.5 text-[9px] text-center"></div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="nudgeSection('core-stats', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeSection('core-stats', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button id="visBtn-core-stats" onclick="toggleCoreSectionVisibility('core-stats')" class="px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="ซ่อน/แสดงโซนนี้"><i class="fa-solid fa-eye"></i></button>
+                    </div>
                 </div>
 
-                <div class="mt-1.5 pt-1.5 border-t border-dashed border-slate-200/60 flex items-center justify-between text-[9px]" style="color: var(--text-main); opacity: 0.75;">
-                    <span id="miniCalQueueSummary">กำลังโหลด...</span>
-                    <span class="font-semibold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform" style="color: var(--accent-color)">
-                        ดูคิว <i class="fa-solid fa-chevron-right text-[7px]"></i>
-                    </span>
-                </div>
-            </div>
-        </section>
-        
-        <!-- ส่วนรูปภาพรายละเอียดการสั่งงาน / เรทราคา -->
-        <section class="px-6 mt-8 mb-6">
-            <h2 class="font-medium text-lg mb-4 text-center" style="color: var(--text-main)">รายละเอียดการสั่งงาน/เรทราคา</h2>
-            <div class="w-full rounded-2xl shadow-sm overflow-hidden surface-card flex items-center justify-center editable-img" onclick="editImage('priceImg', 'เปลี่ยนรูป')">
-                <img id="priceImg" src="https://images.unsplash.com/photo-1542204625-2dfb7e8cb3cc?q=80&w=800&auto=format&fit=crop" class="w-full h-auto object-contain">
-            </div>
-        </section>
+                <!-- เนื้อหาโซนสถิติและปฏิทิน -->
+                <div id="content-core-stats" class="flex gap-3.5 items-stretch">
+                    <div class="w-[44%] flex flex-col gap-3 justify-between">
+                        <div onclick="switchTab('products')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition flex-1 flex flex-col justify-center">
+                            <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนสินค้าทั้งหมด</p>
+                            <p class="text-xl font-semibold mt-1" style="color: var(--accent-color)"><span id="homeProductCount">0</span> <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">รายการ</span></p>
+                        </div>
+                        <div onclick="switchTab('queue')" class="surface-card rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:scale-[1.02] transition flex-1 flex flex-col justify-center">
+                            <p class="text-[11px]" style="color: var(--text-main); opacity: 0.7;">จำนวนคิวงานทั้งหมด</p>
+                            <p class="text-xl font-semibold mt-1" style="color: var(--accent-color)"><span id="homeQueueCount">0</span> <span class="text-sm font-normal" style="color: var(--text-main); opacity: 0.7;">งาน</span></p>
+                        </div>
+                    </div>
 
-        <!-- ========================================== -->
-        <!-- 🖼️ โซนตัวอย่างงานป้าย (ถัดจากรายละเอียดการสั่งงาน/เรทราคา) -->
-        <!-- รองรับการอัปโหลดหลายรูป เลื่อนซ้าย-ขวาได้ หรือสลับเป็นตาราง 3x3 / 2x2 ได้ -->
-        <!-- ========================================== -->
-        <section class="px-6 mt-8 mb-6">
-            <div class="flex items-center justify-between mb-3">
-                <div>
-                    <h2 id="portfolioTitle" onblur="savePortfolioMeta()" class="font-medium text-lg editable-text" contenteditable="false" style="color: var(--text-main)">ตัวอย่างงานป้าย</h2>
-                    <p id="portfolioSubtitle" onblur="savePortfolioMeta()" class="text-[11px] editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.65;">เลื่อนซ้าย-ขวาเพื่อชมผลงาน หรือแตะที่ภาพเพื่อดูขนาดใหญ่</p>
-                </div>
-
-                <!-- ปุ่มควบคุมสำหรับแอดมิน: สลับรูปแบบการโชว์ & เพิ่มรูปหลายรูป -->
-                <div class="admin-only items-center gap-1.5 shrink-0">
-                    <select id="portfolioLayoutSelect" onchange="changePortfolioLayout(this.value)" class="text-[10px] rounded-full px-2.5 py-1.5 font-medium theme-input cursor-pointer" title="เลือกรูปแบบการแสดงผล">
-                        <option value="carousel">↔️ เลื่อนซ้าย-ขวา</option>
-                        <option value="grid3">🔢 ตาราง 3x3</option>
-                        <option value="grid2">🔲 ตาราง 2x2</option>
-                    </select>
-                    <button onclick="openPortfolioModal()" class="keep-white bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-green-100 transition shadow-sm flex items-center gap-1">
-                        <i class="fa-solid fa-plus"></i> เพิ่มรูปงาน
-                    </button>
+                    <div onclick="openCalendarModal()" class="flex-1 surface-card rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden cursor-pointer hover:scale-[1.02] transition group">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="font-semibold text-xs flex items-center gap-1.5" style="color: var(--accent-color)">
+                                <i class="fa-regular fa-calendar-check"></i> ปฏิทินงาน
+                            </h3>
+                            <span id="miniCalMonthLabel" class="text-[9px] font-bold px-2 py-0.5 rounded-full theme-btn-secondary"></span>
+                        </div>
+                        <div class="my-1">
+                            <div class="grid grid-cols-7 text-[8px] text-center opacity-50 font-medium mb-1">
+                                <span class="text-rose-400">อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span class="text-blue-400">ส</span>
+                            </div>
+                            <div id="miniCalendarGrid" class="grid grid-cols-7 gap-0.5 text-[9px] text-center"></div>
+                        </div>
+                        <div class="mt-1.5 pt-1.5 border-t border-dashed border-slate-200/60 flex items-center justify-between text-[9px]" style="color: var(--text-main); opacity: 0.75;">
+                            <span id="miniCalQueueSummary">กำลังโหลด...</span>
+                            <span class="font-semibold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform" style="color: var(--accent-color)">
+                                ดูคิว <i class="fa-solid fa-chevron-right text-[7px]"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- กล่องแสดงรูปตัวอย่างงานป้าย (มีปุ่มลูกศรซ้าย-ขวาเมื่ออยู่ในโหมดเลื่อนสไลด์) -->
-            <div class="relative group">
-                <button id="portPrevBtn" onclick="scrollPortfolio(-1)" class="keep-white hidden absolute left-1.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 shadow-md text-slate-700 items-center justify-center hover:scale-110 transition">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-                
-                <div id="portfolioDisplayContainer"></div>
+            <!-- โซนหลักที่ 2: รายละเอียดการสั่งงาน / เรทราคา -->
+            <div id="section-core-price" data-section-id="core-price" class="home-draggable-section">
+                <!-- แถบจับย้ายสำหรับแอดมิน -->
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-800 text-white text-[10px]">
+                    <div class="section-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold">โซนหลัก: รายละเอียด/เรทราคา (ลากย้ายได้)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="nudgeSection('core-price', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeSection('core-price', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button id="visBtn-core-price" onclick="toggleCoreSectionVisibility('core-price')" class="px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="ซ่อน/แสดงโซนนี้"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
 
-                <button id="portNextBtn" onclick="scrollPortfolio(1)" class="keep-white hidden absolute right-1.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 shadow-md text-slate-700 items-center justify-center hover:scale-110 transition">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
+                <div id="content-core-price">
+                    <h2 id="priceSectionTitle" onblur="saveShopText()" class="font-medium text-lg mb-3 text-center editable-text" contenteditable="false" style="color: var(--text-main)">รายละเอียดการสั่งงาน/เรทราคา</h2>
+                    <div class="w-full rounded-2xl shadow-sm overflow-hidden surface-card flex items-center justify-center editable-img" onclick="editImage('priceImg', 'เปลี่ยนรูป')">
+                        <img id="priceImg" src="https://images.unsplash.com/photo-1542204625-2dfb7e8cb3cc?q=80&w=800&auto=format&fit=crop" class="w-full h-auto object-contain">
+                    </div>
+                </div>
             </div>
-        </section>
 
-        <!-- ========================================== -->
-        <!-- ✨ โซนบล็อกตกแต่งหน้าโฮมอิสระ (Custom Home Blocks) -->
-        <!-- แอดมินสามารถเพิ่มตัวหนังสือคั่น แถบโชว์รูปหลายแบบ หรือกล่องพับเก็บได้ -->
-        <!-- ========================================== -->
-        <div id="customHomeBlocksContainer" class="px-6 space-y-6 mb-6"></div>
+            <!-- โซนหลักที่ 3: ตัวอย่างงานป้าย (อัปโหลดได้หลายรูป + ลากสลับรูปได้ + เลื่อนซ้ายขวาหรือตาราง 3x3) -->
+            <div id="section-core-portfolio" data-section-id="core-portfolio" class="home-draggable-section">
+                <!-- แถบจับย้ายสำหรับแอดมิน -->
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-800 text-white text-[10px]">
+                    <div class="section-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold">โซนหลัก: ตัวอย่างงานป้าย (ลากย้ายได้)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="nudgeSection('core-portfolio', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeSection('core-portfolio', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button id="visBtn-core-portfolio" onclick="toggleCoreSectionVisibility('core-portfolio')" class="px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="ซ่อน/แสดงโซนนี้"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div id="content-core-portfolio">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <div class="min-w-0">
+                            <h2 id="portfolioTitle" onblur="savePortfolioMeta()" class="font-medium text-lg editable-text" contenteditable="false" style="color: var(--text-main)">ตัวอย่างงานป้าย</h2>
+                            <p id="portfolioSubtitle" onblur="savePortfolioMeta()" class="text-[11px] editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.65;">เลื่อนซ้าย-ขวาเพื่อชมผลงาน หรือแตะที่ภาพเพื่อดูขนาดใหญ่</p>
+                        </div>
+
+                        <!-- ปุ่มควบคุมสำหรับแอดมิน: สลับรูปแบบการโชว์ & เพิ่มรูปหลายรูป -->
+                        <div class="admin-only items-center gap-1.5 shrink-0">
+                            <select id="portfolioLayoutSelect" onchange="changePortfolioLayout(this.value)" class="text-[10px] rounded-full px-2.5 py-1.5 font-medium theme-input cursor-pointer" title="เลือกรูปแบบการแสดงผล">
+                                <option value="carousel">↔️ เลื่อนซ้าย-ขวา</option>
+                                <option value="grid3">🔢 ตาราง 3x3</option>
+                                <option value="grid2">🔲 ตาราง 2x2</option>
+                            </select>
+                            <button onclick="openPortfolioModal()" class="keep-white bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-green-100 transition shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> เพิ่มรูปงาน
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- กล่องแสดงรูปตัวอย่างงานป้าย -->
+                    <div class="relative group">
+                        <button id="portPrevBtn" onclick="scrollPortfolio(-1)" class="keep-white hidden absolute left-1.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 shadow-md text-slate-700 items-center justify-center hover:scale-110 transition">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+                        
+                        <div id="portfolioDisplayContainer"></div>
+
+                        <button id="portNextBtn" onclick="scrollPortfolio(1)" class="keep-white hidden absolute right-1.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 shadow-md text-slate-700 items-center justify-center hover:scale-110 transition">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- บล็อกเสริมทั้งหมดที่แอดมินสร้างเพิ่ม จะถูกแทรกและเรียงลำดับอยู่ใน #homeSortableContainer นี้โดยอัตโนมัติ -->
+        </div>
 
         <!-- แผงควบคุมการเพิ่มลูกเล่นหน้าโฮม (แสดงเฉพาะตอนอยู่ในโหมดแก้ไข) -->
-        <div class="admin-block-only px-6 mb-8">
+        <div class="admin-block-only px-6 mt-6 mb-8">
             <div class="p-4 rounded-3xl border-2 border-dashed text-center space-y-3 transition" style="border-color: var(--accent-color); background-color: var(--accent-bg); opacity: 0.95;">
                 <div class="text-xs font-bold flex items-center justify-center gap-1.5" style="color: var(--accent-color)">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> แต่งหน้าโฮมเพิ่มเติม (เพิ่มบล็อกอิสระ)
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> แต่งหน้าโฮมเพิ่มเติม (เพิ่มแล้วลากย้ายไปวางจุดไหนก็ได้)
                 </div>
                 <p class="text-[10px] opacity-80" style="color: var(--text-main)">
-                    เลือกเพิ่มตัวหนังสือคั่น แถบโชว์ภาพ (ปัดซ้าย-ขวา / ตาราง 3x3) หรือกล่องข้อมูลพับได้
+                    กดเพิ่มบล็อกที่ต้องการ แล้วลากแถบหัวบล็อกไปวางคั่นตรงไหนของหน้าโฮมก็ได้เลย!
                 </p>
                 <div class="flex flex-wrap justify-center gap-2">
                     <button onclick="openCustomBlockModal('text')" class="keep-white px-3 py-2 bg-white rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700">
@@ -362,6 +443,9 @@
                     </button>
                     <button onclick="openCustomBlockModal('faq')" class="keep-white px-3 py-2 bg-white rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700">
                         <i class="fa-solid fa-circle-question text-amber-500"></i> + กล่องพับอ่าน (Q&A)
+                    </button>
+                    <button onclick="openCustomBlockModal('button')" class="keep-white px-3 py-2 bg-white rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-emerald-500"></i> + ปุ่มลิงก์ทางลัด
                     </button>
                 </div>
             </div>
@@ -374,13 +458,11 @@
     <div id="productsSection" class="hidden px-5 pt-8 min-h-screen">
         <h2 class="text-2xl font-bold mb-4" style="color: var(--text-main)">หมวดหมู่สินค้า</h2>
         
-        <!-- ช่องค้นหาชื่อสินค้า -->
         <div class="relative mb-4">
             <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 opacity-50" style="color: var(--text-main)"></i>
             <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="ค้นหาสินค้า..." class="w-full rounded-full py-3 pl-11 pr-4 text-sm shadow-sm theme-input">
         </div>
 
-        <!-- แถบปุ่มกรองแท็กสินค้าพร้อมจำนวนในวงเล็บ -->
         <div id="tagContainer" class="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-2"></div>
 
         <div class="flex justify-between items-end mb-4">
@@ -390,7 +472,6 @@
             </button>
         </div>
 
-        <!-- ตารางแสดงการ์ดสินค้า -->
         <div id="productGrid" class="grid grid-cols-2 gap-4 pb-10">
             <div class="col-span-2 text-center py-10 opacity-60 text-sm">
                 <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><br>กำลังโหลดสินค้า...
@@ -432,13 +513,11 @@
             </div>
         </div>
 
-        <!-- ช่องค้นหาชื่อลูกค้า/รายละเอียดคิว -->
         <div class="relative mb-4">
             <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 opacity-50" style="color: var(--text-main)"></i>
             <input type="text" id="queueSearchInput" onkeyup="filterQueues()" placeholder="ค้นหาชื่อลูกค้า หรือประเภทงาน..." class="w-full rounded-full py-3 pl-11 pr-4 text-sm shadow-sm theme-input">
         </div>
 
-        <!-- แถบกรองสถานะคิวงาน -->
         <div id="queueStatusContainer" class="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-2"></div>
 
         <div class="flex justify-between items-end mb-4">
@@ -448,7 +527,6 @@
             </button>
         </div>
 
-        <!-- รายการการ์ดคิวงาน -->
         <div id="queueList" class="space-y-3 pb-10">
             <div class="text-center py-10 opacity-60 text-sm">
                 <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><br>กำลังโหลดคิวงาน...
@@ -474,7 +552,6 @@
             </button>
         </div>
 
-        <!-- กล่องสรุปคะแนนรีวิว -->
         <div class="surface-card rounded-2xl p-4 shadow-sm mb-4 flex items-center justify-between">
             <div class="flex items-center gap-3.5">
                 <div class="w-14 h-14 rounded-2xl flex flex-col items-center justify-center theme-btn-secondary">
@@ -491,16 +568,13 @@
             </div>
         </div>
 
-        <!-- ช่องค้นหารีวิว -->
         <div class="relative mb-3">
             <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 opacity-50" style="color: var(--text-main)"></i>
             <input type="text" id="reviewSearchInput" onkeyup="filterReviews()" placeholder="ค้นหาชื่อลูกค้า หรือคำในรีวิว..." class="w-full rounded-full py-2.5 pl-11 pr-4 text-xs shadow-sm theme-input">
         </div>
 
-        <!-- แถบกรองคะแนนดาว / รีวิวมีรูป -->
         <div id="reviewFilterContainer" class="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-2"></div>
 
-        <!-- รายการการ์ดรีวิว -->
         <div id="reviewsList" class="space-y-3 pb-10">
             <div class="text-center py-10 opacity-60 text-sm">
                 <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><br>กำลังโหลดรีวิว...
@@ -536,7 +610,7 @@
     <!-- 🪟 ส่วนที่ 2: หน้าต่างป๊อปอัพต่างๆ (MODALS) -->
     <!-- ========================================== -->
 
-    <!-- 🖼️ Modal เพิ่มรูปภาพเข้า "โซนตัวอย่างงานป้าย" (รองรับการเลือกหลายไฟล์พร้อมกัน & วางลิงก์) -->
+    <!-- 🖼️ Modal เพิ่มรูปภาพเข้า "โซนตัวอย่างงานป้าย" (เลือกหลายไฟล์พร้อมกัน & ลากเรียงรูปได้) -->
     <div id="portfolioModal" class="hidden fixed inset-0 bg-slate-900/60 z-[95] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('portfolioModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
@@ -546,14 +620,12 @@
             <p class="text-[11px] theme-text-muted mb-4">เลือกอัปโหลดจากเครื่องได้หลายรูปพร้อมกัน หรือวางลิงก์รูปภาพ</p>
 
             <div class="space-y-3.5">
-                <!-- ปุ่มอัปโหลดหลายรูปจากเครื่อง -->
                 <label class="cursor-pointer w-full py-4 px-3 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 transition hover:opacity-85 theme-btn-secondary" style="border-color: var(--accent-color)">
                     <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
                     <span class="text-xs font-bold">แตะเพื่อเลือกรูปภาพจากเครื่อง (เลือกได้หลายรูป)</span>
                     <input type="file" id="portfolioFilesInput" accept="image/*" multiple class="hidden" onchange="handlePortfolioFilesSelect(event)">
                 </label>
 
-                <!-- หรือเพิ่มผ่านลิงก์รูปภาพ -->
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">หรือวางลิงก์รูปภาพแล้วกดปุ่ม +</label>
                     <div class="flex gap-2">
@@ -564,7 +636,6 @@
                     </div>
                 </div>
 
-                <!-- พรีวิวรูปที่เตรียมบันทึก -->
                 <div>
                     <label class="text-[11px] font-bold mb-1.5 block theme-text">รูปที่เตรียมเพิ่ม (<span id="stagingPortfolioCount">0</span> รูป)</label>
                     <div id="stagingPortfolioGrid" class="grid grid-cols-3 gap-2 max-h-44 overflow-y-auto p-2 rounded-2xl theme-box hide-scrollbar">
@@ -584,18 +655,18 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 id="customBlockModalTitle" class="font-bold text-lg mb-1 theme-text"><i class="fa-solid fa-wand-magic-sparkles theme-accent mr-1"></i> เพิ่มบล็อกตกแต่งหน้าโฮม</h3>
-            <p class="text-[11px] theme-text-muted mb-4">ปรับแต่งโซนข้อมูลและลูกเล่นบนหน้าโฮมได้ตามต้องการ</p>
+            <p class="text-[11px] theme-text-muted mb-4">เพิ่มแล้วสามารถลากย้ายวางสลับตำแหน่งบนหน้าโฮมได้อิสระ</p>
 
             <input type="hidden" id="cbId">
 
             <div class="space-y-3.5">
-                <!-- เลือกประเภทของบล็อก -->
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">ประเภทบล็อก</label>
                     <select id="cbCategorySelect" onchange="onCustomBlockCategoryChange()" class="w-full rounded-xl px-3 py-2 text-xs font-medium theme-input">
                         <option value="text">🎀 ตัวหนังสือคั่น / แถบข้อความวิ่ง / กล่องประกาศ</option>
                         <option value="gallery">🖼️ แถบโชว์รูปภาพ (เลื่อนซ้าย-ขวา / ตาราง 3x3 / 2x2)</option>
                         <option value="faq">💬 กล่องข้อมูลพับเปิด-ปิดได้ (Q&A / กฎร้าน)</option>
+                        <option value="button">🔗 ปุ่มลิงก์ทางลัด (กดไปลิงก์ภายนอก/กลุ่ม)</option>
                     </select>
                 </div>
 
@@ -615,8 +686,8 @@
                         <input type="text" id="cbTextTitle" placeholder="เช่น ✧ โซนงานโลโก้สุดคิ้วท์ ✧ หรือ โปรโมชั่นเดือนนี้!" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold mb-1 block theme-text">ข้อความบรรยายเพิ่มเติม (สำหรับกล่องประกาศ)</label>
-                        <textarea id="cbTextSub" rows="2" placeholder="ใส่รายละเอียดเพิ่มเติม (ถ้ามี)..." class="w-full rounded-xl px-3 py-2 text-xs theme-input resize-none"></textarea>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">ข้อความบรรยายเพิ่มเติม (ถ้ามี)</label>
+                        <textarea id="cbTextSub" rows="2" placeholder="ใส่รายละเอียดเพิ่มเติม..." class="w-full rounded-xl px-3 py-2 text-xs theme-input resize-none"></textarea>
                     </div>
                 </div>
 
@@ -650,7 +721,7 @@
                     </div>
 
                     <div>
-                        <label class="text-[10px] font-bold mb-1 block theme-text-muted">รูปในบล็อกนี้ (<span id="cbGalleryImgCount">0</span> รูป)</label>
+                        <label class="text-[10px] font-bold mb-1 block theme-text-muted">รูปในบล็อกนี้ (<span id="cbGalleryImgCount">0</span> รูป) - ลากสลับตำแหน่งได้</label>
                         <div id="cbGalleryPreviewGrid" class="grid grid-cols-3 gap-2 max-h-36 overflow-y-auto p-2 rounded-2xl theme-box hide-scrollbar"></div>
                     </div>
                 </div>
@@ -664,6 +735,18 @@
                     <div>
                         <label class="text-[11px] font-bold mb-1 block theme-text">เนื้อหาด้านในเมื่อกางออก *</label>
                         <textarea id="cbFaqAnswer" rows="4" placeholder="1. แจ้งรายละเอียดบรีฟงาน...&#10;2. ชำระมัดจำ 50% ก่อนเริ่มงาน..." class="w-full rounded-xl px-3 py-2 text-xs theme-input resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- 4. ตั้งค่าสำหรับบล็อกปุ่มลิงก์ทางลัด -->
+                <div id="cbButtonConfigSection" class="hidden space-y-3">
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">ข้อความบนปุ่ม *</label>
+                        <input type="text" id="cbBtnLabel" placeholder="เช่น 🛒 คลิกเข้ากลุ่มป้ายราคาพิเศษ" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">ลิงก์ปลายทาง (URL) *</label>
+                        <input type="text" id="cbBtnUrl" placeholder="https://..." class="w-full rounded-xl px-3 py-2 text-xs theme-input">
                     </div>
                 </div>
             </div>
@@ -715,9 +798,6 @@
                             <input type="time" id="shopCloseTime" value="00:00" class="w-full rounded-xl px-3 py-2 text-xs theme-input cursor-pointer">
                         </div>
                     </div>
-                    <p class="text-[10px] theme-text-muted leading-relaxed">
-                        💡 รองรับเวลาข้ามคืน เช่น ตั้งเปิด <b>08:30</b> ปิด <b>00:00</b> (เที่ยงคืน) ระบบจะแสดง <b>Open</b> ในช่วงเวลาดังกล่าว และเปลี่ยนเป็น <b>Closed</b> นอกเวลาอัตโนมัติค่ะ
-                    </p>
                 </div>
             </div>
 
@@ -725,7 +805,7 @@
         </div>
     </div>
 
-    <!-- 🎵 Modal ตั้งค่าเพลงโปรด (ใส่ลิงก์เพลง หรือ อัปโหลดไฟล์ MP3 จากเครื่อง) -->
+    <!-- 🎵 Modal ตั้งค่าเพลงโปรด -->
     <div id="musicModal" class="hidden fixed inset-0 bg-slate-900/60 z-[95] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-full max-w-[360px] max-h-[90vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('musicModal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full theme-btn-secondary hover:opacity-80">
@@ -751,7 +831,6 @@
                     </div>
                 </div>
 
-                <!-- กรอบแสดงสถานะไฟล์เพลงและตัวทดลองฟัง -->
                 <div id="musicPreviewBox" class="hidden p-3 rounded-2xl theme-box space-y-2">
                     <div class="flex items-center justify-between">
                         <span id="musicFileStatusText" class="text-[11px] font-medium theme-text truncate pr-2">พร้อมใช้งาน</span>
@@ -958,7 +1037,6 @@
             <h3 class="font-bold text-lg mb-4 theme-text" id="productModalTitle"><i class="fa-solid fa-box theme-accent"></i> เพิ่มสินค้าใหม่</h3>
             <input type="hidden" id="prodId">
             <div class="space-y-3">
-                
                 <div>
                     <label class="text-[11px] font-bold mb-1 block theme-text">รูปภาพสินค้า (วางลิงก์ หรือ เลือกจากเครื่อง) *</label>
                     <div class="flex gap-2">
@@ -1015,7 +1093,7 @@
         </div>
     </div>
 
-    <!-- Input Modal (สำหรับเปลี่ยนภาพปก, ภาพโปรไฟล์, และเปลี่ยนรูปเรทราคา รองรับทั้งวางลิงก์และอัปโหลดจากเครื่อง) -->
+    <!-- Input Modal (เปลี่ยนภาพปก, ภาพโปรไฟล์, และเปลี่ยนรูปเรทราคา) -->
     <div id="inputModal" class="hidden fixed inset-0 bg-slate-900/60 z-[70] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-[90%] max-w-[340px] p-6 relative theme-card transition-colors duration-300">
             <button onclick="document.getElementById('inputModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80"><i class="fa-solid fa-xmark"></i></button>
@@ -1030,7 +1108,6 @@
                 </label>
             </div>
 
-            <!-- กรอบพรีวิวรูปภาพก่อนบันทึก -->
             <div id="modalImagePreviewBox" class="hidden mb-4 relative w-32 h-32 rounded-2xl overflow-hidden border mx-auto shadow-sm bg-slate-50" style="border-color: var(--accent-bg)">
                 <img id="modalImagePreview" src="" class="w-full h-full object-cover">
                 <button type="button" onclick="clearModalImage()" class="keep-white absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs shadow hover:scale-110 transition" title="ลบรูปภาพ">
@@ -1042,7 +1119,7 @@
         </div>
     </div>
 
-    <!-- 🌐 Social Modal (ตั้งค่าลิงก์ช่องทางติดต่อ รองรับการเพิ่ม/ลบและเลือกแพลตฟอร์มได้อิสระ) -->
+    <!-- 🌐 Social Modal (ตั้งค่าลิงก์ช่องทางติดต่อ) -->
     <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/60 z-[70] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-[92%] max-w-[360px] max-h-[88vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80">
@@ -1051,7 +1128,6 @@
             <h3 class="font-bold mb-1 text-base theme-text"><i class="fa-solid fa-link theme-accent mr-1"></i> ตั้งค่าลิงก์ช่องทางติดต่อ</h3>
             <p class="text-[11px] theme-text-muted mb-3">เลือกแพลตฟอร์มและวางลิงก์ (ช่องที่เว้นว่างจะไม่แสดงบนหน้าเว็บ)</p>
 
-            <!-- ปุ่มลัดสำหรับกดเพิ่มโซเชียลยอดฮิตได้ทันที -->
             <div class="mb-3">
                 <span class="text-[10px] font-bold theme-text-muted block mb-1.5">กดเพิ่มด่วน:</span>
                 <div class="flex flex-wrap gap-1.5">
@@ -1063,10 +1139,8 @@
                 </div>
             </div>
 
-            <!-- รายการช่องทางโซเชียลทั้งหมด -->
             <div id="socialInputsContainer" class="space-y-3 max-h-[42vh] overflow-y-auto pr-1 hide-scrollbar"></div>
 
-            <!-- ปุ่มเพิ่มแถวช่องทางใหม่ -->
             <button type="button" onclick="addSocialRow('website', '')" class="w-full mt-3 py-2 rounded-xl text-xs font-bold border border-dashed transition flex items-center justify-center gap-1.5 theme-btn-outline hover:opacity-80">
                 <i class="fa-solid fa-plus text-[10px]"></i> เพิ่มช่องทางติดต่ออื่น
             </button>
@@ -1075,7 +1149,7 @@
         </div>
     </div>
 
-    <!-- 🌟🌟 แผงตกแต่งธีมสี พร้อมสวิตช์โหมด สว่าง-มืด (Theme Modal) 🌟🌟 -->
+    <!-- 🌟🌟 แผงตกแต่งธีมสี พร้อมสวิตช์โหมด สว่าง-มืด (Theme Modal - ห้ามแก้ไขโครงสร้างเดิม) 🌟🌟 -->
     <div id="themeModal" class="hidden fixed inset-0 bg-slate-900/60 z-[80] flex justify-center items-center backdrop-blur-sm p-4">
         <div class="rounded-3xl w-[90%] max-w-[360px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
             <button onclick="toggleThemeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all theme-btn-secondary hover:opacity-80">
@@ -1090,7 +1164,6 @@
                 <p class="text-[11px] theme-text-muted mt-1">ปรับแต่งสีเว็บไซต์และหน้าต่างนี้ตามต้องการ</p>
             </div>
 
-            <!-- ☀️🌙 สวิตช์สลับโหมด สว่าง / มืด สำหรับปรับโทน -->
             <div class="mb-5 p-1.5 rounded-2xl flex items-center relative theme-box">
                 <button id="btnLightMode" onclick="setThemeMode(false)" class="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-btn-primary shadow-sm">
                     <i class="fa-solid fa-sun text-amber-300"></i> โหมดสว่าง
@@ -1100,7 +1173,6 @@
                 </button>
             </div>
             
-            <!-- ⚡ ธีมสำเร็จรูป (โหมดสว่างใช้พื้นหลังสีขาวคลีน #ffffff) -->
             <div class="mb-5">
                 <h4 class="text-xs font-bold mb-3 flex items-center gap-1.5 theme-text"><i class="fa-solid fa-bolt theme-accent"></i> ธีมสำเร็จรูป</h4>
                 <div class="flex flex-wrap gap-2">
@@ -1112,7 +1184,6 @@
                 </div>
             </div>
 
-            <!-- 🌟 ธีมของฉัน -->
             <div class="mb-5">
                 <h4 class="text-xs font-bold mb-3 flex items-center gap-1.5 theme-text"><i class="fa-solid fa-star theme-accent"></i> ธีมของฉัน</h4>
                 <div id="myThemesContainer" class="flex flex-wrap gap-2 text-xs theme-text-muted"><span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span></div>
@@ -1120,7 +1191,6 @@
 
             <div class="w-full h-[1px] my-5 opacity-20" style="background-color: var(--text-main);"></div>
 
-            <!-- 🎨 ปรับแต่งสีด้วย Pickr -->
             <div class="mb-5">
                 <h4 class="text-xs font-bold mb-3 flex items-center gap-1.5 theme-text">
                     <i class="fa-solid fa-fill-drip theme-accent"></i> ปรับแต่งสีเอง (คลิกที่วงกลมสี)
@@ -1161,7 +1231,6 @@
                 </div>
             </div>
 
-            <!-- Smart Palette Guide -->
             <div class="mb-6 p-4 rounded-2xl relative mt-8 transition-colors duration-300 theme-btn-secondary border-none">
                 <div class="keep-white absolute -top-3 left-4 px-2.5 py-0.5 text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm bg-white" style="color: var(--accent-color);">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> <span id="paletteLabel">แนะนำเฉดสีที่เข้ากัน (โทนสว่าง)</span>
@@ -1195,7 +1264,7 @@
         // ฟังก์ชันเสริมสำหรับแปลงค่าสี RGB เป็นรหัสสี HEX
         function rgbToHex(r, g, b) { return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase(); }
 
-        // รายชื่อเดือนภาษาไทยแบบย่อและแบบเต็มสำหรับระบบปฏิทินและคิวงาน
+        // รายชื่อเดือนและวันภาษาไทย
         const thaiMonthsShort = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
         const thaiMonthsFull = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
         const thaiDaysShort = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
@@ -1211,7 +1280,7 @@
             return `${day} ${thaiMonthsShort[month] || ''} ${String(year).slice(-2)}`;
         }
 
-        // ฟังก์ชันช่วยย่อขนาดรูปภาพจากไฟล์ในเครื่องให้เป็น Base64 ที่คมชัดและไม่หนักฐานข้อมูล
+        // ฟังก์ชันช่วยย่อขนาดรูปภาพจากไฟล์ในเครื่องให้เป็น Base64 ที่คมชัดและซิงค์ไว
         function compressImageFileToBase64(file, maxDim = 800, quality = 0.84) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1281,21 +1350,320 @@
         let selectedCalendarDateStr = null;
 
         // ==========================================
-        // 🖼️ ระบบโซนตัวอย่างงานป้าย (Portfolio Showcase ถัดจากเรทราคา)
+        // 🖐️ ระบบจัดการโครงสร้างหน้าโฮมแบบ "ยกย้ายวาง (Unified Sortable Home Layout)"
+        // สามารถลากสลับตำแหน่งได้ทุกโซนทั้งโซนหลักและบล็อกเสริม
+        // ==========================================
+        let homeLayoutConfig = {
+            order: ['core-stats', 'core-price', 'core-portfolio'], // ลำดับโซนทั้งหมดบนหน้าโฮม
+            hidden: {} // เก็บสถานะการซ่อนโซนหลัก เช่น {'core-portfolio': true}
+        };
+        let customHomeBlocks = [];       // รายการบล็อกเสริมทั้งหมด
+        let stagedCbGalleryImages = [];  // เก็บรูปของบล็อกโชว์ภาพในหน้าต่าง Modal
+        let homeSortableInstance = null; // อินสแตนซ์ SortableJS ของหน้าโฮม
+        let portfolioSortableInstance = null; // อินสแตนซ์ SortableJS สำหรับลากสลับรูปในโซนตัวอย่างงาน
+        let cbPreviewSortableInstance = null; // อินสแตนซ์ SortableJS สำหรับลากสลับรูปใน Modal บล็อกเสริม
+
+        // ดึงข้อมูลลำดับการจัดวางหน้าโฮมจาก Firebase
+        db.ref('homeLayoutConfig').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if (val) {
+                homeLayoutConfig = {
+                    order: Array.isArray(val.order) ? val.order : ['core-stats', 'core-price', 'core-portfolio'],
+                    hidden: val.hidden || {}
+                };
+            }
+            applyHomeUnifiedLayout();
+        });
+
+        // ดึงข้อมูลบล็อกเสริมทั้งหมดจาก Firebase
+        db.ref('homeCustomBlocks').orderByChild('order').on('value', (snapshot) => {
+            customHomeBlocks = [];
+            snapshot.forEach(child => {
+                customHomeBlocks.push({ id: child.key, ...child.val() });
+            });
+            applyHomeUnifiedLayout();
+        });
+
+        // ฟังก์ชันรวมโซนหลักและบล็อกเสริมเข้าด้วยกัน แล้วจัดเรียงตามลำดับที่ลากวางไว้
+        function applyHomeUnifiedLayout() {
+            const container = document.getElementById('homeSortableContainer');
+            if (!container) return;
+
+            // 1. ลบบล็อกเสริมเดิมออกก่อนเพื่อสร้างใหม่ให้เป็นปัจจุบัน
+            container.querySelectorAll('.custom-dynamic-section').forEach(el => el.remove());
+
+            // 2. สร้าง DOM ของบล็อกเสริมแต่ละอันแล้วยัดเข้า container
+            customHomeBlocks.forEach((block) => {
+                const sectionId = 'custom-' + block.id;
+                const el = createCustomBlockElement(block, sectionId);
+                container.appendChild(el);
+            });
+
+            // 3. อัปเดตการซ่อน/แสดงของโซนหลัก (Core Sections)
+            ['core-stats', 'core-price', 'core-portfolio'].forEach(coreId => {
+                const secEl = document.getElementById('section-' + coreId);
+                const contentEl = document.getElementById('content-' + coreId);
+                const visBtn = document.getElementById('visBtn-' + coreId);
+                if (!secEl || !contentEl) return;
+
+                const isHidden = !!(homeLayoutConfig.hidden && homeLayoutConfig.hidden[coreId]);
+                if (isHidden) {
+                    if (isAdmin) {
+                        secEl.classList.remove('hidden');
+                        contentEl.classList.add('opacity-40');
+                    } else {
+                        secEl.classList.add('hidden');
+                    }
+                    if (visBtn) {
+                        visBtn.className = 'px-2 py-0.5 rounded bg-rose-500 text-white';
+                        visBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> ซ่อนอยู่';
+                    }
+                } else {
+                    secEl.classList.remove('hidden');
+                    contentEl.classList.remove('opacity-40');
+                    if (visBtn) {
+                        visBtn.className = 'px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white';
+                        visBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+                    }
+                }
+            });
+
+            // 4. จัดเรียงลำดับ DOM ทั้งหมดใน #homeSortableContainer ตาม homeLayoutConfig.order
+            const allChildren = Array.from(container.children);
+            const mapById = {};
+            allChildren.forEach(ch => {
+                const sid = ch.getAttribute('data-section-id');
+                if (sid) mapById[sid] = ch;
+            });
+
+            const finalOrder = [];
+            (homeLayoutConfig.order || []).forEach(sid => {
+                if (mapById[sid]) {
+                    finalOrder.push(sid);
+                    container.appendChild(mapById[sid]);
+                    delete mapById[sid];
+                }
+            });
+            // โซนหรือบล็อกที่เพิ่งสร้างใหม่แล้วยังไม่อยู่ใน order ให้ต่อท้ายอัตโนมัติ
+            Object.keys(mapById).forEach(sid => {
+                finalOrder.push(sid);
+                container.appendChild(mapById[sid]);
+            });
+
+            initOrUpdateHomeSortable();
+        }
+
+        // สร้าง HTML สำหรับบล็อกเสริมแต่ละชิ้น พร้อมแถบจับลาก (Drag Handle)
+        function createCustomBlockElement(block, sectionId) {
+            const wrapper = document.createElement('div');
+            wrapper.id = 'section-' + sectionId;
+            wrapper.setAttribute('data-section-id', sectionId);
+            wrapper.className = 'home-draggable-section custom-dynamic-section';
+
+            const typeLabelMap = {
+                text: 'ตัวหนังสือ/ประกาศ',
+                gallery: 'แถบโชว์รูปภาพ',
+                faq: 'กล่องพับอ่าน Q&A',
+                button: 'ปุ่มลิงก์ทางลัด'
+            };
+            const typeLabel = typeLabelMap[block.category] || 'บล็อกเสริม';
+
+            const adminBar = `
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-800 text-white text-[10px]">
+                    <div class="section-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold truncate max-w-[150px]">บล็อก: ${typeLabel} (ลากย้ายได้)</span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="nudgeSection('${sectionId}', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeSection('${sectionId}', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button onclick="editCustomBlock('${block.id}')" class="px-2 py-0.5 rounded bg-blue-500 hover:bg-blue-600"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                        <button onclick="deleteCustomBlock('${block.id}')" class="px-2 py-0.5 rounded bg-red-500 hover:bg-red-600"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+
+            let contentHTML = '';
+
+            // 1. บล็อกตัวหนังสือคั่น / แถบข้อความวิ่ง / กล่องประกาศ
+            if (block.category === 'text') {
+                const style = block.style || 'divider';
+                if (style === 'divider') {
+                    contentHTML = `
+                        <div class="flex items-center gap-3 py-1">
+                            <div class="flex-1 h-[1.5px] rounded-full" style="background-color: var(--accent-bg)"></div>
+                            <span class="text-xs font-bold px-3.5 py-1 rounded-full theme-btn-secondary shadow-sm">${block.title || ''}</span>
+                            <div class="flex-1 h-[1.5px] rounded-full" style="background-color: var(--accent-bg)"></div>
+                        </div>
+                    `;
+                } else if (style === 'marquee') {
+                    contentHTML = `
+                        <div class="w-full overflow-hidden rounded-full py-2 px-3 shadow-sm flex items-center gap-2 surface-card" style="border: 1px solid var(--accent-bg)">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 theme-btn-primary"><i class="fa-solid fa-bullhorn mr-1"></i>ประกาศ</span>
+                            <div class="overflow-hidden flex-1">
+                                <div class="marquee-track text-xs font-medium" style="color: var(--text-main)">
+                                    ${block.title || ''} ${block.subtitle ? ` — ${block.subtitle}` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (style === 'ribbon') {
+                    contentHTML = `
+                        <div class="text-center py-1">
+                            <div class="inline-block px-6 py-2 rounded-2xl text-xs font-bold shadow-md theme-btn-primary">
+                                <i class="fa-solid fa-star text-amber-200 mr-1"></i> ${block.title || ''} <i class="fa-solid fa-star text-amber-200 ml-1"></i>
+                            </div>
+                            ${block.subtitle ? `<p class="text-[11px] mt-1.5 opacity-75" style="color: var(--text-main)">${block.subtitle}</p>` : ''}
+                        </div>
+                    `;
+                } else {
+                    contentHTML = `
+                        <div class="p-4 rounded-2xl shadow-sm theme-btn-secondary">
+                            <h4 class="font-bold text-sm flex items-center gap-1.5 mb-1" style="color: var(--accent-color)">
+                                <i class="fa-solid fa-bell"></i> ${block.title || ''}
+                            </h4>
+                            ${block.subtitle ? `<p class="text-xs leading-relaxed whitespace-pre-line" style="color: var(--text-main)">${block.subtitle}</p>` : ''}
+                        </div>
+                    `;
+                }
+            }
+            // 2. บล็อกแถบโชว์รูปภาพ (ปัดซ้าย-ขวา, ตาราง 3x3, ตาราง 2x2, แบนเนอร์)
+            else if (block.category === 'gallery') {
+                const imgs = Array.isArray(block.images) ? block.images : [];
+                const layout = block.layout || 'carousel';
+                const titleHTML = block.title ? `<h3 class="font-medium text-base mb-2.5" style="color: var(--text-main)">${block.title}</h3>` : '';
+
+                if (layout === 'carousel') {
+                    const slides = imgs.map(src => `
+                        <div onclick="openLightbox('${src}')" class="snap-item flex-none w-36 h-36 rounded-2xl overflow-hidden surface-card shadow-sm cursor-zoom-in">
+                            <img src="${src}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                    `).join('');
+                    contentHTML = `${titleHTML}<div class="flex gap-2.5 overflow-x-auto hide-scrollbar snap-carousel pb-1">${slides}</div>`;
+                } else if (layout === 'banner') {
+                    const slides = imgs.map(src => `
+                        <div onclick="openLightbox('${src}')" class="snap-item flex-none w-full h-44 rounded-2xl overflow-hidden surface-card shadow-sm cursor-zoom-in">
+                            <img src="${src}" class="w-full h-full object-cover">
+                        </div>
+                    `).join('');
+                    contentHTML = `${titleHTML}<div class="flex gap-3 overflow-x-auto hide-scrollbar snap-carousel pb-1">${slides}</div>`;
+                } else {
+                    const cols = layout === 'grid3' ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-3';
+                    const cells = imgs.map(src => `
+                        <div onclick="openLightbox('${src}')" class="aspect-square rounded-xl overflow-hidden surface-card shadow-sm cursor-zoom-in">
+                            <img src="${src}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                    `).join('');
+                    contentHTML = `${titleHTML}<div class="grid ${cols}">${cells}</div>`;
+                }
+            }
+            // 3. บล็อกกล่องพับเปิด-ปิดข้อมูล (Q&A / กฎการสั่งงาน)
+            else if (block.category === 'faq') {
+                contentHTML = `
+                    <details class="group surface-card rounded-2xl p-3.5 shadow-sm cursor-pointer">
+                        <summary class="font-semibold text-xs flex items-center justify-between list-none" style="color: var(--text-main)">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-circle-info" style="color: var(--accent-color)"></i> ${block.title || 'รายละเอียดเพิ่มเติม'}
+                            </span>
+                            <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180" style="color: var(--accent-color)"></i>
+                        </summary>
+                        <div class="mt-2.5 pt-2.5 border-t border-dashed border-slate-200/70 text-xs leading-relaxed whitespace-pre-line opacity-85" style="color: var(--text-main)">
+                            ${block.subtitle || ''}
+                        </div>
+                    </details>
+                `;
+            }
+            // 4. บล็อกปุ่มลิงก์ทางลัด
+            else if (block.category === 'button') {
+                let href = (block.url || '#').trim();
+                if (href !== '#' && !/^https?:\/\//i.test(href)) href = 'https://' + href;
+                contentHTML = `
+                    <a href="${href}" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2 transition transform hover:scale-[1.02] theme-btn-primary">
+                        <span>${block.title || 'คลิกที่นี่'}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                `;
+            }
+
+            wrapper.innerHTML = adminBar + contentHTML;
+            return wrapper;
+        }
+
+        // เปิดใช้งาน SortableJS บนหน้าโฮมเพื่อให้คลิกค้างที่หัวบล็อกแล้วยกย้ายวางได้ทันที
+        function initOrUpdateHomeSortable() {
+            const container = document.getElementById('homeSortableContainer');
+            if (!container || typeof Sortable === 'undefined') return;
+
+            if (homeSortableInstance) {
+                homeSortableInstance.option('disabled', !isAdmin);
+                return;
+            }
+
+            homeSortableInstance = Sortable.create(container, {
+                handle: '.section-drag-handle',
+                animation: 220,
+                disabled: !isAdmin,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                onEnd: function () {
+                    saveCurrentHomeDOMOrder();
+                }
+            });
+        }
+
+        // บันทึกลำดับโซนบนหน้าโฮมลง Firebase ทันทีที่ปล่อยเมาส์/นิ้ว
+        function saveCurrentHomeDOMOrder() {
+            const container = document.getElementById('homeSortableContainer');
+            if (!container) return;
+            const newOrder = Array.from(container.children)
+                .map(el => el.getAttribute('data-section-id'))
+                .filter(Boolean);
+            homeLayoutConfig.order = newOrder;
+            db.ref('homeLayoutConfig/order').set(newOrder);
+        }
+
+        // ปุ่มขยับบล็อกขึ้น-ลง 1 ขั้น (เผื่อกดด้วยปุ่มนอกจากการลากวาง)
+        function nudgeSection(sectionId, delta) {
+            const container = document.getElementById('homeSortableContainer');
+            if (!container) return;
+            const children = Array.from(container.children);
+            const idx = children.findIndex(el => el.getAttribute('data-section-id') === sectionId);
+            if (idx === -1) return;
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= children.length) return;
+
+            if (delta < 0) {
+                container.insertBefore(children[idx], children[targetIdx]);
+            } else {
+                container.insertBefore(children[targetIdx], children[idx]);
+            }
+            saveCurrentHomeDOMOrder();
+        }
+
+        // ซ่อน/แสดงโซนหลัก (สถิติ, เรทราคา, ตัวอย่างงาน)
+        function toggleCoreSectionVisibility(coreId) {
+            const currentHidden = !!(homeLayoutConfig.hidden && homeLayoutConfig.hidden[coreId]);
+            if (!homeLayoutConfig.hidden) homeLayoutConfig.hidden = {};
+            homeLayoutConfig.hidden[coreId] = !currentHidden;
+            db.ref('homeLayoutConfig/hidden').set(homeLayoutConfig.hidden);
+        }
+
+        // ==========================================
+        // 🖼️ ระบบโซนตัวอย่างงานป้าย (Portfolio Showcase + ลากสลับรูปได้)
         // ==========================================
         let homePortfolioData = {
             title: 'ตัวอย่างงานป้าย',
             subtitle: 'เลื่อนซ้าย-ขวาเพื่อชมผลงาน หรือแตะที่ภาพเพื่อดูขนาดใหญ่',
-            layout: 'carousel', // 'carousel' | 'grid3' | 'grid2'
+            layout: 'carousel',
             images: [
                 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop',
                 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=600&auto=format&fit=crop',
                 'https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=600&auto=format&fit=crop'
             ]
         };
-        let stagedPortfolioImages = []; // เก็บรูปชั่วคราวใน Modal ก่อนกดบันทึก
+        let stagedPortfolioImages = [];
 
-        // ดึงข้อมูลโซนตัวอย่างงานป้ายจาก Firebase แบบ Real-time
         db.ref('homePortfolio').on('value', (snapshot) => {
             const val = snapshot.val();
             if (val) {
@@ -1318,7 +1686,6 @@
             renderPortfolioSection();
         });
 
-        // บันทึกชื่อหัวข้อและคำอธิบายโซนตัวอย่างงานป้าย
         function savePortfolioMeta() {
             if (!isAdmin) return;
             homePortfolioData.title = document.getElementById('portfolioTitle').innerText.trim() || 'ตัวอย่างงานป้าย';
@@ -1329,14 +1696,12 @@
             });
         }
 
-        // สลับรูปแบบการแสดงผลของโซนตัวอย่างงานป้าย (เลื่อนซ้าย-ขวา / ตาราง 3x3 / ตาราง 2x2)
         function changePortfolioLayout(newLayout) {
             homePortfolioData.layout = newLayout;
             db.ref('homePortfolio').update({ layout: newLayout });
             renderPortfolioSection();
         }
 
-        // แสดงผลรูปภาพในโซนตัวอย่างงานป้ายตามรูปแบบที่เลือก
         function renderPortfolioSection() {
             const container = document.getElementById('portfolioDisplayContainer');
             const prevBtn = document.getElementById('portPrevBtn');
@@ -1358,7 +1723,6 @@
             }
 
             if (layout === 'carousel') {
-                // แสดงปุ่มลูกศรซ้าย-ขวาเมื่อมีรูปมากกว่า 2 รูป
                 if (imgs.length > 2) {
                     prevBtn.classList.remove('hidden');
                     prevBtn.classList.add('flex');
@@ -1372,24 +1736,24 @@
                 let cardsHTML = '';
                 imgs.forEach((src, idx) => {
                     const adminOverlay = isAdmin ? `
-                        <div class="absolute top-1.5 right-1.5 flex items-center gap-1 z-20">
-                            ${idx > 0 ? `<button onclick="event.stopPropagation(); movePortfolioImg(${idx}, -1)" class="keep-white w-6 h-6 rounded-full bg-slate-800/75 text-white flex items-center justify-center text-[10px] hover:bg-black" title="เลื่อนไปซ้าย"><i class="fa-solid fa-chevron-left"></i></button>` : ''}
-                            ${idx < imgs.length - 1 ? `<button onclick="event.stopPropagation(); movePortfolioImg(${idx}, 1)" class="keep-white w-6 h-6 rounded-full bg-slate-800/75 text-white flex items-center justify-center text-[10px] hover:bg-black" title="เลื่อนไปขวา"><i class="fa-solid fa-chevron-right"></i></button>` : ''}
-                            <button onclick="event.stopPropagation(); deletePortfolioImg(${idx})" class="keep-white w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] shadow hover:scale-110 transition" title="ลบรูปนี้"><i class="fa-solid fa-xmark"></i></button>
+                        <div class="absolute top-1.5 left-1.5 z-20 w-6 h-6 rounded-full bg-slate-800/75 text-white flex items-center justify-center text-[10px] cursor-grab port-img-handle" title="ลากเพื่อสลับรูป">
+                            <i class="fa-solid fa-arrows-left-right"></i>
                         </div>
+                        <button onclick="event.stopPropagation(); deletePortfolioImg(${idx})" class="keep-white absolute top-1.5 right-1.5 z-20 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] shadow hover:scale-110 transition" title="ลบรูปนี้">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
                     ` : '';
 
                     cardsHTML += `
-                        <div onclick="openLightbox('${src}')" class="snap-item flex-none w-40 h-40 rounded-2xl overflow-hidden surface-card shadow-sm relative cursor-zoom-in group/item">
+                        <div data-img-src="${src.replace(/"/g, '&quot;')}" onclick="openLightbox('${src}')" class="snap-item flex-none w-40 h-40 rounded-2xl overflow-hidden surface-card shadow-sm relative cursor-zoom-in group/item">
                             ${adminOverlay}
                             <img src="${src}" class="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300">
                         </div>
                     `;
                 });
 
-                container.innerHTML = `<div id="portfolioCarouselTrack" class="flex gap-3 overflow-x-auto hide-scrollbar snap-carousel pb-2">${cardsHTML}</div>`;
+                container.innerHTML = `<div id="portfolioSortableList" class="flex gap-3 overflow-x-auto hide-scrollbar snap-carousel pb-2">${cardsHTML}</div>`;
             } else {
-                // โหมดตาราง 3x3 หรือ 2x2
                 prevBtn.classList.add('hidden');
                 nextBtn.classList.add('hidden');
                 const gridCols = layout === 'grid3' ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-3';
@@ -1397,39 +1761,44 @@
                 let itemsHTML = '';
                 imgs.forEach((src, idx) => {
                     const adminOverlay = isAdmin ? `
-                        <div class="absolute top-1 right-1 flex items-center gap-1 z-20">
-                            <button onclick="event.stopPropagation(); deletePortfolioImg(${idx})" class="keep-white w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-[9px] shadow hover:scale-110 transition" title="ลบรูปนี้"><i class="fa-solid fa-xmark"></i></button>
+                        <div class="absolute top-1 left-1 z-20 w-5 h-5 rounded-full bg-slate-800/75 text-white flex items-center justify-center text-[9px] cursor-grab port-img-handle" title="ลากเพื่อสลับรูป">
+                            <i class="fa-solid fa-up-down-left-right"></i>
                         </div>
+                        <button onclick="event.stopPropagation(); deletePortfolioImg(${idx})" class="keep-white absolute top-1 right-1 z-20 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-[9px] shadow hover:scale-110 transition" title="ลบรูปนี้">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
                     ` : '';
 
                     itemsHTML += `
-                        <div onclick="openLightbox('${src}')" class="aspect-square rounded-xl overflow-hidden surface-card shadow-sm relative cursor-zoom-in group/item">
+                        <div data-img-src="${src.replace(/"/g, '&quot;')}" onclick="openLightbox('${src}')" class="aspect-square rounded-xl overflow-hidden surface-card shadow-sm relative cursor-zoom-in group/item">
                             ${adminOverlay}
                             <img src="${src}" class="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300">
                         </div>
                     `;
                 });
 
-                container.innerHTML = `<div class="grid ${gridCols}">${itemsHTML}</div>`;
+                container.innerHTML = `<div id="portfolioSortableList" class="grid ${gridCols}">${itemsHTML}</div>`;
+            }
+
+            // เปิดให้แอดมินลากสลับรูปในโซนตัวอย่างงานได้โดยตรง
+            const listEl = document.getElementById('portfolioSortableList');
+            if (listEl && typeof Sortable !== 'undefined' && isAdmin) {
+                Sortable.create(listEl, {
+                    animation: 180,
+                    handle: '.port-img-handle',
+                    ghostClass: 'sortable-ghost',
+                    onEnd: function () {
+                        const reordered = Array.from(listEl.children).map(el => el.getAttribute('data-img-src')).filter(Boolean);
+                        homePortfolioData.images = reordered;
+                        db.ref('homePortfolio/images').set(reordered);
+                    }
+                });
             }
         }
 
-        // เลื่อนแถบตัวอย่างงานป้ายซ้าย-ขวาเมื่อกดปุ่มลูกศร
         function scrollPortfolio(direction) {
-            const track = document.getElementById('portfolioCarouselTrack');
-            if (track) {
-                track.scrollBy({ left: direction * 180, behavior: 'smooth' });
-            }
-        }
-
-        function movePortfolioImg(index, delta) {
-            const imgs = [...(homePortfolioData.images || [])];
-            const targetIdx = index + delta;
-            if (targetIdx < 0 || targetIdx >= imgs.length) return;
-            const temp = imgs[index];
-            imgs[index] = imgs[targetIdx];
-            imgs[targetIdx] = temp;
-            db.ref('homePortfolio/images').set(imgs);
+            const track = document.getElementById('portfolioSortableList');
+            if (track) track.scrollBy({ left: direction * 180, behavior: 'smooth' });
         }
 
         function deletePortfolioImg(index) {
@@ -1447,19 +1816,14 @@
             document.getElementById('portfolioModal').classList.remove('hidden');
         }
 
-        // รองรับการเลือกไฟล์รูปหลายรูปพร้อมกันจากเครื่อง
         async function handlePortfolioFilesSelect(event) {
             const files = Array.from(event.target.files || []);
-            if (files.length === 0) return;
-
             for (const file of files) {
                 try {
                     const base64 = await compressImageFileToBase64(file, 800, 0.84);
                     stagedPortfolioImages.push(base64);
                     renderStagedPortfolioGrid();
-                } catch (e) {
-                    console.log(e);
-                }
+                } catch (e) { console.log(e); }
             }
             event.target.value = '';
         }
@@ -1516,151 +1880,14 @@
         }
 
         // ==========================================
-        // ✨ ระบบแต่งหน้าโฮมอิสระ (Custom Home Blocks Builder)
-        // เพิ่มตัวหนังสือคั่น / ป้ายวิ่ง / แถบโชว์รูปหลายแบบ / กล่องพับอ่าน (Q&A)
+        // ✨ การจัดการ Modal เพิ่ม/แก้ไขบล็อกตกแต่งหน้าโฮม
         // ==========================================
-        let customHomeBlocks = [];
-        let stagedCbGalleryImages = [];
-
-        // ดึงข้อมูลบล็อกตกแต่งหน้าโฮมจาก Firebase แบบ Real-time
-        db.ref('homeCustomBlocks').orderByChild('order').on('value', (snapshot) => {
-            customHomeBlocks = [];
-            snapshot.forEach(child => {
-                customHomeBlocks.push({ id: child.key, ...child.val() });
-            });
-            renderCustomHomeBlocks();
-        });
-
-        // วาดบล็อกตกแต่งหน้าโฮมทั้งหมดตามลำดับ
-        function renderCustomHomeBlocks() {
-            const container = document.getElementById('customHomeBlocksContainer');
-            if (!container) return;
-            container.innerHTML = '';
-
-            customHomeBlocks.forEach((block, index) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'relative transition-all';
-
-                // แถบเครื่องมือแอดมินสำหรับจัดการแต่ละบล็อก (เลื่อนขึ้น-ลง, แก้ไข, ลบ)
-                let adminBar = '';
-                if (isAdmin) {
-                    adminBar = `
-                        <div class="flex items-center justify-between px-3 py-1.5 mb-1.5 rounded-xl bg-slate-800/80 text-white text-[10px]">
-                            <span class="font-medium flex items-center gap-1.5">
-                                <i class="fa-solid fa-layer-group text-amber-300"></i> บล็อกเสริม #${index + 1}
-                            </span>
-                            <div class="flex items-center gap-1.5">
-                                ${index > 0 ? `<button onclick="moveCustomBlock(${index}, -1)" class="px-2 py-0.5 rounded bg-white/20 hover:bg-white/30" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
-                                ${index < customHomeBlocks.length - 1 ? `<button onclick="moveCustomBlock(${index}, 1)" class="px-2 py-0.5 rounded bg-white/20 hover:bg-white/30" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
-                                <button onclick="editCustomBlock('${block.id}')" class="px-2 py-0.5 rounded bg-blue-500 hover:bg-blue-600"><i class="fa-solid fa-pen"></i> แก้ไข</button>
-                                <button onclick="deleteCustomBlock('${block.id}')" class="px-2 py-0.5 rounded bg-red-500 hover:bg-red-600"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                let contentHTML = '';
-
-                // 1. บล็อกตัวหนังสือคั่น / แถบข้อความวิ่ง / กล่องประกาศ
-                if (block.category === 'text') {
-                    const style = block.style || 'divider';
-                    if (style === 'divider') {
-                        contentHTML = `
-                            <div class="flex items-center gap-3 py-2">
-                                <div class="flex-1 h-[1.5px] rounded-full" style="background-color: var(--accent-bg)"></div>
-                                <span class="text-xs font-bold px-3 py-1 rounded-full theme-btn-secondary shadow-sm">${block.title || ''}</span>
-                                <div class="flex-1 h-[1.5px] rounded-full" style="background-color: var(--accent-bg)"></div>
-                            </div>
-                        `;
-                    } else if (style === 'marquee') {
-                        contentHTML = `
-                            <div class="w-full overflow-hidden rounded-full py-2 px-3 shadow-sm flex items-center gap-2 surface-card" style="border: 1px solid var(--accent-bg)">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 theme-btn-primary"><i class="fa-solid fa-bullhorn mr-1"></i>ประกาศ</span>
-                                <div class="overflow-hidden flex-1">
-                                    <div class="marquee-track text-xs font-medium" style="color: var(--text-main)">
-                                        ${block.title || ''} ${block.subtitle ? ` — ${block.subtitle}` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else if (style === 'ribbon') {
-                        contentHTML = `
-                            <div class="text-center py-1">
-                                <div class="inline-block px-6 py-2 rounded-2xl text-xs font-bold shadow-md theme-btn-primary">
-                                    <i class="fa-solid fa-star text-amber-200 mr-1"></i> ${block.title || ''} <i class="fa-solid fa-star text-amber-200 ml-1"></i>
-                                </div>
-                                ${block.subtitle ? `<p class="text-[11px] mt-1.5 opacity-75" style="color: var(--text-main)">${block.subtitle}</p>` : ''}
-                            </div>
-                        `;
-                    } else {
-                        // callout
-                        contentHTML = `
-                            <div class="p-4 rounded-2xl shadow-sm theme-btn-secondary">
-                                <h4 class="font-bold text-sm flex items-center gap-1.5 mb-1" style="color: var(--accent-color)">
-                                    <i class="fa-solid fa-bell"></i> ${block.title || ''}
-                                </h4>
-                                ${block.subtitle ? `<p class="text-xs leading-relaxed whitespace-pre-line" style="color: var(--text-main)">${block.subtitle}</p>` : ''}
-                            </div>
-                        `;
-                    }
-                }
-                // 2. บล็อกแถบโชว์รูปภาพ (ปัดซ้าย-ขวา, ตาราง 3x3, ตาราง 2x2, แบนเนอร์)
-                else if (block.category === 'gallery') {
-                    const imgs = Array.isArray(block.images) ? block.images : [];
-                    const layout = block.layout || 'carousel';
-                    const titleHTML = block.title ? `<h3 class="font-medium text-base mb-3" style="color: var(--text-main)">${block.title}</h3>` : '';
-
-                    if (layout === 'carousel') {
-                        const slides = imgs.map(src => `
-                            <div onclick="openLightbox('${src}')" class="snap-item flex-none w-36 h-36 rounded-2xl overflow-hidden surface-card shadow-sm cursor-zoom-in">
-                                <img src="${src}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-                            </div>
-                        `).join('');
-                        contentHTML = `${titleHTML}<div class="flex gap-2.5 overflow-x-auto hide-scrollbar snap-carousel pb-1">${slides}</div>`;
-                    } else if (layout === 'banner') {
-                        const slides = imgs.map(src => `
-                            <div onclick="openLightbox('${src}')" class="snap-item flex-none w-full h-44 rounded-2xl overflow-hidden surface-card shadow-sm cursor-zoom-in">
-                                <img src="${src}" class="w-full h-full object-cover">
-                            </div>
-                        `).join('');
-                        contentHTML = `${titleHTML}<div class="flex gap-3 overflow-x-auto hide-scrollbar snap-carousel pb-1">${slides}</div>`;
-                    } else {
-                        const cols = layout === 'grid3' ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-3';
-                        const cells = imgs.map(src => `
-                            <div onclick="openLightbox('${src}')" class="aspect-square rounded-xl overflow-hidden surface-card shadow-sm cursor-zoom-in">
-                                <img src="${src}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-                            </div>
-                        `).join('');
-                        contentHTML = `${titleHTML}<div class="grid ${cols}">${cells}</div>`;
-                    }
-                }
-                // 3. บล็อกกล่องพับเปิด-ปิดข้อมูล (Q&A / กฎการสั่งงาน)
-                else if (block.category === 'faq') {
-                    contentHTML = `
-                        <details class="group surface-card rounded-2xl p-3.5 shadow-sm cursor-pointer">
-                            <summary class="font-semibold text-xs flex items-center justify-between list-none" style="color: var(--text-main)">
-                                <span class="flex items-center gap-2">
-                                    <i class="fa-solid fa-circle-info" style="color: var(--accent-color)"></i> ${block.title || 'รายละเอียดเพิ่มเติม'}
-                                </span>
-                                <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180" style="color: var(--accent-color)"></i>
-                            </summary>
-                            <div class="mt-2.5 pt-2.5 border-t border-dashed border-slate-200/70 text-xs leading-relaxed whitespace-pre-line opacity-85" style="color: var(--text-main)">
-                                ${block.subtitle || ''}
-                            </div>
-                        </details>
-                    `;
-                }
-
-                wrapper.innerHTML = adminBar + contentHTML;
-                container.appendChild(wrapper);
-            });
-        }
-
         function onCustomBlockCategoryChange() {
             const cat = document.getElementById('cbCategorySelect').value;
             document.getElementById('cbTextConfigSection').classList.toggle('hidden', cat !== 'text');
             document.getElementById('cbGalleryConfigSection').classList.toggle('hidden', cat !== 'gallery');
             document.getElementById('cbFaqConfigSection').classList.toggle('hidden', cat !== 'faq');
+            document.getElementById('cbButtonConfigSection').classList.toggle('hidden', cat !== 'button');
         }
 
         function openCustomBlockModal(defaultCat = 'text') {
@@ -1678,6 +1905,9 @@
 
             document.getElementById('cbFaqQuestion').value = '';
             document.getElementById('cbFaqAnswer').value = '';
+
+            document.getElementById('cbBtnLabel').value = '';
+            document.getElementById('cbBtnUrl').value = '';
 
             onCustomBlockCategoryChange();
             document.getElementById('customBlockModalTitle').innerHTML = '<i class="fa-solid fa-wand-magic-sparkles theme-accent mr-1"></i> เพิ่มบล็อกตกแต่งหน้าโฮม';
@@ -1704,6 +1934,9 @@
             } else if (b.category === 'faq') {
                 document.getElementById('cbFaqQuestion').value = b.title || '';
                 document.getElementById('cbFaqAnswer').value = b.subtitle || '';
+            } else if (b.category === 'button') {
+                document.getElementById('cbBtnLabel').value = b.title || '';
+                document.getElementById('cbBtnUrl').value = b.url || '';
             }
 
             document.getElementById('customBlockModalTitle').innerHTML = '<i class="fa-solid fa-pen theme-accent mr-1"></i> แก้ไขบล็อกหน้าโฮม';
@@ -1717,9 +1950,7 @@
                     const base64 = await compressImageFileToBase64(file, 800, 0.84);
                     stagedCbGalleryImages.push(base64);
                     renderCbGalleryPreview();
-                } catch (e) {
-                    console.log(e);
-                }
+                } catch (e) { console.log(e); }
             }
             event.target.value = '';
         }
@@ -1749,7 +1980,7 @@
             grid.innerHTML = '';
             stagedCbGalleryImages.forEach((src, idx) => {
                 grid.innerHTML += `
-                    <div class="relative aspect-square rounded-lg overflow-hidden border border-slate-200">
+                    <div data-cb-img="${src.replace(/"/g, '&quot;')}" class="relative aspect-square rounded-lg overflow-hidden border border-slate-200 cursor-grab">
                         <img src="${src}" class="w-full h-full object-cover">
                         <button type="button" onclick="removeCbGalleryImg(${idx})" class="keep-white absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[8px]">
                             <i class="fa-solid fa-xmark"></i>
@@ -1757,6 +1988,15 @@
                     </div>
                 `;
             });
+
+            if (typeof Sortable !== 'undefined') {
+                Sortable.create(grid, {
+                    animation: 150,
+                    onEnd: function () {
+                        stagedCbGalleryImages = Array.from(grid.children).map(el => el.getAttribute('data-cb-img')).filter(Boolean);
+                    }
+                });
+            }
         }
 
         function saveCustomHomeBlock() {
@@ -1780,46 +2020,47 @@
                 if (!q) { alert('กรุณากรอกหัวข้อก่อนกดบันทึกนะคะ'); return; }
                 blockData.title = q;
                 blockData.subtitle = document.getElementById('cbFaqAnswer').value.trim();
+            } else if (category === 'button') {
+                const label = document.getElementById('cbBtnLabel').value.trim();
+                const url = document.getElementById('cbBtnUrl').value.trim();
+                if (!label || !url) { alert('กรุณากรอกข้อความบนปุ่มและลิงก์ปลายทางนะคะ'); return; }
+                blockData.title = label;
+                blockData.url = url;
             }
 
             if (id) {
                 db.ref('homeCustomBlocks/' + id).update(blockData);
             } else {
                 blockData.order = Date.now();
-                db.ref('homeCustomBlocks').push(blockData);
+                const newRef = db.ref('homeCustomBlocks').push();
+                newRef.set(blockData).then(() => {
+                    const newSecId = 'custom-' + newRef.key;
+                    const updatedOrder = [...(homeLayoutConfig.order || []), newSecId];
+                    db.ref('homeLayoutConfig/order').set(updatedOrder);
+                });
             }
             document.getElementById('customBlockModal').classList.add('hidden');
-        }
-
-        function moveCustomBlock(index, delta) {
-            const targetIdx = index + delta;
-            if (targetIdx < 0 || targetIdx >= customHomeBlocks.length) return;
-            const itemA = customHomeBlocks[index];
-            const itemB = customHomeBlocks[targetIdx];
-            const orderA = itemA.order || index;
-            const orderB = itemB.order || targetIdx;
-
-            db.ref('homeCustomBlocks/' + itemA.id).update({ order: orderB });
-            db.ref('homeCustomBlocks/' + itemB.id).update({ order: orderA });
         }
 
         function deleteCustomBlock(id) {
             if (confirm('ต้องการลบบล็อกตกแต่งนี้ใช่หรือไม่?')) {
                 db.ref('homeCustomBlocks/' + id).remove();
+                const secId = 'custom-' + id;
+                const filteredOrder = (homeLayoutConfig.order || []).filter(x => x !== secId);
+                db.ref('homeLayoutConfig/order').set(filteredOrder);
             }
         }
 
         // ==========================================
-        // 🕒 ระบบที่ 1: ระบบตั้งเวลาเปิด-ปิดร้านอัตโนมัติ (Open / Closed)
+        // 🕒 ระบบตั้งเวลาเปิด-ปิดร้านอัตโนมัติ (Open / Closed)
         // ==========================================
         let shopStatusConfig = {
-            mode: 'auto',               // 'auto' | 'open' | 'closed'
-            days: [0, 1, 2, 3, 4, 5, 6], // วันเปิดทำการ (0=อาทิตย์ ถึง 6=เสาร์)
-            openTime: '08:30',          // เวลาเปิด
-            closeTime: '00:00'          // เวลาปิด
+            mode: 'auto',
+            days: [0, 1, 2, 3, 4, 5, 6],
+            openTime: '08:30',
+            closeTime: '00:00'
         };
 
-        // ดึงการตั้งค่าเวลาเปิด-ปิดจาก Firebase แบบ Real-time
         db.ref('shopStatusConfig').on('value', (snapshot) => {
             const val = snapshot.val();
             if (val) {
@@ -1833,13 +2074,12 @@
             updateShopOpenStatusUI();
         });
 
-        // ฟังก์ชันคำนวณว่าขณะนี้ร้านอยู่ในช่วงเวลา Open หรือ Closed
         function checkIsShopOpenNow() {
             if (shopStatusConfig.mode === 'open') return true;
             if (shopStatusConfig.mode === 'closed') return false;
 
             const now = new Date();
-            const currentDay = now.getDay(); // 0 (อาทิตย์) - 6 (เสาร์)
+            const currentDay = now.getDay();
             const yesterdayDay = (currentDay + 6) % 7;
             const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
@@ -1861,7 +2101,6 @@
             return isOpenFromToday || isOpenFromYesterday;
         }
 
-        // อัปเดตการแสดงผลป้าย Open / Closed บนหน้าเว็บ
         function updateShopOpenStatusUI() {
             const badge = document.getElementById('shopStatusBadge');
             const dot = document.getElementById('shopStatusDot');
@@ -1930,24 +2169,19 @@
                 selectedDays.push(parseInt(cb.value, 10));
             });
 
-            const newConfig = {
+            db.ref('shopStatusConfig').set({
                 mode: mode,
                 days: selectedDays,
                 openTime: openTime,
                 closeTime: closeTime
-            };
-
-            db.ref('shopStatusConfig').set(newConfig);
+            });
             document.getElementById('statusModal').classList.add('hidden');
         }
 
         // ==========================================
-        // 🎵 ระบบที่ 2: ระบบเครื่องเล่นเพลงโปรด (รองรับไฟล์ MP3 & ลิงก์เพลง)
+        // 🎵 ระบบเครื่องเล่นเพลงโปรด (รองรับไฟล์ MP3 & ลิงก์เพลง)
         // ==========================================
-        let shopMusicConfig = {
-            title: 'เล่นเพลงโปรด',
-            src: ''
-        };
+        let shopMusicConfig = { title: 'เล่นเพลงโปรด', src: '' };
         let uploadedMusicBase64 = '';
         let isPlaying = false;
 
@@ -1978,11 +2212,8 @@
         function togglePlayMusic() {
             const audioEl = document.getElementById('bgAudioPlayer');
             if (!shopMusicConfig.src) {
-                if (isAdmin) {
-                    openMusicModal();
-                } else {
-                    alert('ทางร้านยังไม่ได้ใส่เพลงประกอบค่ะ');
-                }
+                if (isAdmin) openMusicModal();
+                else alert('ทางร้านยังไม่ได้ใส่เพลงประกอบค่ะ');
                 return;
             }
 
@@ -1994,8 +2225,7 @@
                 audioEl.play().then(() => {
                     isPlaying = true;
                     updateMusicButtonUI();
-                }).catch(err => {
-                    console.log(err);
+                }).catch(() => {
                     alert('ไม่สามารถเล่นไฟล์เสียงนี้ได้ กรุณาตรวจสอบลิงก์หรือไฟล์ MP3 อีกครั้งค่ะ');
                 });
             }
@@ -2105,10 +2335,7 @@
             const previewPlayer = document.getElementById('musicModalPreviewPlayer');
             if (previewPlayer) previewPlayer.pause();
 
-            db.ref('shopMusic').set({
-                title: title,
-                src: finalSrc
-            }).then(() => {
+            db.ref('shopMusic').set({ title: title, src: finalSrc }).then(() => {
                 const audioEl = document.getElementById('bgAudioPlayer');
                 if (audioEl) {
                     audioEl.pause();
@@ -2121,7 +2348,7 @@
         }
 
         // ==========================================
-        // 🌐 ระบบจัดการช่องทางโซเชียลมีเดีย (รองรับหลายแพลตฟอร์ม: LINE, FB, IG, Discord, X, Lemon8, YouTube ฯลฯ)
+        // 🌐 ระบบจัดการช่องทางโซเชียลมีเดีย (รองรับหลายแพลตฟอร์ม)
         // ==========================================
         const SOCIAL_PLATFORMS = {
             line: { name: 'LINE', icon: 'fa-brands fa-line', bg: 'bg-green-100', text: 'text-green-600', placeholder: 'https://line.me/...' },
@@ -2173,9 +2400,7 @@
             activeLinks.forEach(item => {
                 const pf = SOCIAL_PLATFORMS[item.platform] || SOCIAL_PLATFORMS.website;
                 let href = item.url.trim();
-                if (!/^https?:\/\//i.test(href)) {
-                    href = 'https://' + href;
-                }
+                if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
                 const a = document.createElement('a');
                 a.href = href;
                 a.target = '_blank';
@@ -2259,9 +2484,7 @@
             rows.forEach(row => {
                 const platform = row.querySelector('.social-platform-select').value;
                 const url = row.querySelector('.social-url-input').value.trim();
-                if (url !== '') {
-                    items.push({ platform, url });
-                }
+                if (url !== '') items.push({ platform, url });
             });
 
             db.ref('shopSocials').set({ items: items });
@@ -2289,6 +2512,9 @@
                 if (txt.shopDesc && document.activeElement !== document.getElementById('shopDesc')) {
                     document.getElementById('shopDesc').innerText = txt.shopDesc;
                 }
+                if (txt.priceSectionTitle && document.activeElement !== document.getElementById('priceSectionTitle')) {
+                    document.getElementById('priceSectionTitle').innerText = txt.priceSectionTitle;
+                }
             }
         });
 
@@ -2296,7 +2522,8 @@
             if (!isAdmin) return;
             db.ref('shopText').set({
                 shopName: document.getElementById('shopName').innerText.trim(),
-                shopDesc: document.getElementById('shopDesc').innerText.trim()
+                shopDesc: document.getElementById('shopDesc').innerText.trim(),
+                priceSectionTitle: document.getElementById('priceSectionTitle').innerText.trim()
             });
         }
 
@@ -2333,7 +2560,7 @@
         }
 
         // ==========================================
-        // 📦 ระบบที่ 3: ระบบจัดการสินค้า (Products Manager)
+        // 📦 ระบบจัดการสินค้า (Products Manager)
         // ==========================================
         function onProdUrlInput() {
             const url = document.getElementById('prodImage').value.trim();
@@ -2361,9 +2588,7 @@
                 urlInput.placeholder = 'อัปโหลดรูปจากเครื่องแล้ว ✓';
                 document.getElementById('prodImagePreview').src = uploadedProdBase64;
                 document.getElementById('prodImagePreviewBox').classList.remove('hidden');
-            } catch (e) {
-                console.log(e);
-            }
+            } catch (e) { console.log(e); }
         }
 
         function clearProdImage() {
@@ -2545,7 +2770,7 @@
         function handleDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
 
         // ==========================================
-        // 📋 ระบบที่ 4: ระบบจัดการคิวงาน (Queue Manager) & ปฏิทินส่งงาน
+        // 📋 ระบบจัดการคิวงาน (Queue Manager) & ปฏิทินส่งงาน
         // ==========================================
         db.ref('queues').orderByChild('order').on('value', (snapshot) => {
             queuesList = [];
@@ -2785,16 +3010,8 @@
         function renderQueueStatusTabs() {
             const container = document.getElementById('queueStatusContainer');
             const statuses = ['ทั้งหมด', 'รอคิว', 'กำลังทำ', 'รอเช็คงาน', 'เสร็จสิ้น'];
-            let counts = {
-                'ทั้งหมด': queuesList.length,
-                'รอคิว': 0,
-                'กำลังทำ': 0,
-                'รอเช็คงาน': 0,
-                'เสร็จสิ้น': 0
-            };
-            queuesList.forEach(q => {
-                if (counts[q.status] !== undefined) counts[q.status]++;
-            });
+            let counts = { 'ทั้งหมด': queuesList.length, 'รอคิว': 0, 'กำลังทำ': 0, 'รอเช็คงาน': 0, 'เสร็จสิ้น': 0 };
+            queuesList.forEach(q => { if (counts[q.status] !== undefined) counts[q.status]++; });
 
             container.innerHTML = '';
             statuses.forEach(st => {
@@ -2809,16 +3026,11 @@
 
         function getStatusConfig(status) {
             switch(status) {
-                case 'รอคิว':
-                    return { badge: 'bg-slate-100 text-slate-600', icon: 'fa-clock', progress: 25, barColor: 'bg-slate-400' };
-                case 'กำลังทำ':
-                    return { badge: 'bg-blue-100 text-blue-600', icon: 'fa-paintbrush', progress: 60, barColor: 'bg-blue-500' };
-                case 'รอเช็คงาน':
-                    return { badge: 'bg-amber-100 text-amber-700', icon: 'fa-magnifying-glass', progress: 85, barColor: 'bg-amber-500' };
-                case 'เสร็จสิ้น':
-                    return { badge: 'bg-emerald-100 text-emerald-600', icon: 'fa-circle-check', progress: 100, barColor: 'bg-emerald-500' };
-                default:
-                    return { badge: 'bg-slate-100 text-slate-600', icon: 'fa-clock', progress: 25, barColor: 'bg-slate-400' };
+                case 'รอคิว': return { badge: 'bg-slate-100 text-slate-600', icon: 'fa-clock', progress: 25, barColor: 'bg-slate-400' };
+                case 'กำลังทำ': return { badge: 'bg-blue-100 text-blue-600', icon: 'fa-paintbrush', progress: 60, barColor: 'bg-blue-500' };
+                case 'รอเช็คงาน': return { badge: 'bg-amber-100 text-amber-700', icon: 'fa-magnifying-glass', progress: 85, barColor: 'bg-amber-500' };
+                case 'เสร็จสิ้น': return { badge: 'bg-emerald-100 text-emerald-600', icon: 'fa-circle-check', progress: 100, barColor: 'bg-emerald-500' };
+                default: return { badge: 'bg-slate-100 text-slate-600', icon: 'fa-clock', progress: 25, barColor: 'bg-slate-400' };
             }
         }
 
@@ -2975,28 +3187,14 @@
                 isUrgent: document.getElementById('queueUrgent').checked
             };
 
-            if (id) {
-                db.ref('queues/' + id).update(queueData);
-            } else {
-                queueData.order = Date.now();
-                db.ref('queues').push(queueData);
-            }
+            if (id) db.ref('queues/' + id).update(queueData);
+            else { queueData.order = Date.now(); db.ref('queues').push(queueData); }
             document.getElementById('queueModal').classList.add('hidden');
         }
 
-        function quickChangeQueueStatus(id, newStatus) {
-            db.ref('queues/' + id).update({ status: newStatus });
-        }
-
-        function quickChangeQueuePayment(id, newPayment) {
-            db.ref('queues/' + id).update({ payment: newPayment });
-        }
-
-        function deleteQueue(id) {
-            if (confirm("ต้องการลบคิวงานนี้ใช่หรือไม่?")) {
-                db.ref('queues/' + id).remove();
-            }
-        }
+        function quickChangeQueueStatus(id, newStatus) { db.ref('queues/' + id).update({ status: newStatus }); }
+        function quickChangeQueuePayment(id, newPayment) { db.ref('queues/' + id).update({ payment: newPayment }); }
+        function deleteQueue(id) { if (confirm("ต้องการลบคิวงานนี้ใช่หรือไม่?")) db.ref('queues/' + id).remove(); }
 
         let dragQueueSrcId = null;
         function handleQueueDragStart(e) { dragQueueSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
@@ -3018,7 +3216,7 @@
         function handleQueueDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
 
         // ==========================================
-        // ⭐ ระบบที่ 5: ระบบจัดการหน้ารีวิว (Reviews Manager)
+        // ⭐ ระบบจัดการหน้ารีวิว (Reviews Manager)
         // ==========================================
         db.ref('reviews').orderByChild('order').on('value', (snapshot) => {
             reviewsList = [];
@@ -3159,11 +3357,8 @@
             selectedReviewRating = stars;
             const icons = document.querySelectorAll('#starSelector i');
             icons.forEach((icon, idx) => {
-                if (idx < stars) {
-                    icon.className = 'fa-solid fa-star text-amber-400 transition transform hover:scale-110';
-                } else {
-                    icon.className = 'fa-regular fa-star text-slate-300 transition transform hover:scale-110';
-                }
+                if (idx < stars) icon.className = 'fa-solid fa-star text-amber-400 transition transform hover:scale-110';
+                else icon.className = 'fa-regular fa-star text-slate-300 transition transform hover:scale-110';
             });
         }
 
@@ -3193,9 +3388,7 @@
                 urlInput.placeholder = 'อัปโหลดรูปจากเครื่องแล้ว ✓';
                 document.getElementById('revImagePreview').src = uploadedRevBase64;
                 document.getElementById('revImagePreviewBox').classList.remove('hidden');
-            } catch (e) {
-                console.log(e);
-            }
+            } catch (e) { console.log(e); }
         }
 
         function clearRevImage() {
@@ -3247,10 +3440,7 @@
         function saveReview() {
             const id = document.getElementById('revId').value;
             const comment = document.getElementById('revComment').value.trim();
-            if (!comment) {
-                alert('กรุณาพิมพ์ข้อความรีวิวก่อนกดบันทึกนะคะ');
-                return;
-            }
+            if (!comment) { alert('กรุณาพิมพ์ข้อความรีวิวก่อนกดบันทึกนะคะ'); return; }
             const finalImage = uploadedRevBase64 || document.getElementById('revImage').value.trim() || '';
             const today = new Date().toISOString().split('T')[0];
 
@@ -3262,21 +3452,12 @@
                 image: finalImage
             };
 
-            if (id) {
-                db.ref('reviews/' + id).update(reviewData);
-            } else {
-                reviewData.date = today;
-                reviewData.order = Date.now();
-                db.ref('reviews').push(reviewData);
-            }
+            if (id) db.ref('reviews/' + id).update(reviewData);
+            else { reviewData.date = today; reviewData.order = Date.now(); db.ref('reviews').push(reviewData); }
             document.getElementById('reviewModal').classList.add('hidden');
         }
 
-        function deleteReview(id) {
-            if (confirm('ต้องการลบรีวิวนี้ใช่หรือไม่?')) {
-                db.ref('reviews/' + id).remove();
-            }
-        }
+        function deleteReview(id) { if (confirm('ต้องการลบรีวิวนี้ใช่หรือไม่?')) db.ref('reviews/' + id).remove(); }
 
         let dragRevSrcId = null;
         function handleReviewDragStart(e) { dragRevSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
@@ -3298,7 +3479,7 @@
         function handleReviewDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
 
         // ==========================================
-        // 🎨 ระบบที่ 6: ระบบแต่งสีเว็บ + สวิตช์โหมด สว่าง/มืด (Light/Dark Mode)
+        // 🎨 ระบบแต่งสีเว็บ + สวิตช์โหมด สว่าง/มืด (Light/Dark Mode)
         // ==========================================
         function updateModeSwitchUI() {
             const btnLight = document.getElementById('btnLightMode');
@@ -3323,7 +3504,6 @@
         function setThemeMode(dark) {
             isDarkMode = dark;
             updateModeSwitchUI();
-            
             const root = getComputedStyle(document.documentElement);
             const currentAccent = root.getPropertyValue('--accent-color').trim();
             generateSmartPalette(currentAccent);
@@ -3405,7 +3585,7 @@
                 filterQueues();
                 filterReviews();
                 renderPortfolioSection();
-                renderCustomHomeBlocks();
+                applyHomeUnifiedLayout();
             } else alert("รหัสผ่านไม่ถูกต้อง");
         }
 
@@ -3423,7 +3603,7 @@
             filterQueues();
             filterReviews();
             renderPortfolioSection();
-            renderCustomHomeBlocks();
+            applyHomeUnifiedLayout();
         }
 
         const pickrConfig = {
@@ -3615,7 +3795,7 @@
         }
 
         // ==========================================
-        // 🖼️ ระบบที่ 7: ระบบเปลี่ยนรูปหน้าโฮม (ปก, โปรไฟล์, เรทราคา)
+        // 🖼️ ระบบเปลี่ยนรูปหน้าโฮม (ปก, โปรไฟล์, เรทราคา)
         // ==========================================
         function onModalUrlInput() {
             const url = document.getElementById('modalInput').value.trim();
@@ -3643,9 +3823,7 @@
                 urlInput.placeholder = 'อัปโหลดรูปจากเครื่องแล้ว ✓';
                 document.getElementById('modalImagePreview').src = uploadedModalBase64;
                 document.getElementById('modalImagePreviewBox').classList.remove('hidden');
-            } catch (e) {
-                console.log(e);
-            }
+            } catch (e) { console.log(e); }
         }
 
         function clearModalImage() {
@@ -3660,10 +3838,7 @@
 
         function editImage(imgId, title) {
             if(!isAdmin) {
-                // หากไม่ได้อยู่ในโหมดแอดมิน แต่คลิกที่รูปเรทราคา ให้ซูมดูรูปใหญ่แทน
-                if (imgId === 'priceImg') {
-                    openLightbox(document.getElementById('priceImg').src);
-                }
+                if (imgId === 'priceImg') openLightbox(document.getElementById('priceImg').src);
                 return;
             }
             currentTargetId = imgId;
@@ -3700,6 +3875,7 @@
             updateShopOpenStatusUI();
             renderSocialIcons();
             renderPortfolioSection();
+            applyHomeUnifiedLayout();
         };
     </script>
 </body>
