@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ร้านป้ายสไตล์น่ารัก - ระบบครบวงจร</title>
 
-    <!-- นำเข้า Tailwind CSS สำหรับจัดหน้าเว็บ และ Font Awesome สำหรับไอคอน -->
+    <!-- นำเข้า Tailwind CSS สำหรับจัดหน้าเว็บ และ Font Awesome 6.5.1 (รองรับไอคอน X, Threads, Discord ฯลฯ) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- นำเข้าไลบรารีวงกลมเลือกสี (Pickr) -->
@@ -204,13 +204,9 @@
                         รับทำป้ายไวนิล โปสเตอร์ โลโก้ สไตล์มินิมอลและน่ารักๆ สามารถใส่รายละเอียดร้านเพิ่มเติมได้ตรงนี้เลยค่ะ
                     </p>
 
-                    <!-- ปุ่มโซเชียลมีเดีย -->
+                    <!-- 🌐 ปุ่มโซเชียลมีเดีย (รองรับหลายแพลตฟอร์ม: LINE, FB, IG, Discord, X, Lemon8, YouTube, TikTok ฯลฯ) -->
                     <div class="mt-3 flex flex-wrap items-center gap-2">
-                        <div id="socialIcons" class="flex gap-2">
-                            <a href="#" id="icon-line" target="_blank" class="w-7 h-7 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-line"></i></a>
-                            <a href="#" id="icon-facebook" target="_blank" class="w-7 h-7 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-sm transition hover:scale-110"><i class="fa-brands fa-facebook-f"></i></a>
-                            <a href="#" id="icon-ig" target="_blank" class="w-7 h-7 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-sm transition hover:scale-110 hidden"><i class="fa-brands fa-instagram"></i></a>
-                        </div>
+                        <div id="socialIcons" class="flex flex-wrap gap-2"></div>
                         <button id="editSocialBtn" class="admin-only keep-white px-3 py-1 bg-white border border-dashed border-slate-300 text-slate-500 rounded-full text-[10px] font-medium hover:bg-slate-50 transition items-center gap-1" onclick="openSocialModal()">
                             <i class="fa-solid fa-pen"></i> แก้ไขช่องทาง
                         </button>
@@ -457,7 +453,6 @@
             <p class="text-[11px] theme-text-muted mb-4">ระบบจะแสดงป้าย <b>Open</b> หรือ <b>Closed</b> ตามเวลาที่กำหนดอัตโนมัติ</p>
 
             <div class="space-y-3.5">
-                <!-- เลือกโหมดการทำงาน -->
                 <div>
                     <label class="text-[11px] font-bold mb-1.5 block theme-text">โหมดการแสดงสถานะร้าน</label>
                     <select id="statusModeSelect" onchange="toggleScheduleConfigFields()" class="w-full rounded-xl px-3 py-2.5 text-xs font-medium theme-input">
@@ -467,7 +462,6 @@
                     </select>
                 </div>
 
-                <!-- ส่วนตั้งค่าวันและเวลา (แสดงเมื่อเลือกโหมดอัตโนมัติ) -->
                 <div id="scheduleConfigFields" class="space-y-3.5 p-3.5 rounded-2xl theme-box">
                     <div>
                         <label class="text-[11px] font-bold mb-2 block theme-text">เลือกวันที่เปิดรับงาน</label>
@@ -819,17 +813,36 @@
         </div>
     </div>
 
-    <!-- Social Modal -->
+    <!-- 🌐 Social Modal (ตั้งค่าลิงก์ช่องทางติดต่อ รองรับการเพิ่ม/ลบและเลือกแพลตฟอร์มได้อิสระ) -->
     <div id="socialModal" class="hidden fixed inset-0 bg-slate-900/60 z-[70] flex justify-center items-center backdrop-blur-sm p-4">
-        <div class="rounded-3xl w-[90%] max-w-[340px] max-h-[85vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
-            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="font-bold mb-1 text-sm theme-text"><i class="fa-solid fa-link theme-accent"></i> ตั้งค่าลิงก์ช่องทางติดต่อ</h3>
-            <div class="space-y-4 mt-4">
-                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-line text-green-500"></i> LINE URL</label><input type="text" id="input-line" placeholder="https://line.me/..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
-                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-facebook text-blue-500"></i> Facebook URL</label><input type="text" id="input-facebook" placeholder="https://facebook.com/..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
-                <div><label class="text-[11px] font-medium flex items-center gap-1.5 mb-1 theme-text"><i class="fa-brands fa-instagram text-pink-500"></i> Instagram URL</label><input type="text" id="input-ig" placeholder="https://instagram.com/..." class="w-full rounded-xl px-3 py-2 text-xs theme-input"></div>
+        <div class="rounded-3xl w-[92%] max-w-[360px] max-h-[88vh] overflow-y-auto p-6 relative hide-scrollbar theme-card transition-colors duration-300">
+            <button onclick="document.getElementById('socialModal').classList.add('hidden')" class="absolute top-4 right-5 rounded-full w-8 h-8 flex items-center justify-center theme-btn-secondary hover:opacity-80">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="font-bold mb-1 text-base theme-text"><i class="fa-solid fa-link theme-accent mr-1"></i> ตั้งค่าลิงก์ช่องทางติดต่อ</h3>
+            <p class="text-[11px] theme-text-muted mb-3">เลือกแพลตฟอร์มและวางลิงก์ (ช่องที่เว้นว่างจะไม่แสดงบนหน้าเว็บ)</p>
+
+            <!-- ปุ่มลัดสำหรับกดเพิ่มโซเชียลยอดฮิตได้ทันที -->
+            <div class="mb-3">
+                <span class="text-[10px] font-bold theme-text-muted block mb-1.5">กดเพิ่มด่วน:</span>
+                <div class="flex flex-wrap gap-1.5">
+                    <button type="button" onclick="addSocialRow('discord', '')" class="keep-white px-2.5 py-1 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition flex items-center gap-1"><i class="fa-brands fa-discord"></i> + Discord</button>
+                    <button type="button" onclick="addSocialRow('x', '')" class="keep-white px-2.5 py-1 rounded-full text-[10px] font-medium bg-slate-100 text-slate-800 border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1"><i class="fa-brands fa-x-twitter"></i> + X</button>
+                    <button type="button" onclick="addSocialRow('lemon8', '')" class="keep-white px-2.5 py-1 rounded-full text-[10px] font-medium bg-yellow-50 text-amber-600 border border-yellow-200 hover:bg-yellow-100 transition flex items-center gap-1"><i class="fa-solid fa-lemon"></i> + Lemon8</button>
+                    <button type="button" onclick="addSocialRow('youtube', '')" class="keep-white px-2.5 py-1 rounded-full text-[10px] font-medium bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition flex items-center gap-1"><i class="fa-brands fa-youtube"></i> + YouTube</button>
+                    <button type="button" onclick="addSocialRow('tiktok', '')" class="keep-white px-2.5 py-1 rounded-full text-[10px] font-medium bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition flex items-center gap-1"><i class="fa-brands fa-tiktok"></i> + TikTok</button>
+                </div>
             </div>
-            <button onclick="saveSocials()" class="w-full rounded-xl py-3 text-sm font-medium mt-6 transition theme-btn-primary hover:opacity-90">บันทึก</button>
+
+            <!-- รายการช่องทางโซเชียลทั้งหมด -->
+            <div id="socialInputsContainer" class="space-y-3 max-h-[42vh] overflow-y-auto pr-1 hide-scrollbar"></div>
+
+            <!-- ปุ่มเพิ่มแถวช่องทางใหม่ -->
+            <button type="button" onclick="addSocialRow('website', '')" class="w-full mt-3 py-2 rounded-xl text-xs font-bold border border-dashed transition flex items-center justify-center gap-1.5 theme-btn-outline hover:opacity-80">
+                <i class="fa-solid fa-plus text-[10px]"></i> เพิ่มช่องทางติดต่ออื่น
+            </button>
+
+            <button onclick="saveSocials()" class="w-full rounded-xl py-3 text-sm font-bold mt-5 transition shadow-lg theme-btn-primary hover:opacity-90">บันทึก</button>
         </div>
     </div>
 
@@ -1048,15 +1061,12 @@
 
             const openDays = shopStatusConfig.days || [];
 
-            // กรณีเปิด-ปิดภายในวันเดียวกัน (เช่น 08:30 ถึง 22:00)
             if (closeMinutes > openMinutes) {
                 return openDays.includes(currentDay) && nowMinutes >= openMinutes && nowMinutes < closeMinutes;
             }
-            // กรณีปิดเที่ยงคืนตรง (00:00) นับตั้งแต่เวลาเปิดจนจบวันนั้น (24:00)
             if (closeMinutes === 0) {
                 return openDays.includes(currentDay) && nowMinutes >= openMinutes;
             }
-            // กรณีเปิดข้ามคืนไปถึงเช้ามืดของอีกวัน (เช่น 08:30 ถึง 02:00)
             const isOpenFromToday = openDays.includes(currentDay) && nowMinutes >= openMinutes;
             const isOpenFromYesterday = openDays.includes(yesterdayDay) && nowMinutes < closeMinutes;
             return isOpenFromToday || isOpenFromYesterday;
@@ -1082,7 +1092,6 @@
                 dot.className = 'w-2 h-2 rounded-full bg-rose-500';
             }
 
-            // แสดงข้อความบอกเวลาเปิด-ปิดด้านล่างชื่อร้าน
             if (hint) {
                 if (shopStatusConfig.mode === 'auto') {
                     const daysCount = (shopStatusConfig.days || []).length;
@@ -1096,10 +1105,8 @@
             }
         }
 
-        // ตรวจสอบเวลาทุกๆ 30 วินาทีเพื่อสลับ Open / Closed อัตโนมัติโดยไม่ต้องรีเฟรชหน้า
         setInterval(updateShopOpenStatusUI, 30000);
 
-        // เมื่อคลิกที่ป้าย Open/Closed (ถ้าเป็นแอดมินจะเปิดหน้าต่างตั้งค่าเวลา)
         function onStatusBadgeClick() {
             if (isAdmin) openStatusModal();
         }
@@ -1155,7 +1162,6 @@
         let uploadedMusicBase64 = '';
         let isPlaying = false;
 
-        // ดึงข้อมูลเพลงจาก Firebase แบบ Real-time
         db.ref('shopMusic').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -1171,7 +1177,6 @@
             }
         });
 
-        // อัปเดตชื่อเพลงและไอคอนบนปุ่มเล่นเพลง
         function updateMusicButtonUI() {
             const iconEl = document.getElementById('musicIcon');
             const textEl = document.getElementById('musicText');
@@ -1181,7 +1186,6 @@
             textEl.innerText = shopMusicConfig.title || 'เล่นเพลงโปรด';
         }
 
-        // กดปุ่มเล่น / หยุดเพลง
         function togglePlayMusic() {
             const audioEl = document.getElementById('bgAudioPlayer');
             if (!shopMusicConfig.src) {
@@ -1259,19 +1263,16 @@
             }
         }
 
-        // เมื่อเลือกไฟล์ MP3 จากเครื่อง (แปลงเป็น Base64 เพื่อเก็บลง Firebase)
         function handleMusicFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // ตรวจสอบขนาดไฟล์ไม่ให้เกิน 7MB เพื่อความรวดเร็วในการซิงค์บน Firebase
             if (file.size > 7 * 1024 * 1024) {
                 alert('ไฟล์ MP3 มีขนาดใหญ่เกิน 7MB กรุณาเลือกไฟล์ขนาดเล็กลง หรือใช้การวางลิงก์แทนนะคะ');
                 event.target.value = '';
                 return;
             }
 
-            // หากยังไม่ได้ตั้งชื่อเพลง ให้นำชื่อไฟล์มาใส่เป็นชื่อเพลงให้อัตโนมัติ
             const titleInput = document.getElementById('musicTitleInput');
             if (!titleInput.value.trim()) {
                 titleInput.value = file.name.replace(/\.[^/.]+$/, '');
@@ -1319,7 +1320,6 @@
                 title: title,
                 src: finalSrc
             }).then(() => {
-                // หากกำลังเล่นเพลงเก่าอยู่ ให้รีโหลดเพลงใหม่ทันที
                 const audioEl = document.getElementById('bgAudioPlayer');
                 if (audioEl) {
                     audioEl.pause();
@@ -1332,7 +1332,163 @@
         }
 
         // ==========================================
-        // 🏠 ระบบซิงค์ข้อมูลหน้าโฮม (รูปภาพ, ข้อความชื่อร้าน, โซเชียล)
+        // 🌐 ระบบจัดการช่องทางโซเชียลมีเดีย (รองรับหลายแพลตฟอร์ม: LINE, FB, IG, Discord, X, Lemon8, YouTube ฯลฯ)
+        // ==========================================
+        const SOCIAL_PLATFORMS = {
+            line: { name: 'LINE', icon: 'fa-brands fa-line', bg: 'bg-green-100', text: 'text-green-600', placeholder: 'https://line.me/...' },
+            facebook: { name: 'Facebook', icon: 'fa-brands fa-facebook-f', bg: 'bg-blue-100', text: 'text-blue-600', placeholder: 'https://facebook.com/...' },
+            ig: { name: 'Instagram', icon: 'fa-brands fa-instagram', bg: 'bg-pink-100', text: 'text-pink-600', placeholder: 'https://instagram.com/...' },
+            discord: { name: 'Discord', icon: 'fa-brands fa-discord', bg: 'bg-indigo-100', text: 'text-indigo-600', placeholder: 'https://discord.gg/...' },
+            x: { name: 'X (Twitter)', icon: 'fa-brands fa-x-twitter', bg: 'bg-slate-200', text: 'text-slate-800', placeholder: 'https://x.com/...' },
+            lemon8: { name: 'Lemon8', icon: 'fa-solid fa-lemon', bg: 'bg-yellow-100', text: 'text-amber-500', placeholder: 'https://www.lemon8-app.com/...' },
+            youtube: { name: 'YouTube', icon: 'fa-brands fa-youtube', bg: 'bg-red-100', text: 'text-red-600', placeholder: 'https://youtube.com/...' },
+            tiktok: { name: 'TikTok', icon: 'fa-brands fa-tiktok', bg: 'bg-rose-100', text: 'text-rose-600', placeholder: 'https://tiktok.com/@...' },
+            twitch: { name: 'Twitch', icon: 'fa-brands fa-twitch', bg: 'bg-purple-100', text: 'text-purple-600', placeholder: 'https://twitch.tv/...' },
+            threads: { name: 'Threads', icon: 'fa-brands fa-threads', bg: 'bg-neutral-200', text: 'text-neutral-800', placeholder: 'https://threads.net/@...' },
+            website: { name: 'เว็บไซต์ / ลิงก์อื่นๆ', icon: 'fa-solid fa-globe', bg: 'bg-sky-100', text: 'text-sky-600', placeholder: 'https://...' }
+        };
+
+        let shopSocialsList = [];
+
+        // แปลงข้อมูลโซเชียลจาก Firebase (รองรับทั้งรูปแบบเก่าและรูปแบบลิสต์ใหม่)
+        function parseSocialData(raw) {
+            if (!raw) return [];
+            if (Array.isArray(raw)) return raw.filter(item => item && item.platform);
+            if (Array.isArray(raw.items)) return raw.items.filter(item => item && item.platform);
+
+            // รองรับข้อมูลรูปแบบเก่า { line, facebook, ig }
+            const converted = [];
+            if (raw.line) converted.push({ platform: 'line', url: raw.line });
+            if (raw.facebook) converted.push({ platform: 'facebook', url: raw.facebook });
+            if (raw.ig) converted.push({ platform: 'ig', url: raw.ig });
+            return converted;
+        }
+
+        // แสดงผลปุ่มไอคอนโซเชียลบนหน้าโปรไฟล์ร้าน
+        function renderSocialIcons() {
+            const container = document.getElementById('socialIcons');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const activeLinks = shopSocialsList.filter(item => item && item.url && item.url.trim() !== '');
+
+            // หากยังไม่มีการตั้งค่าลิงก์ใดๆ เลย ให้แสดงปุ่มตัวอย่าง LINE และ Facebook
+            if (activeLinks.length === 0) {
+                ['line', 'facebook'].forEach(key => {
+                    const pf = SOCIAL_PLATFORMS[key];
+                    container.innerHTML += `
+                        <a href="#" onclick="if(isAdmin){openSocialModal(); return false;}" title="${pf.name}" class="keep-white w-7 h-7 rounded-full ${pf.bg} ${pf.text} flex items-center justify-center text-sm transition hover:scale-110 shadow-sm">
+                            <i class="${pf.icon}"></i>
+                        </a>
+                    `;
+                });
+                return;
+            }
+
+            activeLinks.forEach(item => {
+                const pf = SOCIAL_PLATFORMS[item.platform] || SOCIAL_PLATFORMS.website;
+                let href = item.url.trim();
+                if (!/^https?:\/\//i.test(href)) {
+                    href = 'https://' + href;
+                }
+                const a = document.createElement('a');
+                a.href = href;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.title = pf.name;
+                a.className = `keep-white w-7 h-7 rounded-full ${pf.bg} ${pf.text} flex items-center justify-center text-sm transition hover:scale-110 shadow-sm`;
+                a.innerHTML = `<i class="${pf.icon}"></i>`;
+                container.appendChild(a);
+            });
+        }
+
+        // ดึงข้อมูลช่องทางโซเชียลจาก Firebase แบบ Real-time
+        db.ref('shopSocials').on('value', (snapshot) => {
+            shopSocialsList = parseSocialData(snapshot.val());
+            renderSocialIcons();
+        });
+
+        // สร้างแถวกรอกข้อมูลโซเชียลในหน้าต่างตั้งค่า
+        function addSocialRow(platformKey = 'line', urlValue = '') {
+            const container = document.getElementById('socialInputsContainer');
+            const pf = SOCIAL_PLATFORMS[platformKey] || SOCIAL_PLATFORMS.website;
+
+            const row = document.createElement('div');
+            row.className = 'social-row p-2.5 rounded-2xl theme-box space-y-2 transition-all';
+
+            let optionsHTML = '';
+            Object.keys(SOCIAL_PLATFORMS).forEach(key => {
+                const p = SOCIAL_PLATFORMS[key];
+                const selected = key === platformKey ? 'selected' : '';
+                optionsHTML += `<option value="${key}" ${selected}>${p.name}</option>`;
+            });
+
+            row.innerHTML = `
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-1">
+                        <span class="social-row-badge keep-white w-6 h-6 rounded-full ${pf.bg} ${pf.text} flex items-center justify-center text-xs shrink-0">
+                            <i class="${pf.icon}"></i>
+                        </span>
+                        <select onchange="onSocialPlatformChange(this)" class="social-platform-select flex-1 rounded-xl px-2.5 py-1.5 text-xs font-medium theme-input">
+                            ${optionsHTML}
+                        </select>
+                    </div>
+                    <button type="button" onclick="this.closest('.social-row').remove()" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition" title="ลบช่องทางนี้">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+                <input type="text" value="${urlValue.replace(/"/g, '&quot;')}" placeholder="${pf.placeholder}" class="social-url-input w-full rounded-xl px-3 py-2 text-xs theme-input">
+            `;
+
+            container.appendChild(row);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // เมื่อเปลี่ยนชนิดโซเชียลใน Dropdown ให้อัปเดตไอคอนและ Placeholder ทันที
+        function onSocialPlatformChange(selectEl) {
+            const row = selectEl.closest('.social-row');
+            const pf = SOCIAL_PLATFORMS[selectEl.value] || SOCIAL_PLATFORMS.website;
+            const badge = row.querySelector('.social-row-badge');
+            const input = row.querySelector('.social-url-input');
+
+            badge.className = `social-row-badge keep-white w-6 h-6 rounded-full ${pf.bg} ${pf.text} flex items-center justify-center text-xs shrink-0`;
+            badge.innerHTML = `<i class="${pf.icon}"></i>`;
+            input.placeholder = pf.placeholder;
+        }
+
+        function openSocialModal() {
+            const container = document.getElementById('socialInputsContainer');
+            container.innerHTML = '';
+
+            if (shopSocialsList.length > 0) {
+                shopSocialsList.forEach(item => addSocialRow(item.platform, item.url || ''));
+            } else {
+                // แสดงช่องพื้นฐานเริ่มต้นหากยังไม่มีข้อมูล
+                addSocialRow('line', '');
+                addSocialRow('facebook', '');
+                addSocialRow('ig', '');
+            }
+
+            document.getElementById('socialModal').classList.remove('hidden');
+        }
+
+        function saveSocials() {
+            const rows = document.querySelectorAll('#socialInputsContainer .social-row');
+            const items = [];
+            rows.forEach(row => {
+                const platform = row.querySelector('.social-platform-select').value;
+                const url = row.querySelector('.social-url-input').value.trim();
+                if (url !== '') {
+                    items.push({ platform, url });
+                }
+            });
+
+            db.ref('shopSocials').set({ items: items });
+            document.getElementById('socialModal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 🏠 ระบบซิงค์รูปภาพและข้อความหน้าโฮม
         // ==========================================
         db.ref('shopImages').on('value', (snapshot) => {
             const imgs = snapshot.val();
@@ -1361,39 +1517,6 @@
                 shopName: document.getElementById('shopName').innerText.trim(),
                 shopDesc: document.getElementById('shopDesc').innerText.trim()
             });
-        }
-
-        db.ref('shopSocials').on('value', (snapshot) => {
-            const soc = snapshot.val();
-            if (soc) {
-                const lineIcon = document.getElementById('icon-line');
-                const fbIcon = document.getElementById('icon-facebook');
-                const igIcon = document.getElementById('icon-ig');
-
-                if (soc.line) { lineIcon.href = soc.line; lineIcon.classList.remove('hidden'); }
-                if (soc.facebook) { fbIcon.href = soc.facebook; fbIcon.classList.remove('hidden'); }
-                if (soc.ig) { igIcon.href = soc.ig; igIcon.classList.remove('hidden'); } else { igIcon.classList.add('hidden'); }
-            }
-        });
-
-        function openSocialModal() {
-            db.ref('shopSocials').once('value', (snapshot) => {
-                const soc = snapshot.val() || {};
-                document.getElementById('input-line').value = soc.line || '';
-                document.getElementById('input-facebook').value = soc.facebook || '';
-                document.getElementById('input-ig').value = soc.ig || '';
-                document.getElementById('socialModal').classList.remove('hidden');
-            });
-        }
-
-        function saveSocials() {
-            const socData = {
-                line: document.getElementById('input-line').value.trim(),
-                facebook: document.getElementById('input-facebook').value.trim(),
-                ig: document.getElementById('input-ig').value.trim()
-            };
-            db.ref('shopSocials').set(socData);
-            document.getElementById('socialModal').classList.add('hidden');
         }
 
         // ==========================================
@@ -1495,7 +1618,6 @@
             document.getElementById('prodImagePreviewBox').classList.add('hidden');
         }
 
-        // ดึงข้อมูลสินค้าจาก Firebase แบบ Real-time
         db.ref('products').orderByChild('order').on('value', (snapshot) => {
             productsList = [];
             snapshot.forEach(child => { productsList.push({ id: child.key, ...child.val() }); });
@@ -1504,12 +1626,11 @@
             renderTags(); filterProducts(); 
         });
 
-        // สร้างปุ่มแท็กหมวดหมู่สินค้าพร้อมตัวเลขจำนวนในวงเล็บ
         function renderTags() {
             const tagContainer = document.getElementById('tagContainer');
             let tagCounts = { 'All': productsList.length };
             productsList.forEach(p => {
-                const tags = p.tags.split(',').map(t => t.trim()).filter(t => t);
+                const tags = (p.tags || '').split(',').map(t => t.trim()).filter(t => t);
                 tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
             });
             tagContainer.innerHTML = '';
@@ -1523,14 +1644,13 @@
             });
         }
 
-        // กรองและแสดงผลการ์ดสินค้า
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
             let filtered = productsList.filter(p => {
-                const matchSearch = p.name.toLowerCase().includes(query);
-                const matchTag = (activeTag === 'All') || p.tags.split(',').map(t=>t.trim()).includes(activeTag);
+                const matchSearch = (p.name || '').toLowerCase().includes(query);
+                const matchTag = (activeTag === 'All') || (p.tags || '').split(',').map(t=>t.trim()).includes(activeTag);
                 return matchSearch && matchTag;
             });
 
@@ -1562,7 +1682,7 @@
                 } else {
                     priceHTML = `<div class="flex justify-between mt-1 px-1"><div class="text-center"><span class="text-[8px] opacity-60 block leading-tight">ใช้เอง</span><span class="text-xs font-bold" style="color: var(--accent-color)">฿${p.pricePersonal}</span></div><div class="text-center"><span class="text-[8px] opacity-60 block leading-tight">ลงกลุ่ม</span><span class="text-xs font-bold text-rose-400">฿${p.priceCommercial}</span></div></div>`;
                 }
-                const tagChips = p.tags.split(',').slice(0,2).map(t => `<span class="theme-btn-secondary px-1.5 py-0.5 rounded-md text-[8px] truncate whitespace-nowrap max-w-[60px] inline-block">${t.trim()}</span>`).join('');
+                const tagChips = (p.tags || '').split(',').slice(0,2).map(t => `<span class="theme-btn-secondary px-1.5 py-0.5 rounded-md text-[8px] truncate whitespace-nowrap max-w-[60px] inline-block">${t.trim()}</span>`).join('');
                 card.innerHTML = `
                     ${adminControls}
                     <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100/20 mb-2 border border-slate-100">${badgesHTML}<img src="${p.image}" class="w-full h-full object-cover"></div>
@@ -1649,7 +1769,6 @@
 
         function deleteProduct(id) { if(confirm("แน่ใจหรือไม่ว่าต้องการลบสินค้านี้?")) db.ref('products/' + id).remove(); }
 
-        // ระบบลากวางสลับลำดับสินค้า (Drag & Drop)
         let dragSrcId = null;
         function handleDragStart(e) { dragSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
         function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
@@ -1699,7 +1818,6 @@
             return `${year}-${m}-${d}`;
         }
 
-        // วาดตารางปฏิทินมินิบนการ์ดหน้าโฮม
         function renderMiniCalendar() {
             const grid = document.getElementById('miniCalendarGrid');
             const monthLabel = document.getElementById('miniCalMonthLabel');
@@ -1776,7 +1894,6 @@
             renderFullCalendar();
         }
 
-        // วาดตารางปฏิทินเต็มในหน้าต่างป๊อปอัพ
         function renderFullCalendar() {
             const titleEl = document.getElementById('calModalMonthTitle');
             const grid = document.getElementById('fullCalendarGrid');
@@ -2123,7 +2240,6 @@
             }
         }
 
-        // ระบบลากวางสลับลำดับคิวงาน (Drag & Drop)
         let dragQueueSrcId = null;
         function handleQueueDragStart(e) { dragQueueSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
         function handleQueueDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
@@ -2427,7 +2543,6 @@
             }
         }
 
-        // ระบบลากวางสลับลำดับรีวิว (Drag & Drop)
         let dragRevSrcId = null;
         function handleReviewDragStart(e) { dragRevSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
         function handleReviewDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
@@ -2537,7 +2652,6 @@
             else openLoginWindow();
         }
 
-        // ระบบตรวจสอบรหัสผ่านแอดมิน (รหัสเริ่มต้น: 1234)
         function attemptLogin() {
             if(document.getElementById('adminPassword').value === '1234') {
                 isAdmin = true;
@@ -2558,7 +2672,6 @@
             } else alert("รหัสผ่านไม่ถูกต้อง");
         }
 
-        // ออกจากโหมดแอดมิน
         function logoutAdmin() {
             isAdmin = false;
             document.body.classList.remove('admin-active');
@@ -2574,7 +2687,6 @@
             filterReviews();
         }
 
-        // ตั้งค่าวงกลมเลือกสี Pickr ทั้ง 4 จุด
         const pickrConfig = {
             theme: 'nano', swatches: null,
             components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: true, input: true } }
@@ -2647,7 +2759,6 @@
             setTimeout(saveCurrentTheme, 100); 
         }
 
-        // ระบบคำนวณเฉดสีที่เข้ากันอัตโนมัติ (Smart Palette)
         let currentSuggested = {};
         function parseRGB(colorStr) {
             let r=0, g=0, b=0, a=1;
@@ -2865,6 +2976,7 @@
             if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); 
             renderMiniCalendar();
             updateShopOpenStatusUI();
+            renderSocialIcons();
         };
     </script>
 </body>
