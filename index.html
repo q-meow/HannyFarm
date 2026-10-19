@@ -2392,3 +2392,480 @@
             document.getElementById('reviewModalTitle').innerHTML = '<i class="fa-solid fa-pen theme-accent"></i> แก้ไขรีวิว';
             document.getElementById('reviewModal').classList.remove('hidden');
         }
+
+        function saveReview() {
+            const id = document.getElementById('revId').value;
+            const comment = document.getElementById('revComment').value.trim();
+            if (!comment) {
+                alert('กรุณาพิมพ์ข้อความรีวิวก่อนกดบันทึกนะคะ');
+                return;
+            }
+            const finalImage = uploadedRevBase64 || document.getElementById('revImage').value.trim() || '';
+            const today = new Date().toISOString().split('T')[0];
+
+            const reviewData = {
+                author: document.getElementById('revAuthor').value.trim() || 'ลูกค้าที่น่ารัก',
+                service: document.getElementById('revService').value.trim(),
+                comment: comment,
+                rating: selectedReviewRating,
+                image: finalImage
+            };
+
+            if (id) {
+                db.ref('reviews/' + id).update(reviewData);
+            } else {
+                reviewData.date = today;
+                reviewData.order = Date.now();
+                db.ref('reviews').push(reviewData);
+            }
+            document.getElementById('reviewModal').classList.add('hidden');
+        }
+
+        function deleteReview(id) {
+            if (confirm('ต้องการลบรีวิวนี้ใช่หรือไม่?')) {
+                db.ref('reviews/' + id).remove();
+            }
+        }
+
+        // ระบบลากวางสลับลำดับรีวิว (Drag & Drop)
+        let dragRevSrcId = null;
+        function handleReviewDragStart(e) { dragRevSrcId = this.dataset.id; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
+        function handleReviewDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); return false; }
+        function handleReviewDrop(e) {
+            e.stopPropagation();
+            const targetId = this.dataset.id;
+            if (dragRevSrcId && dragRevSrcId !== targetId) {
+                const srcItem = reviewsList.find(r => r.id === dragRevSrcId);
+                const targetItem = reviewsList.find(r => r.id === targetId);
+                if (srcItem && targetItem) {
+                    const tempOrder = srcItem.order;
+                    db.ref('reviews/' + dragRevSrcId).update({ order: targetItem.order });
+                    db.ref('reviews/' + targetId).update({ order: tempOrder });
+                }
+            }
+            return false;
+        }
+        function handleReviewDragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
+
+        // ==========================================
+        // 🎨 ระบบที่ 6: ระบบแต่งสีเว็บ + สวิตช์โหมด สว่าง/มืด (Light/Dark Mode)
+        // ==========================================
+        function updateModeSwitchUI() {
+            const btnLight = document.getElementById('btnLightMode');
+            const btnDark = document.getElementById('btnDarkMode');
+            const paletteLabel = document.getElementById('paletteLabel');
+            
+            document.body.classList.toggle('dark-mode', isDarkMode);
+
+            if(btnLight && btnDark) {
+                if(isDarkMode) {
+                    btnDark.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-btn-primary shadow-sm";
+                    btnLight.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-text-muted hover:opacity-100";
+                    if(paletteLabel) paletteLabel.innerText = "แนะนำเฉดสีที่เข้ากัน (โทนมืด)";
+                } else {
+                    btnLight.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-btn-primary shadow-sm";
+                    btnDark.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 theme-text-muted hover:opacity-100";
+                    if(paletteLabel) paletteLabel.innerText = "แนะนำเฉดสีที่เข้ากัน (โทนสว่าง)";
+                }
+            }
+        }
+
+        function setThemeMode(dark) {
+            isDarkMode = dark;
+            updateModeSwitchUI();
+            
+            const root = getComputedStyle(document.documentElement);
+            const currentAccent = root.getPropertyValue('--accent-color').trim();
+            generateSmartPalette(currentAccent);
+            applySuggestedPalette();
+        }
+
+        function loadLocalTheme() {
+            const saved = localStorage.getItem('myCuteSignActiveTheme');
+            if (saved) {
+                try {
+                    const theme = JSON.parse(saved);
+                    isDarkMode = !!theme.isDark;
+                    const bgToUse = (!isDarkMode && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
+                    const root = document.documentElement;
+                    root.style.setProperty('--bg-color', bgToUse);
+                    root.style.setProperty('--accent-color', theme.accent);
+                    root.style.setProperty('--accent-bg', theme.accentBg);
+                    root.style.setProperty('--text-main', theme.text);
+                    updateModeSwitchUI();
+                } catch(e) {}
+            }
+        }
+        loadLocalTheme(); 
+
+        db.ref('theme/active').on('value', (snapshot) => {
+            const theme = snapshot.val();
+            if (theme && document.getElementById('themeModal').classList.contains('hidden')) {
+                isDarkMode = !!theme.isDark;
+                const bgToUse = (!isDarkMode && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
+                const root = document.documentElement;
+                root.style.setProperty('--bg-color', bgToUse);
+                root.style.setProperty('--accent-color', theme.accent);
+                root.style.setProperty('--accent-bg', theme.accentBg);
+                root.style.setProperty('--text-main', theme.text);
+                updateModeSwitchUI();
+                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify({ ...theme, bg: bgToUse }));
+            }
+        });
+
+        db.ref('theme/active').once('value', (snapshot) => { if (!snapshot.exists()) saveCurrentTheme(); });
+
+        let saveTimeout;
+        function saveCurrentTheme() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                const root = getComputedStyle(document.documentElement);
+                const currentTheme = {
+                    bg: root.getPropertyValue('--bg-color').trim(),
+                    accent: root.getPropertyValue('--accent-color').trim(),
+                    accentBg: root.getPropertyValue('--accent-bg').trim(),
+                    text: root.getPropertyValue('--text-main').trim(),
+                    isDark: isDarkMode
+                };
+                localStorage.setItem('myCuteSignActiveTheme', JSON.stringify(currentTheme));
+                if(typeof db !== 'undefined') db.ref('theme/active').set(currentTheme).catch(err => console.log(err));
+            }, 150);
+        }
+
+        function settingsClicked() {
+            if(isAdmin) toggleThemeModal();
+            else openLoginWindow();
+        }
+
+        // ระบบตรวจสอบรหัสผ่านแอดมิน (รหัสเริ่มต้น: 1234)
+        function attemptLogin() {
+            if(document.getElementById('adminPassword').value === '1234') {
+                isAdmin = true;
+                document.body.classList.add('admin-active'); 
+                document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'true'));
+                document.getElementById('loginModal').classList.add('hidden');
+                
+                let btn = document.getElementById('openLoginBtn');
+                btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
+                btn.classList.remove('bg-white/80');
+                btn.classList.add('theme-btn-primary');
+                btn.style.color = "#ffffff";
+                
+                loadCustomThemes();
+                filterProducts();
+                filterQueues();
+                filterReviews();
+            } else alert("รหัสผ่านไม่ถูกต้อง");
+        }
+
+        // ออกจากโหมดแอดมิน
+        function logoutAdmin() {
+            isAdmin = false;
+            document.body.classList.remove('admin-active');
+            document.querySelectorAll('.editable-text').forEach(el => el.setAttribute('contenteditable', 'false'));
+            document.getElementById('themeModal').classList.add('hidden');
+            
+            let btn = document.getElementById('openLoginBtn');
+            btn.innerHTML = '<i class="fa-solid fa-lock text-[10px]"></i> ผู้ดูแล';
+            btn.className = "keep-white absolute top-4 right-4 z-20 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/50 hover:bg-white transition flex items-center gap-1.5";
+            btn.style.color = "#334155";
+            filterProducts();
+            filterQueues();
+            filterReviews();
+        }
+
+        // ตั้งค่าวงกลมเลือกสี Pickr ทั้ง 4 จุด
+        const pickrConfig = {
+            theme: 'nano', swatches: null,
+            components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: true, input: true } }
+        };
+
+        const pickrAccent = Pickr.create({ el: '#pickerAccent', default: '#3b82f6', ...pickrConfig });
+        const pickrBg = Pickr.create({ el: '#pickerBg', default: '#ffffff', ...pickrConfig });
+        const pickrAccentBg = Pickr.create({ el: '#pickerAccentBg', default: '#dbeafe', ...pickrConfig });
+        const pickrText = Pickr.create({ el: '#pickerText', default: '#334155', ...pickrConfig });
+
+        function updateRootColor(varName, pickrInstance, hexSpanId, runSmartPalette = false) {
+            const hexColor = pickrInstance.getColor().toHEXA().toString();
+            document.documentElement.style.setProperty(varName, hexColor);
+            if(document.getElementById(hexSpanId)) document.getElementById(hexSpanId).innerText = hexColor;
+            if(runSmartPalette) generateSmartPalette(hexColor);
+            saveCurrentTheme();
+        }
+
+        pickrAccent.on('change', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true)).on('changestop', () => updateRootColor('--accent-color', pickrAccent, 'hexColorAccent', true));
+        pickrBg.on('change', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg')).on('changestop', () => updateRootColor('--bg-color', pickrBg, 'hexColorBg'));
+        pickrAccentBg.on('change', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg')).on('changestop', () => updateRootColor('--accent-bg', pickrAccentBg, 'hexColorAccentBg'));
+        pickrText.on('change', () => updateRootColor('--text-main', pickrText, 'hexColorText')).on('changestop', () => updateRootColor('--text-main', pickrText, 'hexColorText'));
+
+        function toggleThemeModal() {
+            const modal = document.getElementById('themeModal');
+            if(modal.classList.contains('hidden')) {
+                updateModeSwitchUI();
+                syncPickersWithRoot(); 
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function syncPickersWithRoot() {
+            const root = getComputedStyle(document.documentElement);
+            const bg = root.getPropertyValue('--bg-color').trim();
+            const accent = root.getPropertyValue('--accent-color').trim();
+            const accentBg = root.getPropertyValue('--accent-bg').trim();
+            const text = root.getPropertyValue('--text-main').trim();
+
+            pickrBg.setColor(bg); pickrAccent.setColor(accent); pickrAccentBg.setColor(accentBg); pickrText.setColor(text);
+            
+            document.getElementById('hexColorBg').innerText = bg;
+            document.getElementById('hexColorAccent').innerText = accent;
+            document.getElementById('hexColorAccentBg').innerText = accentBg;
+            document.getElementById('hexColorText').innerText = text;
+            
+            generateSmartPalette(accent); 
+        }
+
+        function applyPresetWithMode(bg, accent, accentBg, text) {
+            if(isDarkMode) {
+                generateSmartPalette(accent);
+                applySuggestedPalette();
+            } else {
+                applyPresetTheme(bg, accent, accentBg, text, false);
+            }
+        }
+
+        function applyPresetTheme(bg, accent, accentBg, text, darkFlag = isDarkMode) {
+            isDarkMode = darkFlag;
+            updateModeSwitchUI();
+            const root = document.documentElement;
+            root.style.setProperty('--bg-color', bg);
+            root.style.setProperty('--accent-color', accent);
+            root.style.setProperty('--accent-bg', accentBg);
+            root.style.setProperty('--text-main', text);
+            syncPickersWithRoot(); 
+            setTimeout(saveCurrentTheme, 100); 
+        }
+
+        // ระบบคำนวณเฉดสีที่เข้ากันอัตโนมัติ (Smart Palette)
+        let currentSuggested = {};
+        function parseRGB(colorStr) {
+            let r=0, g=0, b=0, a=1;
+            if(colorStr.startsWith('rgba')) {
+                const parts = colorStr.match(/[\d.]+/g);
+                if(parts && parts.length >= 3) { r = parseInt(parts[0]); g = parseInt(parts[1]); b = parseInt(parts[2]); if(parts.length >= 4) a = parseFloat(parts[3]); }
+            } else if(colorStr.startsWith('rgb')) {
+                const parts = colorStr.match(/[\d.]+/g);
+                if(parts && parts.length >= 3) { r = parseInt(parts[0]); g = parseInt(parts[1]); b = parseInt(parts[2]); }
+            } else if(colorStr.startsWith('#')) {
+                let hex = colorStr.replace('#', '');
+                if(hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+                if(hex.length === 8) { r = parseInt(hex.substring(0,2), 16); g = parseInt(hex.substring(2,4), 16); b = parseInt(hex.substring(4,6), 16); a = parseInt(hex.substring(6,8), 16) / 255; }
+                else { r = parseInt(hex.substring(0,2), 16); g = parseInt(hex.substring(2,4), 16); b = parseInt(hex.substring(4,6), 16); }
+            }
+            return {r, g, b, a};
+        }
+
+        function RGBToHSL(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
+            if (delta == 0) h = 0; else if (cmax == r) h = ((g - b) / delta) % 6; else if (cmax == g) h = (b - r) / delta + 2; else h = (r - g) / delta + 4;
+            h = Math.round(h * 60); if (h < 0) h += 360; l = (cmax + cmin) / 2; s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            return {h, s: +(s * 100).toFixed(1), l: +(l * 100).toFixed(1)};
+        }
+
+        function HSLToHex(h, s, l) {
+            s /= 100; l /= 100;
+            let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; } else if (60 <= h && h < 120) { r = x; g = c; b = 0; } else if (120 <= h && h < 180) { r = 0; g = c; b = x; } else if (180 <= h && h < 240) { r = 0; g = x; b = c; } else if (240 <= h && h < 300) { r = x; g = 0; b = c; } else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+            r = Math.round((r + m) * 255); g = Math.round((g + m) * 255); b = Math.round((b + m) * 255);
+            return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
+        }
+
+        function generateSmartPalette(baseHex) {
+            const rgb = parseRGB(baseHex);
+            const hsl = RGBToHSL(rgb.r, rgb.g, rgb.b);
+            let textCol, accentBgCol, bgCol, accentCol = baseHex;
+
+            if (!isDarkMode) {
+                textCol = HSLToHex(hsl.h, hsl.s, Math.max(15, hsl.l - 30));
+                accentBgCol = HSLToHex(hsl.h, Math.min(75, hsl.s), 92);
+                bgCol = "#FFFFFF";
+            } else {
+                bgCol = HSLToHex(hsl.h, Math.min(35, hsl.s), 11);
+                accentBgCol = HSLToHex(hsl.h, Math.min(45, hsl.s), 22);
+                textCol = HSLToHex(hsl.h, Math.min(25, hsl.s), 93);
+            }
+            
+            currentSuggested = { text: textCol, accent: accentCol, accentBg: accentBgCol, bg: bgCol };
+
+            document.getElementById('suggestedPaletteContainer').innerHTML = `
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${textCol}" title="สีตัวอักษร"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${accentCol}" title="สีหลัก"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${accentBgCol}" title="สีพื้นหลังป้าย"></div>
+                <div class="flex-1 transition-colors duration-300" style="background-color: ${bgCol}" title="สีพื้นหลังเว็บ"></div>
+            `;
+        }
+
+        function applySuggestedPalette() { 
+            applyPresetTheme(currentSuggested.bg, currentSuggested.accent, currentSuggested.accentBg, currentSuggested.text, isDarkMode); 
+        }
+
+        function saveCustomTheme() {
+            const themeName = prompt("ตั้งชื่อธีมใหม่ของคุณ:");
+            if(!themeName) return;
+            const root = getComputedStyle(document.documentElement);
+            const newTheme = {
+                id: Date.now().toString(),
+                name: themeName,
+                bg: root.getPropertyValue('--bg-color').trim(),
+                accent: root.getPropertyValue('--accent-color').trim(),
+                accentBg: root.getPropertyValue('--accent-bg').trim(),
+                text: root.getPropertyValue('--text-main').trim(),
+                isDark: isDarkMode
+            };
+            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
+            savedThemes.push(newTheme);
+            localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
+            loadCustomThemes();
+        }
+
+        function loadCustomThemes() {
+            const container = document.getElementById('myThemesContainer');
+            let savedThemes = JSON.parse(localStorage.getItem('myCuteSignThemes')) || [];
+            if(savedThemes.length === 0) {
+                container.innerHTML = '<span class="text-[10px]">ยังไม่มีธีมที่บันทึกไว้</span>';
+                return;
+            }
+            container.innerHTML = ''; 
+            savedThemes.forEach(theme => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-1.5 rounded-full text-xs font-medium border shadow-sm transition flex items-center gap-1.5 theme-btn-secondary hover:opacity-80";
+                const modeIcon = theme.isDark ? '<i class="fa-solid fa-moon text-[9px] opacity-70"></i>' : '';
+                btn.innerHTML = `<div class="w-2 h-2 rounded-full shadow-inner" style="background-color: ${theme.accent}"></div> ${modeIcon} ${theme.name}`;
+                btn.onclick = () => {
+                    const bgToApply = (!theme.isDark && theme.bg && theme.bg.toUpperCase().startsWith('#ECB7BA')) ? '#FFFFFF' : theme.bg;
+                    applyPresetTheme(bgToApply, theme.accent, theme.accentBg, theme.text, !!theme.isDark);
+                };
+                
+                const delBtn = document.createElement('span');
+                delBtn.className = "text-[9px] theme-accent hover:text-red-500 ml-1";
+                delBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm(`ต้องการลบธีม "${theme.name}" ใช่หรือไม่?`)) {
+                        savedThemes = savedThemes.filter(t => t.id !== theme.id);
+                        localStorage.setItem('myCuteSignThemes', JSON.stringify(savedThemes));
+                        loadCustomThemes();
+                    }
+                };
+                btn.appendChild(delBtn);
+                container.appendChild(btn);
+            });
+        }
+
+        // ==========================================
+        // 🖼️ ระบบที่ 7: ระบบเปลี่ยนรูปหน้าโฮม (ปก, โปรไฟล์, เรทราคา)
+        // ==========================================
+        function onModalUrlInput() {
+            const url = document.getElementById('modalInput').value.trim();
+            uploadedModalBase64 = '';
+            document.getElementById('modalFile').value = '';
+            document.getElementById('modalInput').placeholder = 'https://...';
+
+            const previewBox = document.getElementById('modalImagePreviewBox');
+            const previewImg = document.getElementById('modalImagePreview');
+            if (url) {
+                previewImg.src = url;
+                previewBox.classList.remove('hidden');
+            } else {
+                previewBox.classList.add('hidden');
+            }
+        }
+
+        function handleModalFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 900;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > h && w > maxDim) {
+                        h = Math.round(h * (maxDim / w));
+                        w = maxDim;
+                    } else if (h > maxDim) {
+                        w = Math.round(w * (maxDim / h));
+                        h = maxDim;
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    uploadedModalBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+                    const urlInput = document.getElementById('modalInput');
+                    urlInput.value = '';
+                    urlInput.placeholder = 'อัปโหลดรูปจากเครื่องแล้ว ✓';
+
+                    document.getElementById('modalImagePreview').src = uploadedModalBase64;
+                    document.getElementById('modalImagePreviewBox').classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearModalImage() {
+            uploadedModalBase64 = '';
+            document.getElementById('modalFile').value = '';
+            const urlInput = document.getElementById('modalInput');
+            urlInput.value = '';
+            urlInput.placeholder = 'https://...';
+            document.getElementById('modalImagePreview').src = '';
+            document.getElementById('modalImagePreviewBox').classList.add('hidden');
+        }
+
+        function editImage(imgId, title) {
+            if(!isAdmin) return; 
+            currentTargetId = imgId;
+            document.getElementById('inputModalTitle').innerText = title;
+            clearModalImage();
+
+            const currentSrc = document.getElementById(imgId).src;
+            if (currentSrc && currentSrc.startsWith('data:image')) {
+                uploadedModalBase64 = currentSrc;
+                document.getElementById('modalInput').placeholder = 'ใช้รูปที่อัปโหลดไว้ ✓';
+                document.getElementById('modalImagePreview').src = currentSrc;
+                document.getElementById('modalImagePreviewBox').classList.remove('hidden');
+            } else if (currentSrc) {
+                document.getElementById('modalInput').value = currentSrc;
+                document.getElementById('modalImagePreview').src = currentSrc;
+                document.getElementById('modalImagePreviewBox').classList.remove('hidden');
+            }
+
+            document.getElementById('inputModal').classList.remove('hidden');
+            document.getElementById('saveInputBtn').onclick = function() {
+                const finalImg = uploadedModalBase64 || document.getElementById('modalInput').value.trim();
+                if(finalImg) {
+                    document.getElementById(currentTargetId).src = finalImg;
+                    db.ref('shopImages/' + currentTargetId).set(finalImg);
+                }
+                document.getElementById('inputModal').classList.add('hidden');
+            };
+        }
+
+        // เริ่มต้นการทำงานเมื่อโหลดหน้าเว็บเสร็จ
+        window.onload = () => { 
+            if(localStorage.getItem('myCuteSignThemes')) loadCustomThemes(); 
+            renderMiniCalendar();
+            updateShopOpenStatusUI();
+        };
+    </script>
+</body>
+</html>
