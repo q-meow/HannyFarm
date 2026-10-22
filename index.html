@@ -1291,7 +1291,10 @@
                     กดเพิ่มบล็อกที่ต้องการ แล้วลากแถบหัวบล็อกไปวางคั่นตรงไหนของหน้าโฮมก็ได้เลย!
                 </p>
                 <div class="flex flex-wrap justify-center gap-2">
-                    <button onclick="openCustomBlockModal('text')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
+                    <button onclick="openCustomBlockModal('card', 'home')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
+                        <i class="fa-solid fa-id-card text-purple-500"></i> + การ์ดรายละเอียด/รูป/ปุ่ม
+                    </button>
+                    <button onclick="openCustomBlockModal('text', 'home')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
                         <i class="fa-solid fa-font text-pink-500"></i> + ตัวหนังสือคั่น/ป้ายวิ่ง
                     </button>
                     <button onclick="openCustomBlockModal('gallery')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
@@ -1311,7 +1314,7 @@
     <!-- ========================================== -->
     <!-- 📦 หน้าที่ 2: หน้ารายการสินค้า (PRODUCTS) -->
     <!-- ========================================== -->
-    <div id="productsSection" class="hidden px-5 pt-8 min-h-screen relative z-10">
+    <div id="productsSection" class="hidden px-5 pt-14 min-h-screen relative z-10">
         <h2 class="text-2xl font-bold mb-4" style="color: var(--text-main)">หมวดหมู่สินค้า</h2>
         
         <div class="relative mb-4">
@@ -1338,7 +1341,7 @@
     <!-- ========================================== -->
     <!-- 📋 หน้าที่ 3: หน้าเช็คคิวงาน (QUEUE) -->
     <!-- ========================================== -->
-    <div id="queueSection" class="hidden px-5 pt-8 min-h-screen relative z-10">
+    <div id="queueSection" class="hidden px-5 pt-14 min-h-screen relative z-10">
         <div class="mb-4 flex justify-between items-start">
             <div>
                 <h2 class="text-2xl font-bold flex items-center gap-2" style="color: var(--text-main)">
@@ -1393,7 +1396,7 @@
     <!-- ========================================== -->
     <!-- ⭐🎁 หน้าที่ 4: หน้ารีวิว & สะสมแต้ม (REVIEWS & LOYALTY STAMP CARD) -->
     <!-- ========================================== -->
-    <div id="reviewsSection" class="hidden px-5 pt-8 min-h-screen relative z-10">
+    <div id="reviewsSection" class="hidden px-5 pt-14 min-h-screen relative z-10">
         <!-- แถบสลับโหมดด้านบน: รีวิวลูกค้า VS บัตรสะสมแต้ม -->
         <div class="p-1.5 rounded-2xl flex items-center gap-1.5 mb-5 surface-card">
             <button type="button" id="subTabBtnReviews" onclick="switchReviewLoyaltySubTab('reviews')" class="flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all theme-btn-primary shadow-sm">
@@ -1518,15 +1521,16 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 🧮💳⚙️ หน้าที่ 5: ศูนย์บริการลูกค้า เช็คราคา & ตั้งค่า (SERVICE HUB & SETTINGS) -->
+    <!-- 🧮💳⚙️ หน้าที่ 5: ศูนย์บริการลูกค้า เช็คราคา & ตั้งค่า (ปรับแต่งและยกย้ายวางได้อิสระเหมือนหน้าโฮม) -->
     <!-- ========================================== -->
-    <div id="serviceHubSection" class="hidden px-5 pt-8 min-h-screen relative z-10 pb-14">
+    <div id="serviceHubSection" class="hidden px-5 pt-14 min-h-screen relative z-10 pb-14">
         <div class="mb-4 flex items-start justify-between gap-2">
-            <div>
+            <div class="min-w-0 flex-1">
                 <h2 class="text-2xl font-bold flex items-center gap-2" style="color: var(--text-main)">
-                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-color)"></i> เช็คราคา & บริการลูกค้า
+                    <i class="fa-solid fa-wand-magic-sparkles shrink-0" style="color: var(--accent-color)"></i>
+                    <span id="serviceHubTitle" onblur="saveServiceHubText()" class="editable-text" contenteditable="false">เช็คราคา & บริการลูกค้า</span>
                 </h2>
-                <p class="text-xs mt-1" style="color: var(--text-main); opacity: 0.75;">
+                <p id="serviceHubSubtitle" onblur="saveServiceHubText()" class="text-xs mt-1 editable-text" contenteditable="false" style="color: var(--text-main); opacity: 0.75;">
                     คำนวณราคาป้ายเบื้องต้น คัดลอกเลขบัญชีชำระเงิน และจัดการตั้งค่าร้าน
                 </p>
             </div>
@@ -1535,85 +1539,189 @@
             </button>
         </div>
 
-        <!-- 1. โปรแกรมคำนวณราคาป้ายอัตโนมัติ (Interactive Sign Price Calculator) -->
-        <div class="surface-card rounded-3xl p-4 mb-4 space-y-3.5">
-            <div class="flex items-center justify-between">
-                <h3 class="font-bold text-sm flex items-center gap-1.5" style="color: var(--accent-color)">
-                    <i class="fa-solid fa-calculator"></i> 1. คำนวณราคาสั่งทำป้ายเบื้องต้น
-                </h3>
-                <button onclick="openCalcConfigModal()" class="admin-only keep-white px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold hover:bg-amber-100 transition items-center gap-1">
-                    <i class="fa-solid fa-pen"></i> แก้ไขเรทคำนวณ
-                </button>
+        <!-- คำแนะนำการยกย้ายวางเมื่ออยู่ในโหมดแก้ไข (เหมือนหน้าโฮมในภาพ 3) -->
+        <div class="admin-block-only mb-4">
+            <div class="px-3.5 py-2.5 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] flex items-center justify-between shadow-lg">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-up-down-left-right text-amber-300"></i>
+                    <span><b>โหมดจัดวางอิสระ:</b> แตะค้างที่แถบหัวบล็อก <i class="fa-solid fa-grip-vertical mx-0.5"></i> เพื่อยกย้ายสลับตำแหน่ง หรือแตะข้อความกรอบประเพื่อแก้ไขได้เลย</span>
+                </span>
             </div>
-            <p class="text-[11px] opacity-75">ติ๊กเลือกรายการที่ต้องการเพื่อให้ระบบประเมินราคาเบื้องต้น แล้วกดส่งเข้าแชทแม่ค้าได้เลยค่ะ</p>
+        </div>
 
-            <div id="priceCalculatorItemsContainer" class="space-y-2"></div>
+        <!-- 🖐️ พื้นที่รวมทุกโซนในหน้าเช็คราคา/บริการ ที่สามารถ "ยกย้ายวาง (Drag & Drop)" และซ่อน/แสดงได้อิสระ -->
+        <div id="serviceSortableContainer" class="space-y-5">
 
-            <div class="p-3.5 rounded-2xl theme-btn-secondary flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] block opacity-80">ยอดประเมินเบื้องต้น</span>
-                    <span class="text-xl font-bold" style="color: var(--accent-color)">฿<span id="calcTotalPrice">0</span></span>
+            <!-- โซนหลักที่ 1: โปรแกรมคำนวณราคาป้ายอัตโนมัติ -->
+            <div id="section-srv-calc" data-section-id="srv-calc" class="home-draggable-section">
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-900/80 backdrop-blur-md text-white text-[10px]">
+                    <div class="srv-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold">โซนหลัก: คำนวณราคาป้าย (ลากย้ายได้)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="nudgeServiceSection('srv-calc', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeServiceSection('srv-calc', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button id="visBtn-srv-calc" onclick="toggleServiceCoreVisibility('srv-calc')" class="px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="ซ่อน/แสดงโซนนี้"><i class="fa-solid fa-eye"></i></button>
+                    </div>
                 </div>
-                <button type="button" onclick="sendCalcQuoteToInbox()" class="px-4 py-2.5 rounded-xl text-xs font-bold shadow-md theme-btn-primary hover:opacity-90 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-paper-plane"></i> ส่งใบประเมินเข้าแชทร้าน
-                </button>
-            </div>
-        </div>
 
-        <!-- 2. ช่องทางชำระเงิน & คัดลอกเลขบัญชี (Payment & QR Code) -->
-        <div class="surface-card rounded-3xl p-4 mb-4 space-y-3">
-            <div class="flex items-center justify-between">
-                <h3 class="font-bold text-sm flex items-center gap-1.5" style="color: var(--accent-color)">
-                    <i class="fa-solid fa-building-columns"></i> 2. ช่องทางชำระเงิน / แจ้งโอน
-                </h3>
-                <button onclick="openPaymentConfigModal()" class="admin-only keep-white px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold hover:bg-amber-100 transition items-center gap-1">
-                    <i class="fa-solid fa-pen"></i> แก้ไขบัญชี/QR
-                </button>
-            </div>
+                <div id="content-srv-calc" class="surface-card rounded-3xl p-4 space-y-3.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <h3 class="font-bold text-sm flex items-center gap-1.5" style="color: var(--accent-color)">
+                            <i class="fa-solid fa-calculator shrink-0"></i>
+                            <span id="srvCalcTitle" onblur="saveServiceHubText()" class="editable-text" contenteditable="false">1. คำนวณราคาสั่งทำป้ายเบื้องต้น</span>
+                        </h3>
+                        <button onclick="openCalcConfigModal()" class="admin-only keep-white px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold hover:bg-amber-100 transition items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-pen"></i> แก้ไขเรทคำนวณ
+                        </button>
+                    </div>
+                    <p id="srvCalcDesc" onblur="saveServiceHubText()" class="text-[11px] opacity-75 editable-text" contenteditable="false">ติ๊กเลือกรายการที่ต้องการเพื่อให้ระบบประเมินราคาเบื้องต้น แล้วกดส่งเข้าแชทแม่ค้าได้เลยค่ะ</p>
 
-            <div class="p-3.5 rounded-2xl theme-box flex items-center justify-between gap-2">
-                <div class="min-w-0">
-                    <span id="payBankName" class="text-[11px] font-bold block" style="color: var(--accent-color)">ธนาคารกสิกรไทย (KBank) / พร้อมเพย์</span>
-                    <span id="payAccountNumber" class="text-base font-bold tracking-wider block mt-0.5">123-4-56789-0</span>
-                    <span id="payAccountOwner" class="text-[11px] opacity-75 block mt-0.5">ชื่อบัญชี: ร้านป้ายน่ารัก สตูดิโอ</span>
+                    <div id="priceCalculatorItemsContainer" class="space-y-2"></div>
+
+                    <div class="p-3.5 rounded-2xl theme-btn-secondary flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] block opacity-80">ยอดประเมินเบื้องต้น</span>
+                            <span class="text-xl font-bold" style="color: var(--accent-color)">฿<span id="calcTotalPrice">0</span></span>
+                        </div>
+                        <button type="button" onclick="sendCalcQuoteToInbox()" class="px-4 py-2.5 rounded-xl text-xs font-bold shadow-md theme-btn-primary hover:opacity-90 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-paper-plane"></i> ส่งใบประเมินเข้าแชทร้าน
+                        </button>
+                    </div>
                 </div>
-                <button type="button" onclick="copyPaymentAccount()" class="px-3.5 py-2 rounded-xl text-xs font-bold theme-btn-primary shadow-sm shrink-0 flex items-center gap-1.5">
-                    <i class="fa-regular fa-copy"></i> คัดลอกเลขบัญชี
-                </button>
             </div>
 
-            <div id="payQrWrapper" class="text-center pt-1">
-                <p class="text-[10px] opacity-70 mb-1.5">แตะที่ QR Code เพื่อขยายใหญ่ หรือแนบสลิปแจ้งโอนในปุ่ม Inbox แชทร้านได้เลยค่ะ</p>
-                <img id="payQrImg" src="" onclick="openLightbox(this.src)" class="w-36 h-36 object-contain rounded-2xl mx-auto border border-white/80 bg-white p-2 shadow-sm cursor-zoom-in" alt="QR รับเงิน">
+            <!-- โซนหลักที่ 2: ช่องทางชำระเงิน & คัดลอกเลขบัญชี -->
+            <div id="section-srv-payment" data-section-id="srv-payment" class="home-draggable-section">
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-900/80 backdrop-blur-md text-white text-[10px]">
+                    <div class="srv-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold">โซนหลัก: ช่องทางชำระเงิน & QR (ลากย้ายได้)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="nudgeServiceSection('srv-payment', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeServiceSection('srv-payment', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button id="visBtn-srv-payment" onclick="toggleServiceCoreVisibility('srv-payment')" class="px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="ซ่อน/แสดงโซนนี้"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div id="content-srv-payment" class="surface-card rounded-3xl p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <h3 class="font-bold text-sm flex items-center gap-1.5" style="color: var(--accent-color)">
+                            <i class="fa-solid fa-building-columns shrink-0"></i>
+                            <span id="srvPayTitle" onblur="saveServiceHubText()" class="editable-text" contenteditable="false">2. ช่องทางชำระเงิน / แจ้งโอน</span>
+                        </h3>
+                        <button onclick="openPaymentConfigModal()" class="admin-only keep-white px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold hover:bg-amber-100 transition items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-pen"></i> แก้ไขบัญชี/QR
+                        </button>
+                    </div>
+
+                    <div class="p-3.5 rounded-2xl theme-box flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <span id="payBankName" class="text-[11px] font-bold block" style="color: var(--accent-color)">ธนาคารกสิกรไทย (KBank) / พร้อมเพย์</span>
+                            <span id="payAccountNumber" class="text-base font-bold tracking-wider block mt-0.5">123-4-56789-0</span>
+                            <span id="payAccountOwner" class="text-[11px] opacity-75 block mt-0.5">ชื่อบัญชี: ร้านป้ายน่ารัก สตูดิโอ</span>
+                        </div>
+                        <button type="button" onclick="copyPaymentAccount()" class="px-3.5 py-2 rounded-xl text-xs font-bold theme-btn-primary shadow-sm shrink-0 flex items-center gap-1.5">
+                            <i class="fa-regular fa-copy"></i> คัดลอกเลขบัญชี
+                        </button>
+                    </div>
+
+                    <div id="payQrWrapper" class="text-center pt-1">
+                        <p id="srvPayDesc" onblur="saveServiceHubText()" class="text-[10px] opacity-70 mb-1.5 editable-text" contenteditable="false">แตะที่ QR Code เพื่อขยายใหญ่ หรือแนบสลิปแจ้งโอนในปุ่ม Inbox แชทร้านได้เลยค่ะ</p>
+                        <img id="payQrImg" src="" onclick="openLightbox(this.src)" class="w-36 h-36 object-contain rounded-2xl mx-auto border border-white/80 bg-white p-2 shadow-sm cursor-zoom-in" alt="QR รับเงิน">
+                    </div>
+                </div>
             </div>
+
+            <!-- โซนหลักที่ 3: แบบฟอร์มส่งบรีฟงานด่วนเข้า Inbox -->
+            <div id="section-srv-brief" data-section-id="srv-brief" class="home-draggable-section">
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-900/80 backdrop-blur-md text-white text-[10px]">
+                    <div class="srv-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold">โซนหลัก: ฟอร์มส่งบรีฟงานด่วน (ลากย้ายได้)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="nudgeServiceSection('srv-brief', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeServiceSection('srv-brief', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button id="visBtn-srv-brief" onclick="toggleServiceCoreVisibility('srv-brief')" class="px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="ซ่อน/แสดงโซนนี้"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div id="content-srv-brief" class="surface-card rounded-3xl p-4 space-y-2.5">
+                    <h3 class="font-bold text-sm flex items-center gap-1.5" style="color: var(--accent-color)">
+                        <i class="fa-solid fa-clipboard-check shrink-0"></i>
+                        <span id="srvBriefTitle" onblur="saveServiceHubText()" class="editable-text" contenteditable="false">3. แบบฟอร์มส่งบรีฟงานด่วนเข้า Inbox</span>
+                    </h3>
+                    <p id="srvBriefDesc" onblur="saveServiceHubText()" class="text-[11px] opacity-75 editable-text" contenteditable="false">กรอกรายละเอียดงานคร่าวๆ แล้วกดส่งเข้าห้องแชทส่วนตัวเพื่อคุยกับแม่ค้าต่อได้ทันที</p>
+                    <input type="text" id="quickBriefType" placeholder="ประเภทป้ายที่ต้องการ (เช่น ป้ายบัญชี / โลโก้ / ป้ายไวนิล)" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
+                    <input type="text" id="quickBriefTone" placeholder="โทนสี / สไตล์ที่ชอบ (เช่น ชมพูพาสเทล นุ้บนิ้บ มีน้องแมว)" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
+                    <textarea id="quickBriefDetail" rows="2" placeholder="ข้อความที่ต้องการใส่ในป้าย หรือรายละเอียดเพิ่มเติม..." class="w-full rounded-xl px-3 py-2 text-xs theme-input resize-none"></textarea>
+                    <button type="button" onclick="sendQuickBriefToInbox()" class="w-full py-2.5 rounded-xl text-xs font-bold shadow-md theme-btn-primary hover:opacity-90 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-comments"></i> ส่งบรีฟนี้เข้าห้องแชท Inbox แม่ค้า
+                    </button>
+                </div>
+            </div>
+
+            <!-- โซนหลักที่ 4: แผงตั้งค่าระบบสำหรับเจ้าของร้าน -->
+            <div id="section-srv-admin" data-section-id="srv-admin" class="home-draggable-section">
+                <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-900/80 backdrop-blur-md text-white text-[10px]">
+                    <div class="srv-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                        <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
+                        <span class="font-semibold">โซนหลัก: แผงทางลัดผู้ดูแล & แต่งธีม (ลากย้ายได้)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="nudgeServiceSection('srv-admin', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="nudgeServiceSection('srv-admin', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button id="visBtn-srv-admin" onclick="toggleServiceCoreVisibility('srv-admin')" class="px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="ซ่อน/แสดงโซนนี้"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div id="content-srv-admin" class="surface-card rounded-3xl p-4 space-y-2.5">
+                    <h3 class="font-bold text-xs flex items-center gap-1.5 opacity-85">
+                        <i class="fa-solid fa-sliders"></i> สำหรับเจ้าของร้าน (Admin Settings)
+                    </h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="settingsClicked()" class="py-2.5 px-3 rounded-2xl text-xs font-bold theme-btn-secondary flex items-center justify-center gap-1.5 hover:opacity-85 transition">
+                            <i class="fa-solid fa-palette"></i> ตกแต่งธีมเว็บ
+                        </button>
+                        <button type="button" onclick="openInboxModal()" class="py-2.5 px-3 rounded-2xl text-xs font-bold theme-btn-secondary flex items-center justify-center gap-1.5 hover:opacity-85 transition">
+                            <i class="fa-solid fa-inbox"></i> ศูนย์รวมแชทลูกค้า
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- บล็อกและการ์ดเสริมที่แอดมินสร้างเพิ่มในหน้านี้ จะถูกแทรกและเรียงลำดับอยู่ใน #serviceSortableContainer โดยอัตโนมัติ -->
         </div>
 
-        <!-- 3. ส่งบรีฟงานด่วนเข้า Inbox (Quick Order Brief Form) -->
-        <div class="surface-card rounded-3xl p-4 mb-4 space-y-2.5">
-            <h3 class="font-bold text-sm flex items-center gap-1.5" style="color: var(--accent-color)">
-                <i class="fa-solid fa-clipboard-check"></i> 3. แบบฟอร์มส่งบรีฟงานด่วนเข้า Inbox
-            </h3>
-            <p class="text-[11px] opacity-75">กรอกรายละเอียดงานคร่าวๆ แล้วกดส่งเข้าห้องแชทส่วนตัวเพื่อคุยกับแม่ค้าต่อได้ทันที</p>
-            <input type="text" id="quickBriefType" placeholder="ประเภทป้ายที่ต้องการ (เช่น ป้ายบัญชี / โลโก้ / ป้ายไวนิล)" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
-            <input type="text" id="quickBriefTone" placeholder="โทนสี / สไตล์ที่ชอบ (เช่น ชมพูพาสเทล นุ้บนิ้บ มีน้องแมว)" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
-            <textarea id="quickBriefDetail" rows="2" placeholder="ข้อความที่ต้องการใส่ในป้าย หรือรายละเอียดเพิ่มเติม..." class="w-full rounded-xl px-3 py-2 text-xs theme-input resize-none"></textarea>
-            <button type="button" onclick="sendQuickBriefToInbox()" class="w-full py-2.5 rounded-xl text-xs font-bold shadow-md theme-btn-primary hover:opacity-90 transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-comments"></i> ส่งบรีฟนี้เข้าห้องแชท Inbox แม่ค้า
-            </button>
-        </div>
-
-        <!-- 4. แผงตั้งค่าระบบสำหรับเจ้าของร้าน (Admin & Theme Quick Access) -->
-        <div class="surface-card rounded-3xl p-4 space-y-2.5">
-            <h3 class="font-bold text-xs flex items-center gap-1.5 opacity-85">
-                <i class="fa-solid fa-Sliders"></i> สำหรับเจ้าของร้าน (Admin Settings)
-            </h3>
-            <div class="grid grid-cols-2 gap-2">
-                <button type="button" onclick="settingsClicked()" class="py-2.5 px-3 rounded-2xl text-xs font-bold theme-btn-secondary flex items-center justify-center gap-1.5 hover:opacity-85 transition">
-                    <i class="fa-solid fa-palette"></i> ตกแต่งธีมเว็บ
-                </button>
-                <button type="button" onclick="openInboxModal()" class="py-2.5 px-3 rounded-2xl text-xs font-bold theme-btn-secondary flex items-center justify-center gap-1.5 hover:opacity-85 transition">
-                    <i class="fa-solid fa-inbox"></i> ศูนย์รวมแชทลูกค้า
-                </button>
+        <!-- แผงควบคุมการเพิ่มบล็อก/การ์ด/รูปภาพ/ปุ่มลิงก์ ในหน้าเช็คราคา & บริการลูกค้า (แสดงเฉพาะโหมดแก้ไข) -->
+        <div class="admin-block-only mt-6 mb-8">
+            <div class="p-4 rounded-3xl border-2 border-dashed text-center space-y-3 transition surface-card" style="border-color: var(--accent-color);">
+                <div class="text-xs font-bold flex items-center justify-center gap-1.5" style="color: var(--accent-color)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> แต่งหน้าเช็คราคา/บริการเพิ่มเติม (เพิ่มแล้วลากย้ายไปวางจุดไหนก็ได้)
+                </div>
+                <p class="text-[10px] opacity-80" style="color: var(--text-main)">
+                    เพิ่มการ์ดรายละเอียด รูปภาพ กล่องพับอ่าน หรือปุ่มลิงก์ทางลัด แล้วลากสลับตำแหน่งได้อิสระเหมือนหน้าโฮมเลยค่ะ!
+                </p>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button onclick="openCustomBlockModal('card', 'service')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
+                        <i class="fa-solid fa-id-card text-purple-500"></i> + การ์ดรายละเอียด/รูป/ปุ่ม
+                    </button>
+                    <button onclick="openCustomBlockModal('text', 'service')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
+                        <i class="fa-solid fa-font text-pink-500"></i> + ตัวหนังสือคั่น/ป้ายวิ่ง
+                    </button>
+                    <button onclick="openCustomBlockModal('gallery', 'service')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
+                        <i class="fa-solid fa-images text-blue-500"></i> + แถบโชว์รูปภาพ
+                    </button>
+                    <button onclick="openCustomBlockModal('faq', 'service')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
+                        <i class="fa-solid fa-circle-question text-amber-500"></i> + กล่องพับอ่าน (Q&A)
+                    </button>
+                    <button onclick="openCustomBlockModal('button', 'service')" class="keep-white px-3 py-2 bg-white/85 rounded-2xl text-[11px] font-bold shadow-sm hover:scale-105 transition flex items-center gap-1.5 text-slate-700 border border-white">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-emerald-500"></i> + ปุ่มลิงก์ทางลัด
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1645,7 +1753,7 @@
             <i class="fa-solid fa-star text-xl"></i><span class="text-[9px] font-medium whitespace-nowrap">รีวิว สะสมแต้ม</span>
         </button>
         <button onclick="switchTab('service')" class="flex flex-col items-center gap-1 transition w-[19%] pb-1 hover:opacity-75">
-            <i class="fa-solid fa-calculator text-xl"></i><span class="text-[10px] font-medium">เช็คราคา/ตั้งค่า</span>
+            <i class="fa-solid fa-calculator text-xl"></i><span class="text-[10px] font-medium">รายละเอียดราคา</span>
         </button>
     </nav>
 
@@ -1948,16 +2056,51 @@
             <p class="text-[11px] theme-text-muted mb-4">เพิ่มแล้วสามารถลากย้ายวางสลับตำแหน่งบนหน้าโฮมได้อิสระ</p>
 
             <input type="hidden" id="cbId">
+            <input type="hidden" id="cbTargetPage" value="home">
 
             <div class="space-y-3.5">
                 <div>
-                    <label class="text-[11px] font-bold mb-1 block theme-text">ประเภทบล็อก</label>
+                    <label class="text-[11px] font-bold mb-1 block theme-text">ประเภทบล็อก / การ์ดที่ต้องการเพิ่ม</label>
                     <select id="cbCategorySelect" onchange="onCustomBlockCategoryChange()" class="w-full rounded-xl px-3 py-2 text-xs font-medium theme-input">
+                        <option value="card">🗂️ การ์ดรายละเอียดอิสระ (หัวข้อ + เนื้อหา + รูปภาพ + ปุ่มลิงก์)</option>
                         <option value="text">🎀 ตัวหนังสือคั่น / แถบข้อความวิ่ง / กล่องประกาศ</option>
-                        <option value="gallery">🖼️ แถบโชว์รูปภาพ (เลื่อนซ้าย-ขวา / ตาราง 3x3 / 2x2)</option>
+                        <option value="gallery">🖼️ แถบโชว์รูปภาพ (เลื่อนซ้าย-ขวา / ตาราง 3x3 / 2x2 / แบนเนอร์)</option>
                         <option value="faq">💬 กล่องข้อมูลพับเปิด-ปิดได้ (Q&A / กฎร้าน)</option>
                         <option value="button">🔗 ปุ่มลิงก์ทางลัด (กดไปลิงก์ภายนอก/กลุ่ม)</option>
                     </select>
+                </div>
+
+                <!-- 0. ตั้งค่าสำหรับบล็อก "การ์ดรายละเอียดอิสระ (Card + Image + Button)" -->
+                <div id="cbCardConfigSection" class="hidden space-y-2.5">
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">หัวข้อการ์ด *</label>
+                        <input type="text" id="cbCardTitle" placeholder="เช่น 📌 เงื่อนไขการรับงานด่วน / โปรโมชั่นพิเศษ" class="w-full rounded-xl px-3 py-2 text-xs theme-input">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">รายละเอียด / เนื้อหาในการ์ด</label>
+                        <textarea id="cbCardBody" rows="3" placeholder="ใส่รายละเอียด คำอธิบาย หรือขั้นตอนต่างๆ ได้อิสระ..." class="w-full rounded-xl px-3 py-2 text-xs theme-input resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold mb-1 block theme-text">รูปภาพประกอบในการ์ด (วางลิงก์ หรือ เลือกรูป - เว้นว่างได้)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="cbCardImgUrl" oninput="onCbCardUrlInput()" placeholder="https://..." class="flex-1 rounded-xl px-3 py-2 text-xs theme-input">
+                            <label class="cursor-pointer px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1 shrink-0 theme-btn-secondary hover:opacity-80">
+                                <i class="fa-solid fa-image"></i> เลือกรูป
+                                <input type="file" id="cbCardImgFile" accept="image/*" class="hidden" onchange="handleCbCardFileSelect(event)">
+                            </label>
+                        </div>
+                        <div id="cbCardImgPreviewBox" class="hidden mt-2 relative w-full h-28 rounded-2xl overflow-hidden border border-white/70 bg-white/40">
+                            <img id="cbCardImgPreview" src="" class="w-full h-full object-cover">
+                            <button type="button" onclick="clearCbCardImg()" class="keep-white absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs shadow">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-2xl theme-box space-y-2">
+                        <label class="text-[10px] font-bold block theme-text-muted">ปุ่มลิงก์ทางลัดท้ายการ์ด (เว้นว่างได้หากไม่ต้องการปุ่ม)</label>
+                        <input type="text" id="cbCardBtnLabel" placeholder="ข้อความบนปุ่ม เช่น คลิกดูตัวอย่างเพิ่มเติม" class="w-full rounded-xl px-3 py-1.5 text-xs theme-input">
+                        <input type="text" id="cbCardBtnUrl" placeholder="ลิงก์ปลายทาง https://..." class="w-full rounded-xl px-3 py-1.5 text-xs theme-input">
+                    </div>
                 </div>
 
                 <!-- 1. ตั้งค่าสำหรับบล็อกข้อความ/ตัวหนังสือคั่น -->
@@ -3090,40 +3233,63 @@
             initOrUpdateHomeSortable();
         }
 
-        // สร้าง HTML สำหรับบล็อกเสริมแต่ละชิ้น พร้อมแถบจับลาก (Drag Handle)
-        function createCustomBlockElement(block, sectionId) {
+        // สร้าง HTML สำหรับบล็อกเสริมแต่ละชิ้น พร้อมแถบจับลาก (รองรับทั้งหน้าโฮมและหน้าเช็คราคา/บริการ)
+        function createCustomBlockElement(block, sectionId, pageContext = 'home') {
             const wrapper = document.createElement('div');
             wrapper.id = 'section-' + sectionId;
             wrapper.setAttribute('data-section-id', sectionId);
             wrapper.className = 'home-draggable-section custom-dynamic-section';
 
             const typeLabelMap = {
+                card: 'การ์ดรายละเอียด/รูป/ปุ่ม',
                 text: 'ตัวหนังสือ/ประกาศ',
                 gallery: 'แถบโชว์รูปภาพ',
                 faq: 'กล่องพับอ่าน Q&A',
                 button: 'ปุ่มลิงก์ทางลัด'
             };
             const typeLabel = typeLabelMap[block.category] || 'บล็อกเสริม';
+            const handleClass = pageContext === 'service' ? 'srv-drag-handle' : 'section-drag-handle';
+            const nudgeFn = pageContext === 'service' ? 'nudgeServiceSection' : 'nudgeSection';
 
             const adminBar = `
                 <div class="admin-flex-only items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-slate-900/80 backdrop-blur-md text-white text-[10px]">
-                    <div class="section-drag-handle flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
+                    <div class="${handleClass} flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 py-0.5">
                         <i class="fa-solid fa-grip-vertical text-amber-300 text-xs"></i>
                         <span class="font-semibold truncate max-w-[150px]">บล็อก: ${typeLabel} (ลากย้ายได้)</span>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                        <button onclick="nudgeSection('${sectionId}', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
-                        <button onclick="nudgeSection('${sectionId}', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
-                        <button onclick="editCustomBlock('${block.id}')" class="px-2 py-0.5 rounded bg-blue-500 hover:bg-blue-600"><i class="fa-solid fa-pen"></i> แก้ไข</button>
-                        <button onclick="deleteCustomBlock('${block.id}')" class="px-2 py-0.5 rounded bg-red-500 hover:bg-red-600"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="${nudgeFn}('${sectionId}', -1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="${nudgeFn}('${sectionId}', 1)" class="px-1.5 py-0.5 rounded bg-white/15 hover:bg-white/25" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button onclick="editCustomBlock('${block.id}', '${pageContext}')" class="px-2 py-0.5 rounded bg-blue-500 hover:bg-blue-600"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                        <button onclick="deleteCustomBlock('${block.id}', '${pageContext}')" class="px-2 py-0.5 rounded bg-red-500 hover:bg-red-600"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
             `;
 
             let contentHTML = '';
 
+            // 0. บล็อกการ์ดรายละเอียดอิสระ (หัวข้อ + เนื้อหา + รูปภาพ + ปุ่มลิงก์)
+            if (block.category === 'card') {
+                let btnHref = (block.btnUrl || '').trim();
+                if (btnHref && !/^https?:\/\//i.test(btnHref)) btnHref = 'https://' + btnHref;
+                contentHTML = `
+                    <div class="surface-card rounded-3xl p-4 space-y-2.5">
+                        ${block.title ? `<h3 class="font-bold text-sm flex items-center gap-1.5" style="color: var(--accent-color)"><i class="fa-solid fa-sparkles text-xs"></i><span>${block.title}</span></h3>` : ''}
+                        ${block.image ? `<div class="rounded-2xl overflow-hidden border border-white/70 bg-white/40"><img src="${block.image}" onclick="openLightbox('${block.image}')" class="w-full max-h-56 object-cover cursor-zoom-in"></div>` : ''}
+                        ${block.subtitle ? `<p class="text-xs leading-relaxed whitespace-pre-line opacity-85" style="color: var(--text-main)">${block.subtitle}</p>` : ''}
+                        ${(block.btnLabel && btnHref) ? `
+                            <div class="pt-1">
+                                <a href="${btnHref}" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition hover:opacity-90 theme-btn-primary">
+                                    <span>${block.btnLabel}</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
             // 1. บล็อกตัวหนังสือคั่น / แถบข้อความวิ่ง / กล่องประกาศ
-            if (block.category === 'text') {
+            else if (block.category === 'text') {
                 const style = block.style || 'divider';
                 if (style === 'divider') {
                     contentHTML = `
@@ -3532,19 +3698,62 @@
         }
 
         // ==========================================
-        // ✨ การจัดการ Modal เพิ่ม/แก้ไขบล็อกตกแต่งหน้าโฮม
+        // ✨ การจัดการ Modal เพิ่ม/แก้ไขบล็อกตกแต่ง (รองรับทั้งหน้าโฮม และหน้าเช็คราคา/บริการ)
         // ==========================================
+        let uploadedCbCardImgBase64 = '';
+
+        function onCbCardUrlInput() {
+            const url = document.getElementById('cbCardImgUrl').value.trim();
+            uploadedCbCardImgBase64 = '';
+            document.getElementById('cbCardImgFile').value = '';
+            if (url) {
+                document.getElementById('cbCardImgPreview').src = url;
+                document.getElementById('cbCardImgPreviewBox').classList.remove('hidden');
+            } else {
+                document.getElementById('cbCardImgPreviewBox').classList.add('hidden');
+            }
+        }
+
+        async function handleCbCardFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                uploadedCbCardImgBase64 = await compressImageFileToBase64(file, 850, 0.84);
+                document.getElementById('cbCardImgUrl').value = '';
+                document.getElementById('cbCardImgPreview').src = uploadedCbCardImgBase64;
+                document.getElementById('cbCardImgPreviewBox').classList.remove('hidden');
+            } catch (e) { console.log(e); }
+        }
+
+        function clearCbCardImg() {
+            uploadedCbCardImgBase64 = '';
+            document.getElementById('cbCardImgFile').value = '';
+            document.getElementById('cbCardImgUrl').value = '';
+            document.getElementById('cbCardImgPreview').src = '';
+            document.getElementById('cbCardImgPreviewBox').classList.add('hidden');
+        }
+
         function onCustomBlockCategoryChange() {
             const cat = document.getElementById('cbCategorySelect').value;
+            const cardSec = document.getElementById('cbCardConfigSection');
+            if (cardSec) cardSec.classList.toggle('hidden', cat !== 'card');
             document.getElementById('cbTextConfigSection').classList.toggle('hidden', cat !== 'text');
             document.getElementById('cbGalleryConfigSection').classList.toggle('hidden', cat !== 'gallery');
             document.getElementById('cbFaqConfigSection').classList.toggle('hidden', cat !== 'faq');
             document.getElementById('cbButtonConfigSection').classList.toggle('hidden', cat !== 'button');
         }
 
-        function openCustomBlockModal(defaultCat = 'text') {
+        function openCustomBlockModal(defaultCat = 'text', targetPage = 'home') {
             document.getElementById('cbId').value = '';
+            document.getElementById('cbTargetPage').value = targetPage;
             document.getElementById('cbCategorySelect').value = defaultCat;
+
+            document.getElementById('cbCardTitle').value = '';
+            document.getElementById('cbCardBody').value = '';
+            document.getElementById('cbCardBtnLabel').value = '';
+            document.getElementById('cbCardBtnUrl').value = '';
+            clearCbCardImg();
+
             document.getElementById('cbTextStyleSelect').value = 'divider';
             document.getElementById('cbTextTitle').value = '';
             document.getElementById('cbTextSub').value = '';
@@ -3562,19 +3771,37 @@
             document.getElementById('cbBtnUrl').value = '';
 
             onCustomBlockCategoryChange();
-            document.getElementById('customBlockModalTitle').innerHTML = '<i class="fa-solid fa-wand-magic-sparkles theme-accent mr-1"></i> เพิ่มบล็อกตกแต่งหน้าโฮม';
+            const pageLabel = targetPage === 'service' ? 'หน้าเช็คราคา/บริการ' : 'หน้าโฮม';
+            document.getElementById('customBlockModalTitle').innerHTML = `<i class="fa-solid fa-wand-magic-sparkles theme-accent mr-1"></i> เพิ่มบล็อก/การ์ด (${pageLabel})`;
             document.getElementById('customBlockModal').classList.remove('hidden');
         }
 
-        function editCustomBlock(id) {
-            const b = customHomeBlocks.find(x => x.id === id);
+        function editCustomBlock(id, targetPage = 'home') {
+            const sourceList = targetPage === 'service' ? customServiceBlocks : customHomeBlocks;
+            const b = sourceList.find(x => x.id === id);
             if (!b) return;
 
             document.getElementById('cbId').value = b.id;
+            document.getElementById('cbTargetPage').value = targetPage;
             document.getElementById('cbCategorySelect').value = b.category || 'text';
             onCustomBlockCategoryChange();
 
-            if (b.category === 'text') {
+            if (b.category === 'card') {
+                document.getElementById('cbCardTitle').value = b.title || '';
+                document.getElementById('cbCardBody').value = b.subtitle || '';
+                document.getElementById('cbCardBtnLabel').value = b.btnLabel || '';
+                document.getElementById('cbCardBtnUrl').value = b.btnUrl || '';
+                clearCbCardImg();
+                if (b.image) {
+                    if (b.image.startsWith('data:')) {
+                        uploadedCbCardImgBase64 = b.image;
+                    } else {
+                        document.getElementById('cbCardImgUrl').value = b.image;
+                    }
+                    document.getElementById('cbCardImgPreview').src = b.image;
+                    document.getElementById('cbCardImgPreviewBox').classList.remove('hidden');
+                }
+            } else if (b.category === 'text') {
                 document.getElementById('cbTextStyleSelect').value = b.style || 'divider';
                 document.getElementById('cbTextTitle').value = b.title || '';
                 document.getElementById('cbTextSub').value = b.subtitle || '';
@@ -3591,7 +3818,7 @@
                 document.getElementById('cbBtnUrl').value = b.url || '';
             }
 
-            document.getElementById('customBlockModalTitle').innerHTML = '<i class="fa-solid fa-pen theme-accent mr-1"></i> แก้ไขบล็อกหน้าโฮม';
+            document.getElementById('customBlockModalTitle').innerHTML = '<i class="fa-solid fa-pen theme-accent mr-1"></i> แก้ไขบล็อก/การ์ด';
             document.getElementById('customBlockModal').classList.remove('hidden');
         }
 
@@ -3653,10 +3880,24 @@
 
         function saveCustomHomeBlock() {
             const id = document.getElementById('cbId').value;
+            const targetPage = document.getElementById('cbTargetPage').value || 'home';
             const category = document.getElementById('cbCategorySelect').value;
             let blockData = { category };
 
-            if (category === 'text') {
+            if (category === 'card') {
+                const title = document.getElementById('cbCardTitle').value.trim();
+                const body = document.getElementById('cbCardBody').value.trim();
+                const img = uploadedCbCardImgBase64 || document.getElementById('cbCardImgUrl').value.trim();
+                if (!title && !body && !img) {
+                    showGlassToast('กรุณากรอกหัวข้อ รายละเอียด หรือเลือกรูปภาพอย่างน้อย 1 อย่างนะคะ');
+                    return;
+                }
+                blockData.title = title;
+                blockData.subtitle = body;
+                blockData.image = img || '';
+                blockData.btnLabel = document.getElementById('cbCardBtnLabel').value.trim();
+                blockData.btnUrl = document.getElementById('cbCardBtnUrl').value.trim();
+            } else if (category === 'text') {
                 const title = document.getElementById('cbTextTitle').value.trim();
                 if (!title) { showGlassToast('กรุณากรอกข้อความหลักก่อนกดบันทึกนะคะ'); return; }
                 blockData.style = document.getElementById('cbTextStyleSelect').value;
@@ -3680,25 +3921,208 @@
                 blockData.url = url;
             }
 
+            const dbBlocksPath = targetPage === 'service' ? 'serviceCustomBlocks' : 'homeCustomBlocks';
+            const dbLayoutPath = targetPage === 'service' ? 'serviceLayoutConfig/order' : 'homeLayoutConfig/order';
+            const currentOrderList = targetPage === 'service' ? (serviceLayoutConfig.order || []) : (homeLayoutConfig.order || []);
+            const secPrefix = targetPage === 'service' ? 'srv-custom-' : 'custom-';
+
             if (id) {
-                db.ref('homeCustomBlocks/' + id).update(blockData);
+                db.ref(dbBlocksPath + '/' + id).update(blockData);
             } else {
                 blockData.order = Date.now();
-                const newRef = db.ref('homeCustomBlocks').push();
+                const newRef = db.ref(dbBlocksPath).push();
                 newRef.set(blockData).then(() => {
-                    const newSecId = 'custom-' + newRef.key;
-                    const updatedOrder = [...(homeLayoutConfig.order || []), newSecId];
-                    db.ref('homeLayoutConfig/order').set(updatedOrder);
+                    const newSecId = secPrefix + newRef.key;
+                    const updatedOrder = [...currentOrderList, newSecId];
+                    db.ref(dbLayoutPath).set(updatedOrder);
                 });
             }
             document.getElementById('customBlockModal').classList.add('hidden');
+            showGlassToast('บันทึกบล็อกเรียบร้อยค่ะ ✨');
         }
 
-        function deleteCustomBlock(id) {
-            db.ref('homeCustomBlocks/' + id).remove();
-            const secId = 'custom-' + id;
-            const filteredOrder = (homeLayoutConfig.order || []).filter(x => x !== secId);
-            db.ref('homeLayoutConfig/order').set(filteredOrder);
+        function deleteCustomBlock(id, targetPage = 'home') {
+            if (targetPage === 'service') {
+                db.ref('serviceCustomBlocks/' + id).remove();
+                const secId = 'srv-custom-' + id;
+                const filteredOrder = (serviceLayoutConfig.order || []).filter(x => x !== secId);
+                db.ref('serviceLayoutConfig/order').set(filteredOrder);
+            } else {
+                db.ref('homeCustomBlocks/' + id).remove();
+                const secId = 'custom-' + id;
+                const filteredOrder = (homeLayoutConfig.order || []).filter(x => x !== secId);
+                db.ref('homeLayoutConfig/order').set(filteredOrder);
+            }
+            showGlassToast('ลบบล็อกเรียบร้อยค่ะ');
+        }
+
+        // ==========================================
+        // 🖐️ ระบบจัดการโครงสร้างหน้าเช็คราคา & บริการลูกค้า (#serviceSortableContainer)
+        // ให้ยกย้ายวาง ซ่อน/แสดง แก้ไขข้อความ และเพิ่มบล็อกได้เหมือนหน้าโฮมทุกประการ
+        // ==========================================
+        let serviceLayoutConfig = {
+            order: ['srv-calc', 'srv-payment', 'srv-brief', 'srv-admin'],
+            hidden: {}
+        };
+        let customServiceBlocks = [];
+        let serviceSortableInstance = null;
+
+        db.ref('serviceLayoutConfig').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if (val) {
+                serviceLayoutConfig = {
+                    order: Array.isArray(val.order) ? val.order : ['srv-calc', 'srv-payment', 'srv-brief', 'srv-admin'],
+                    hidden: val.hidden || {}
+                };
+            }
+            applyServiceUnifiedLayout();
+        });
+
+        db.ref('serviceCustomBlocks').orderByChild('order').on('value', (snapshot) => {
+            customServiceBlocks = [];
+            snapshot.forEach(child => {
+                customServiceBlocks.push({ id: child.key, ...child.val() });
+            });
+            applyServiceUnifiedLayout();
+        });
+
+        db.ref('serviceHubText').on('value', (snapshot) => {
+            const txt = snapshot.val();
+            if (!txt) return;
+            const fields = ['serviceHubTitle', 'serviceHubSubtitle', 'srvCalcTitle', 'srvCalcDesc', 'srvPayTitle', 'srvPayDesc', 'srvBriefTitle', 'srvBriefDesc'];
+            fields.forEach(fid => {
+                const el = document.getElementById(fid);
+                if (el && txt[fid] && document.activeElement !== el) {
+                    el.innerText = txt[fid];
+                }
+            });
+        });
+
+        function saveServiceHubText() {
+            if (!isAdmin) return;
+            const fields = ['serviceHubTitle', 'serviceHubSubtitle', 'srvCalcTitle', 'srvCalcDesc', 'srvPayTitle', 'srvPayDesc', 'srvBriefTitle', 'srvBriefDesc'];
+            const data = {};
+            fields.forEach(fid => {
+                const el = document.getElementById(fid);
+                if (el) data[fid] = el.innerText.trim();
+            });
+            db.ref('serviceHubText').set(data);
+        }
+
+        function applyServiceUnifiedLayout() {
+            const container = document.getElementById('serviceSortableContainer');
+            if (!container) return;
+
+            container.querySelectorAll('.custom-dynamic-section').forEach(el => el.remove());
+
+            customServiceBlocks.forEach((block) => {
+                const sectionId = 'srv-custom-' + block.id;
+                const el = createCustomBlockElement(block, sectionId, 'service');
+                container.appendChild(el);
+            });
+
+            ['srv-calc', 'srv-payment', 'srv-brief', 'srv-admin'].forEach(coreId => {
+                const secEl = document.getElementById('section-' + coreId);
+                const contentEl = document.getElementById('content-' + coreId);
+                const visBtn = document.getElementById('visBtn-' + coreId);
+                if (!secEl || !contentEl) return;
+
+                const isHidden = !!(serviceLayoutConfig.hidden && serviceLayoutConfig.hidden[coreId]);
+                if (isHidden) {
+                    if (isAdmin) {
+                        secEl.classList.remove('hidden');
+                        contentEl.classList.add('opacity-40');
+                    } else {
+                        secEl.classList.add('hidden');
+                    }
+                    if (visBtn) {
+                        visBtn.className = 'px-2 py-0.5 rounded bg-rose-500 text-white';
+                        visBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> ซ่อนอยู่';
+                    }
+                } else {
+                    secEl.classList.remove('hidden');
+                    contentEl.classList.remove('opacity-40');
+                    if (visBtn) {
+                        visBtn.className = 'px-2 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white';
+                        visBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+                    }
+                }
+            });
+
+            const allChildren = Array.from(container.children);
+            const mapById = {};
+            allChildren.forEach(ch => {
+                const sid = ch.getAttribute('data-section-id');
+                if (sid) mapById[sid] = ch;
+            });
+
+            (serviceLayoutConfig.order || []).forEach(sid => {
+                if (mapById[sid]) {
+                    container.appendChild(mapById[sid]);
+                    delete mapById[sid];
+                }
+            });
+            Object.keys(mapById).forEach(sid => {
+                container.appendChild(mapById[sid]);
+            });
+
+            initOrUpdateServiceSortable();
+        }
+
+        function initOrUpdateServiceSortable() {
+            const container = document.getElementById('serviceSortableContainer');
+            if (!container || typeof Sortable === 'undefined') return;
+
+            if (serviceSortableInstance) {
+                serviceSortableInstance.option('disabled', !isAdmin);
+                return;
+            }
+
+            serviceSortableInstance = Sortable.create(container, {
+                handle: '.srv-drag-handle',
+                animation: 220,
+                disabled: !isAdmin,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                onEnd: function () {
+                    saveCurrentServiceDOMOrder();
+                }
+            });
+        }
+
+        function saveCurrentServiceDOMOrder() {
+            const container = document.getElementById('serviceSortableContainer');
+            if (!container) return;
+            const newOrder = Array.from(container.children)
+                .map(el => el.getAttribute('data-section-id'))
+                .filter(Boolean);
+            serviceLayoutConfig.order = newOrder;
+            db.ref('serviceLayoutConfig/order').set(newOrder);
+        }
+
+        function nudgeServiceSection(sectionId, delta) {
+            const container = document.getElementById('serviceSortableContainer');
+            if (!container) return;
+            const children = Array.from(container.children);
+            const idx = children.findIndex(el => el.getAttribute('data-section-id') === sectionId);
+            if (idx === -1) return;
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= children.length) return;
+
+            if (delta < 0) {
+                container.insertBefore(children[idx], children[targetIdx]);
+            } else {
+                container.insertBefore(children[targetIdx], children[idx]);
+            }
+            saveCurrentServiceDOMOrder();
+        }
+
+        function toggleServiceCoreVisibility(coreId) {
+            const currentHidden = !!(serviceLayoutConfig.hidden && serviceLayoutConfig.hidden[coreId]);
+            if (!serviceLayoutConfig.hidden) serviceLayoutConfig.hidden = {};
+            serviceLayoutConfig.hidden[coreId] = !currentHidden;
+            db.ref('serviceLayoutConfig/hidden').set(serviceLayoutConfig.hidden);
         }
 
         // ==========================================
@@ -4186,7 +4610,7 @@
                 document.getElementById('adminPassword').value = '';
                 document.getElementById('adminPassword').focus();
             } else {
-                toggleThemeModal(); 
+                logoutAdmin();
             }
         }
 
@@ -6200,9 +6624,9 @@
                 document.getElementById('loginModal').classList.add('hidden');
                 
                 let btn = document.getElementById('openLoginBtn');
-                btn.innerHTML = '<i class="fa-solid fa-pen text-[10px]"></i> โหมดแก้ไข';
+                btn.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i> ออกจากระบบ';
                 btn.classList.remove('bg-white/75');
-                btn.classList.add('theme-btn-primary');
+                btn.classList.add('bg-rose-500', 'text-white', 'border-rose-400');
                 btn.style.color = "#ffffff";
                 
                 loadCustomThemes();
@@ -6213,6 +6637,7 @@
                 updateInboxUnreadBadges();
                 renderPortfolioSection();
                 applyHomeUnifiedLayout();
+                applyServiceUnifiedLayout();
                 showGlassToast('เข้าสู่ระบบโหมดแก้ไขเรียบร้อย');
             } else {
                 showGlassToast('รหัสผ่านไม่ถูกต้อง (รหัสคือ 1234)');
@@ -6234,6 +6659,9 @@
             filterReviews();
             renderPortfolioSection();
             applyHomeUnifiedLayout();
+            applyServiceUnifiedLayout();
+            updateInboxUnreadBadges();
+            renderLoyaltyMembersList();
             showGlassToast('ออกจากโหมดผู้ดูแลแล้ว');
         }
 
@@ -7465,6 +7893,7 @@
             renderPaymentInfo();
             updateInboxUnreadBadges();
             applyHomeUnifiedLayout();
+            applyServiceUnifiedLayout();
         };
     </script>
 </body>
